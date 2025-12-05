@@ -26,7 +26,3 @@ git clone https://github.com/hannahro15/Musical-Themed-Candy-Crush.git
 - HTML5
 - CSS3
 - JavaScript
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
