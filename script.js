@@ -4,6 +4,9 @@ const heading = document.querySelector('h1');
 const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
 
+// Define musical types
+const notes = ['🎵', '🎶', '🎸', '🎹', '🎻', '🎷', '🎺', '🥁'];
+
 // Handle play button click
 playBtn.addEventListener('click', () => {
     heading.classList.add('hidden');
@@ -19,7 +22,9 @@ function generateGameBoard(rows, cols) {
         for (let j = 0; j < cols; j++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.textContent = `${i},${j}`;
+            cell.textContent = notes[Math.floor(Math.random() * notes.length)];
+            cell.dataset.row = i;
+            cell.dataset.col = j;
             gameBoard.appendChild(cell);
         }
     }
