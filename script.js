@@ -39,7 +39,7 @@ function handleDragOver(e) {
 
 function handleDrop(e) {
     e.preventDefault();
-    if (e.target.classList.contains('cell') && draggedCell) {
+    if (e.target.classList.contains('cell') && draggedCell && areAdjacent(draggedCell, e.target)) {
         [e.target.textContent, draggedCell.textContent] = [draggedCell.textContent, e.target.textContent];
         draggedCell = null;
     }
@@ -70,4 +70,11 @@ function generateGameBoard(rows, cols) {
             gameBoard.appendChild(cell);
         }
     }
+}
+
+function areAdjacent(cell1, cell2) {
+    const rowDiff = Math.abs(cell1.dataset.row - cell2.dataset.row);
+    const colDiff = Math.abs(cell1.dataset.col - cell2.dataset.col);
+    
+    return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
 }
