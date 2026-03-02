@@ -78,3 +78,79 @@ function areAdjacent(cell1, cell2) {
     
     return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
 }
+function matchForThree() {
+    const cells = Array.from(gameBoard.children);
+    const rows = BOARD_SIZE;
+    const cols = BOARD_SIZE;
+    let matches = [];
+
+    // Check horizontal matches
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols - 2; c++) {
+            const cell1 = cells[r * cols + c];
+            const cell2 = cells[r * cols + c + 1];
+            const cell3 = cells[r * cols + c + 2];
+            if (cell1.textContent === cell2.textContent && cell2.textContent === cell3.textContent) {
+                matches.push(cell1, cell2, cell3);
+            }
+        }
+    }
+
+    // Check vertical matches
+    for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows - 2; r++) {
+            const cell1 = cells[r * cols + c];
+            const cell2 = cells[(r + 1) * cols + c];
+            const cell3 = cells[(r + 2) * cols + c];
+            if (cell1.textContent === cell2.textContent && cell2.textContent === cell3.textContent) {
+                matches.push(cell1, cell2, cell3);
+            }
+        }
+    }
+
+    return matches;
+}
+
+// Function to clear matched cells and refill the board
+function clearMatches() {
+    const matches = matchForThree();
+    if (matches.length === 0) return false;
+
+    matches.forEach(cell => {
+        cell.textContent = '';
+    });
+
+    refillBoard();
+    return true;
+}
+
+function refillBoard() {
+    const cells = Array.from(gameBoard.children);
+    const rows = BOARD_SIZE;
+    const cols = BOARD_SIZE;
+
+    for (let c = 0; c < cols; c++) {
+        let emptyCells = [];
+        for (let r = rows - 1; r >= 0; r--) {
+            const cell = cells[r * cols + c];
+            if (cell.textContent === '') {
+                emptyCells.push(cell);
+            } else if (emptyCells.length > 0) {
+                const emptyCell = emptyCells.shift();
+                emptyCell.textContent = cell.textContent;
+                cell.textContent = '';
+                emptyCells.push(cell);
+            }
+        }
+
+        // Fill empty cells at the top
+        emptyCells.forEach(cell => {
+            cell.textContent = getRandomSymbol();
+        });
+    }
+}
+
+// Continuously check for matches after each move
+setInterval(() => {
+    while (clearMatches()) {}
+}, 1000);   

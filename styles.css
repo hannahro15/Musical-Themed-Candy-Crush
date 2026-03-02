@@ -56,10 +56,3 @@ body {
 #gameBoard .cell {
     background-color: lightgray;
 }
-
-.cell.selected {
-    background-color: #ffd700;
-    border: 3px solid #ff6b00;
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
-}
