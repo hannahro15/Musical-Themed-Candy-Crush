@@ -40,7 +40,14 @@ function handleDragOver(e) {
 function handleDrop(e) {
     e.preventDefault();
     if (e.target.classList.contains('cell') && draggedCell && areAdjacent(draggedCell, e.target)) {
+        // Swap the candies
         [e.target.textContent, draggedCell.textContent] = [draggedCell.textContent, e.target.textContent];
+        
+        // Check if the swap creates a match
+        if (!clearMatches()) {
+            // No match found, swap back
+            [e.target.textContent, draggedCell.textContent] = [draggedCell.textContent, e.target.textContent];
+        }
         draggedCell = null;
     }
 }
@@ -148,9 +155,13 @@ function refillBoard() {
             cell.textContent = getRandomSymbol();
         });
     }
-}
+}  
 
-// Continuously check for matches after each move
-setInterval(() => {
-    while (clearMatches()) {}
-}, 1000);   
+function handleDrop() {
+    //swap candies
+    swapCandies(draggedCell, targetCell);
+    // check for matches with clearmatches()
+    // if not match found, swap back
+    // if matches found, process them and refill the board
+    clearMatches();
+}
