@@ -197,17 +197,45 @@ function updateMovesDisplay() {
 
 function getRandomSymbol() {
     return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+// Pick a random symbol that won't form a 3-in-a-row match at (row, col)
+// given the partially-filled grid built so far.
+function safeSymbol(grid, row, col) {
+    const forbidden = new Set();
+
+    // Horizontal: two cells to the left are identical → forbid that symbol
+    if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) {
+        forbidden.add(grid[row][col - 1]);
+    }
+
+    // Vertical: two cells above are identical → forbid that symbol
+    if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) {
+        forbidden.add(grid[row - 1][col]);
+    }
+
+    const available = forbidden.size > 0 ? SYMBOLS.filter(s => !forbidden.has(s)) : SYMBOLS;
+    const pool = available.length > 0 ? available : SYMBOLS;
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // Function to generate the game board
 function generateGameBoard(rows, cols) {
     gameBoard.innerHTML = '';
 
+    // Build a 2-D symbol grid with no pre-existing 3+ matches
+    const grid = [];
+    for (let i = 0; i < rows; i++) {
+        grid[i] = [];
+        for (let j = 0; j < cols; j++) {
+            grid[i][j] = safeSymbol(grid, i, j);
+        }
+    }
+
+    // Create DOM cells from the pre-validated grid
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.textContent = getRandomSymbol();
+            cell.textContent = grid[i][j];
             cell.dataset.row = i;
             cell.dataset.col = j;
             cell.draggable = true;
