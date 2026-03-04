@@ -1,9 +1,9 @@
 // Get DOM elements
-const playBtn = document.getElementById('playBtn');
-const heading = document.querySelector('h1');
-const menu = document.querySelector('.menu');
-const gameBoard = document.getElementById('gameBoard');
-const movesDisplay = document.getElementById('movesDisplay');
+let playBtn;
+let heading;
+let menu;
+let gameBoard;
+let movesDisplay;
 
 // Game configuration
 const SYMBOLS = ['🎵', '🎶', '🎸', '🎹', '🎻', '🎷', '🎺', '🥁'];
@@ -16,22 +16,47 @@ const gameState = {
     isResolving: false,
 };
 let draggedCell = null;
+let isInitialized = false;
+
+function cacheDomElements() {
+    playBtn = document.getElementById('playBtn');
+    heading = document.querySelector('h1');
+    menu = document.querySelector('.menu');
+    gameBoard = document.getElementById('gameBoard');
+    movesDisplay = document.getElementById('movesDisplay');
+}
 
 // Initialize event listeners
-if (playBtn) {
-    playBtn.addEventListener('click', handlePlayClick);
+function initGame() {
+    if (isInitialized) return;
+    cacheDomElements();
+
+    if (playBtn) {
+        playBtn.addEventListener('click', handlePlayClick);
+    }
+    if (gameBoard) {
+        gameBoard.addEventListener('dragstart', handleDragStart);
+        gameBoard.addEventListener('dragover', handleDragOver);
+        gameBoard.addEventListener('drop', handleDrop);
+    }
+
+    isInitialized = true;
 }
-if (gameBoard) {
-    gameBoard.addEventListener('dragstart', handleDragStart);
-    gameBoard.addEventListener('dragover', handleDragOver);
-    gameBoard.addEventListener('drop', handleDrop);
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGame);
+} else {
+    initGame();
 }
 
 // Event handler functions
 function handlePlayClick() {
+    cacheDomElements();
+    if (!gameBoard) return;
+
     if (heading) heading.classList.add('hidden');
     if (menu) menu.classList.add('hidden');
-    if (gameBoard) gameBoard.classList.remove('hidden');
+    gameBoard.classList.remove('hidden');
     if (movesDisplay) {
         movesDisplay.classList.remove('hidden');
     }
