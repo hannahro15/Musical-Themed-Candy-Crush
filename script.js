@@ -197,6 +197,8 @@ function updateMovesDisplay() {
 
 function getRandomSymbol() {
     return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+}
+
 // Pick a random symbol that won't form a 3-in-a-row match at (row, col)
 // given the partially-filled grid built so far.
 function safeSymbol(grid, row, col) {
