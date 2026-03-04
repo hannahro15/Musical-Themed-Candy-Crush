@@ -18,17 +18,23 @@ const gameState = {
 let draggedCell = null;
 
 // Initialize event listeners
-playBtn.addEventListener('click', handlePlayClick);
-gameBoard.addEventListener('dragstart', handleDragStart);
-gameBoard.addEventListener('dragover', handleDragOver);
-gameBoard.addEventListener('drop', handleDrop);
+if (playBtn) {
+    playBtn.addEventListener('click', handlePlayClick);
+}
+if (gameBoard) {
+    gameBoard.addEventListener('dragstart', handleDragStart);
+    gameBoard.addEventListener('dragover', handleDragOver);
+    gameBoard.addEventListener('drop', handleDrop);
+}
 
 // Event handler functions
 function handlePlayClick() {
-    heading.classList.add('hidden');
-    menu.classList.add('hidden');
-    gameBoard.classList.remove('hidden');
-    movesDisplay.classList.remove('hidden');
+    if (heading) heading.classList.add('hidden');
+    if (menu) menu.classList.add('hidden');
+    if (gameBoard) gameBoard.classList.remove('hidden');
+    if (movesDisplay) {
+        movesDisplay.classList.remove('hidden');
+    }
 
     if (gameBoard.children.length === 0) {
         gameState.movesLeft = INITIAL_MOVES;
@@ -190,6 +196,7 @@ function applyGravity() {
 // ── UI helpers ────────────────────────────────────────────────────────────────
 
 function updateMovesDisplay() {
+    if (!movesDisplay) return;
     movesDisplay.textContent = `Moves: ${gameState.movesLeft}`;
 }
 
