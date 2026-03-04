@@ -63,3 +63,16 @@ body {
     transform: scale(1.05);
     box-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
 }
+
+.cell.matched {
+    background-color: #ff6b6b;
+    transform: scale(1.15);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+#movesDisplay {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
