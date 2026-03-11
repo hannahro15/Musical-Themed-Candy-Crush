@@ -1,14 +1,14 @@
-// Get DOM elements
-let playBtn;
-let heading;
-let menu;
-let gameBoard;
-let movesDisplay;
-
 // Game configuration
 const SYMBOLS = ['🎵', '🎶', '🎸', '🎹', '🎻', '🎷', '🎺', '🥁'];
 const BOARD_SIZE = 8;
 const INITIAL_MOVES = 20;
+
+// DOM elements — script runs after <body>, so these are available immediately
+const playBtn = document.getElementById('playBtn');
+const heading = document.querySelector('h1');
+const menu = document.querySelector('.menu');
+const gameBoard = document.getElementById('gameBoard');
+const movesDisplay = document.getElementById('movesDisplay');
 
 // Game state
 const gameState = {
@@ -16,55 +16,26 @@ const gameState = {
     isResolving: false,
 };
 let draggedCell = null;
-let isInitialized = false;
 
-function cacheDomElements() {
-    playBtn = document.getElementById('playBtn');
-    heading = document.querySelector('h1');
-    menu = document.querySelector('.menu');
-    gameBoard = document.getElementById('gameBoard');
-    movesDisplay = document.getElementById('movesDisplay');
-}
+// ── Setup ─────────────────────────────────────────────────────────────────────
 
-// Initialize event listeners
-function initGame() {
-    if (isInitialized) return;
-    cacheDomElements();
+playBtn.addEventListener('click', handlePlayClick);
+gameBoard.addEventListener('dragstart', handleDragStart);
+gameBoard.addEventListener('dragover', e => e.preventDefault());
+gameBoard.addEventListener('drop', handleDrop);
 
-    if (playBtn) {
-        playBtn.addEventListener('click', handlePlayClick);
-    }
-    if (gameBoard) {
-        gameBoard.addEventListener('dragstart', handleDragStart);
-        gameBoard.addEventListener('dragover', handleDragOver);
-        gameBoard.addEventListener('drop', handleDrop);
-    }
+// ── Event handlers ───────────────────────────────────────────────────────────
 
-    isInitialized = true;
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGame);
-} else {
-    initGame();
-}
-
-// Event handler functions
 function handlePlayClick() {
-    cacheDomElements();
-    if (!gameBoard) return;
-
-    if (heading) heading.classList.add('hidden');
-    if (menu) menu.classList.add('hidden');
+    heading.classList.add('hidden');
+    menu.classList.add('hidden');
     gameBoard.classList.remove('hidden');
-    if (movesDisplay) {
-        movesDisplay.classList.remove('hidden');
-    }
+    movesDisplay.classList.remove('hidden');
 
     if (gameBoard.children.length === 0) {
         gameState.movesLeft = INITIAL_MOVES;
         updateMovesDisplay();
-        generateGameBoard(BOARD_SIZE, BOARD_SIZE);
+        generateGameBoard();
     }
 }
 
@@ -74,34 +45,25 @@ function handleDragStart(e) {
     draggedCell = e.target;
 }
 
-function handleDragOver(e) {
-    e.preventDefault();
-}
-
 async function handleDrop(e) {
     e.preventDefault();
-    if (gameState.isResolving) return;
-    if (!e.target.classList.contains('cell') || !draggedCell) return;
-    if (!areAdjacent(draggedCell, e.target)) {
-        draggedCell = null;
-        return;
-    }
+    if (gameState.isResolving || !draggedCell) return;
 
     const source = draggedCell;
     const target = e.target;
     draggedCell = null;
 
-    // Tentatively swap
+    if (!target.classList.contains('cell') || !areAdjacent(source, target)) return;
+
     swapCells(source, target);
 
-    if (!hasAnyMatch()) {
-        // Revert — no match formed, do not consume a move
-        swapCells(source, target);
+    const matched = findMatches();
+    if (matched.size === 0) {
+        swapCells(source, target); // revert — no match formed
     } else {
-        // Valid swap: consume a move and resolve cascades
         gameState.movesLeft--;
         updateMovesDisplay();
-        await resolveBoard();
+        await resolveBoard(matched);
     }
 }
 
@@ -111,16 +73,14 @@ function swapCells(a, b) {
     [a.textContent, b.textContent] = [b.textContent, a.textContent];
 }
 
-function getCell(row, col) {
-    return gameBoard.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+function getCellGrid() {
+    const flat = Array.from(gameBoard.children);
+    return Array.from({ length: BOARD_SIZE }, (_, r) => flat.slice(r * BOARD_SIZE, (r + 1) * BOARD_SIZE));
 }
 
 function findMatches() {
     const matched = new Set();
-    // Cache all cell references in a 2D array to avoid repeated querySelector calls
-    const cells = Array.from({ length: BOARD_SIZE }, (_, r) =>
-        Array.from({ length: BOARD_SIZE }, (_, c) => getCell(r, c))
-    );
+    const cells = getCellGrid();
 
     // Horizontal runs of 3+
     for (let r = 0; r < BOARD_SIZE; r++) {
@@ -157,47 +117,29 @@ function findMatches() {
     return matched;
 }
 
-function hasAnyMatch() {
-    return findMatches().size > 0;
-}
-
 // ── Cascade resolution ────────────────────────────────────────────────────────
 
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function resolveBoard() {
+async function resolveBoard(matched) {
     gameState.isResolving = true;
-
-    let matched = findMatches();
-    while (matched.size > 0) {
-        // Highlight matched cells briefly
-        matched.forEach(cell => cell.classList.add('matched'));
-        await delay(300);
-
-        // Clear matched cells
-        matched.forEach(cell => {
-            cell.classList.remove('matched');
-            cell.textContent = '';
-        });
-        await delay(150);
-
-        // Apply gravity and refill
-        applyGravity();
-        await delay(300);
-
-        matched = findMatches();
+    try {
+        while (matched.size > 0) {
+            matched.forEach(cell => cell.classList.add('matched'));
+            await delay(300);
+            matched.forEach(cell => { cell.classList.remove('matched'); cell.textContent = ''; });
+            await delay(150);
+            applyGravity();
+            await delay(300);
+            matched = findMatches();
+        }
+    } finally {
+        gameState.isResolving = false;
     }
-
-    gameState.isResolving = false;
 }
 
 function applyGravity() {
-    // Cache all cell references in a 2D array to avoid repeated querySelector calls
-    const cells = Array.from({ length: BOARD_SIZE }, (_, r) =>
-        Array.from({ length: BOARD_SIZE }, (_, c) => getCell(r, c))
-    );
+    const cells = getCellGrid();
 
     for (let col = 0; col < BOARD_SIZE; col++) {
         // Compact non-empty symbols to the bottom of each column
@@ -221,7 +163,6 @@ function applyGravity() {
 // ── UI helpers ────────────────────────────────────────────────────────────────
 
 function updateMovesDisplay() {
-    if (!movesDisplay) return;
     movesDisplay.textContent = `Moves: ${gameState.movesLeft}`;
 }
 
@@ -235,57 +176,32 @@ function getRandomSymbol() {
 // given the partially-filled grid built so far.
 function safeSymbol(grid, row, col) {
     const forbidden = new Set();
-
-    // Horizontal: two cells to the left are identical → forbid that symbol
-    if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) {
-        forbidden.add(grid[row][col - 1]);
-    }
-
-    // Vertical: two cells above are identical → forbid that symbol
-    if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) {
-        forbidden.add(grid[row - 1][col]);
-    }
-
-    const available = forbidden.size > 0 ? SYMBOLS.filter(s => !forbidden.has(s)) : SYMBOLS;
-    const pool = available.length > 0 ? available : SYMBOLS;
+    if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) forbidden.add(grid[row][col - 1]);
+    if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) forbidden.add(grid[row - 1][col]);
+    const pool = forbidden.size > 0 ? SYMBOLS.filter(s => !forbidden.has(s)) : SYMBOLS;
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // Function to generate the game board
-function generateGameBoard(rows, cols) {
+function generateGameBoard() {
     gameBoard.innerHTML = '';
-
-    // Build a 2-D symbol grid with no pre-existing 3+ matches
-    const grid = [];
-    for (let i = 0; i < rows; i++) {
-        grid[i] = [];
-        for (let j = 0; j < cols; j++) {
-            grid[i][j] = safeSymbol(grid, i, j);
-        }
-    }
-
-    // Create DOM cells from the pre-validated grid
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
+    const grid = Array.from({ length: BOARD_SIZE }, () => []);
+    for (let i = 0; i < BOARD_SIZE; i++) {
+        for (let j = 0; j < BOARD_SIZE; j++) {
+            const sym = safeSymbol(grid, i, j);
+            grid[i][j] = sym;
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.textContent = grid[i][j];
-            cell.dataset.row = i;
-            cell.dataset.col = j;
+            cell.textContent = sym;
             cell.draggable = true;
-
-            cell.addEventListener('click', () => {
-                cell.classList.toggle('selected');
-            });
-
             gameBoard.appendChild(cell);
         }
     }
 }
 
-function areAdjacent(cell1, cell2) {
-    const rowDiff = Math.abs(cell1.dataset.row - cell2.dataset.row);
-    const colDiff = Math.abs(cell1.dataset.col - cell2.dataset.col);
-
-    return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+function areAdjacent(a, b) {
+    const children = [...gameBoard.children];
+    const ia = children.indexOf(a), ib = children.indexOf(b);
+    const diff = Math.abs(ia - ib);
+    return diff === BOARD_SIZE || (diff === 1 && Math.floor(ia / BOARD_SIZE) === Math.floor(ib / BOARD_SIZE));
 }
