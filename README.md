@@ -1,6 +1,20 @@
 # 🎵 Musical Candy Crush
 
-A musical-themed match-3 puzzle game where you match colorful musical note candies to score points and complete levels.
+A musical-themed match puzzle game where you match colorful musical note candies to score points and complete levels.
+
+Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
+
+# How to Play
+
+ Drag or swipe adjacent tiles to create matches
+
+- Match **3** tiles → 10 points
+- Match **4** tiles → 20 points
+- Match **5** tiles → 40 points
+- Match at least 6 tiles - 60 points
+
+- You have **20 moves** — make them count!
+
 
 ## About
 
