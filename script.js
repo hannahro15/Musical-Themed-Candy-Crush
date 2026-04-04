@@ -118,6 +118,8 @@ async function handleTouchEnd(event) {
 // ── Shared swap logic ────────────────────────────────────────────────────────
 
 async function trySwap(sourceCell, targetCell) {
+    if (gameState.movesLeft <= 0) return; // Prevent moves when game is over
+    
     swapCellContents(sourceCell, targetCell);
 
     const matchedCells = findMatches();
@@ -128,7 +130,7 @@ async function trySwap(sourceCell, targetCell) {
         updateMovesDisplay();
         await resolveBoard(matchedCells);
 
-        if (gameState.movesLeft <= 0) {
+        if (gameState.movesLeft === 0) {
             showGameEndModal();
             return;
         }
