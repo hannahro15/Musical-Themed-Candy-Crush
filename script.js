@@ -10,6 +10,9 @@ const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
 const movesDisplay = document.getElementById('movesDisplay');
 const scoreDisplay = document.getElementById('scoreDisplay');
+const gameEndModal = document.getElementById('gameEndModal');
+const finalScoreDisplay = document.getElementById('finalScore');
+const playAgainButton = document.getElementById('playAgainBtn');
 
 // Game state
 const gameState = {
@@ -25,6 +28,7 @@ let touchStartY = 0;
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 playButton.addEventListener('click', handlePlayClick);
+playAgainButton.addEventListener('click', handlePlayAgain);
 gameBoard.addEventListener('dragstart', handleDragStart);
 gameBoard.addEventListener('dragover', event => event.preventDefault());
 gameBoard.addEventListener('drop', handleDrop);
@@ -114,6 +118,8 @@ async function handleTouchEnd(event) {
 // ── Shared swap logic ────────────────────────────────────────────────────────
 
 async function trySwap(sourceCell, targetCell) {
+    if (gameState.movesLeft <= 0) return; // Prevent moves when game is over
+    
     swapCellContents(sourceCell, targetCell);
 
     const matchedCells = findMatches();
@@ -124,8 +130,8 @@ async function trySwap(sourceCell, targetCell) {
         updateMovesDisplay();
         await resolveBoard(matchedCells);
 
-        if (gameState.movesLeft <= 0) {
-            alert(`Game Over! Final Score: ${gameState.score}`);
+        if (gameState.movesLeft === 0) {
+            showGameEndModal();
             return;
         }
 
@@ -313,4 +319,18 @@ function shuffleBoard() {
         
         allCells.forEach((cell, index) => cell.textContent = symbols[index]);
     } while (findMatches().size > 0 && attempts++ < 5);
+}
+
+function showGameEndModal() {
+    finalScoreDisplay.textContent = gameState.score;
+    gameEndModal.classList.remove('hidden');
+}
+
+function handlePlayAgain() {
+    gameEndModal.classList.add('hidden');
+    gameState.movesLeft = INITIAL_MOVES;
+    gameState.score = 0;
+    updateMovesDisplay();
+    updateScoreDisplay();
+    generateGameBoard();
 }
