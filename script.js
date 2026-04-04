@@ -29,12 +29,9 @@ gameBoard.addEventListener('drop', handleDrop);
 // ── Event handlers ───────────────────────────────────────────────────────────
 
 function handlePlayClick() {
-    heading.classList.add('hidden');
-    menu.classList.add('hidden');
-    document.getElementById('game-board-container').classList.remove('hidden');
-    gameBoard.classList.remove('hidden');
-    movesDisplay.classList.remove('hidden');
-    scoreDisplay.classList.remove('hidden');
+    [heading, menu].forEach(el => el.classList.add('hidden'));
+    [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay]
+        .forEach(el => el.classList.remove('hidden'));
 
     if (gameBoard.children.length === 0) {
         gameState.movesLeft = INITIAL_MOVES;
@@ -70,6 +67,15 @@ async function handleDrop(e) {
         gameState.movesLeft--;
         updateMovesDisplay();
         await resolveBoard(matched);
+
+        if (gameState.movesLeft <= 0) {
+            alert(`Game Over! Final Score: ${gameState.score}`);
+            return;
+        }
+
+        if (!hasValidMoves()) {
+            shuffleBoard();
+        }
     }
 }
 
@@ -80,45 +86,36 @@ function swapCells(a, b) {
 }
 
 function getCellGrid() {
-    const flat = Array.from(gameBoard.children);
-    return Array.from({ length: BOARD_SIZE }, (_, r) => flat.slice(r * BOARD_SIZE, (r + 1) * BOARD_SIZE));
+    const cells = Array.from(gameBoard.children);
+    const grid = [];
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        grid.push(cells.slice(r * BOARD_SIZE, (r + 1) * BOARD_SIZE));
+    }
+    return grid;
 }
 
 function findMatches() {
     const matched = new Set();
     const cells = getCellGrid();
 
-    // Horizontal runs of 3+
-    for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c <= BOARD_SIZE - 3; c++) {
-            const sym = cells[r][c].textContent;
-            if (!sym) continue;
-            if (cells[r][c + 1].textContent === sym && cells[r][c + 2].textContent === sym) {
-                matched.add(cells[r][c]);
-                matched.add(cells[r][c + 1]);
-                matched.add(cells[r][c + 2]);
-                for (let k = c + 3; k < BOARD_SIZE && cells[r][k].textContent === sym; k++) {
-                    matched.add(cells[r][k]);
-                }
+    // Scan a line of cells for runs of 3+
+    function scanLine(line) {
+        let start = 0;
+        while (start <= line.length - 3) {
+            const sym = line[start].textContent;
+            if (!sym) { start++; continue; }
+            let end = start + 1;
+            while (end < line.length && line[end].textContent === sym) end++;
+            if (end - start >= 3) {
+                for (let i = start; i < end; i++) matched.add(line[i]);
             }
+            start = end;
         }
     }
 
-    // Vertical runs of 3+
-    for (let c = 0; c < BOARD_SIZE; c++) {
-        for (let r = 0; r <= BOARD_SIZE - 3; r++) {
-            const sym = cells[r][c].textContent;
-            if (!sym) continue;
-            if (cells[r + 1][c].textContent === sym && cells[r + 2][c].textContent === sym) {
-                matched.add(cells[r][c]);
-                matched.add(cells[r + 1][c]);
-                matched.add(cells[r + 2][c]);
-                for (let k = r + 3; k < BOARD_SIZE && cells[k][c].textContent === sym; k++) {
-                    matched.add(cells[k][c]);
-                }
-            }
-        }
-    }
+    // Scan all rows and columns
+    for (let r = 0; r < BOARD_SIZE; r++) scanLine(cells[r]);
+    for (let c = 0; c < BOARD_SIZE; c++) scanLine(cells.map(row => row[c]));
 
     return matched;
 }
@@ -150,20 +147,16 @@ function applyGravity() {
     const cells = getCellGrid();
 
     for (let col = 0; col < BOARD_SIZE; col++) {
-        // Compact non-empty symbols to the bottom of each column
-        let writeRow = BOARD_SIZE - 1;
+        // Collect non-empty symbols from bottom to top
+        const filled = [];
         for (let row = BOARD_SIZE - 1; row >= 0; row--) {
-            if (cells[row][col].textContent !== '') {
-                if (writeRow !== row) {
-                    cells[writeRow][col].textContent = cells[row][col].textContent;
-                    cells[row][col].textContent = '';
-                }
-                writeRow--;
-            }
+            if (cells[row][col].textContent) filled.push(cells[row][col].textContent);
         }
-        // Fill remaining empty cells at the top with new random symbols
-        for (let row = writeRow; row >= 0; row--) {
-            cells[row][col].textContent = getRandomSymbol();
+
+        // Rewrite column: filled symbols at bottom, new random ones at top
+        for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+            const idx = BOARD_SIZE - 1 - row;
+            cells[row][col].textContent = idx < filled.length ? filled[idx] : getRandomSymbol();
         }
     }
 }
@@ -190,7 +183,7 @@ function safeSymbol(grid, row, col) {
     const forbidden = new Set();
     if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) forbidden.add(grid[row][col - 1]);
     if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) forbidden.add(grid[row - 1][col]);
-    const pool = forbidden.size > 0 ? SYMBOLS.filter(s => !forbidden.has(s)) : SYMBOLS;
+    const pool = SYMBOLS.filter(s => !forbidden.has(s));
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -218,29 +211,48 @@ function areAdjacent(a, b) {
     return diff === BOARD_SIZE || (diff === 1 && Math.floor(ia / BOARD_SIZE) === Math.floor(ib / BOARD_SIZE));
 }
 
+const SCORE_TABLE = { 3: 10, 4: 20, 5: 40 };
+
 function scoreForMatch(size) {
-    if (size == 3) { 
-        return 10;
-    } else if (size == 4) {
-        return 20;
-    } else if (size == 5) {
-        return 40;
-    } else if (size > 5) {
-        return 60;
-    }
-    return 0;
+    return SCORE_TABLE[size] || (size > 5 ? 60 : 0);
 }
 
-function gameOverIfNoMatches() {
+// Check if any adjacent swap produces at least one 3-in-a-row
+function hasValidMoves() {
     const cells = getCellGrid();
     for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
-            const sym = cells[r][c].textContent;
-            if (!sym) continue;
-            // Check right and down for potential matches
-            if (c < BOARD_SIZE - 1 && cells[r][c + 1].textContent === sym) return false;
-            if (r < BOARD_SIZE - 1 && cells[r + 1][c].textContent === sym) return false;
+            // Try swap right
+            if (c < BOARD_SIZE - 1) {
+                swapCells(cells[r][c], cells[r][c + 1]);
+                const found = findMatches().size > 0;
+                swapCells(cells[r][c], cells[r][c + 1]);
+                if (found) return true;
+            }
+            // Try swap down
+            if (r < BOARD_SIZE - 1) {
+                swapCells(cells[r][c], cells[r + 1][c]);
+                const found = findMatches().size > 0;
+                swapCells(cells[r][c], cells[r + 1][c]);
+                if (found) return true;
+            }
         }
     }
-    alert('Game Over! No more matches available.');
+    return false;
+}
+
+// Shuffle all board symbols until the board has valid moves and no existing matches
+function shuffleBoard() {
+    const flat = Array.from(gameBoard.children);
+    let attempts = 0;
+    do {
+        const symbols = flat.map(cell => cell.textContent);
+        // Fisher-Yates shuffle
+        for (let i = symbols.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
+        }
+        flat.forEach((cell, idx) => { cell.textContent = symbols[idx]; });
+        attempts++;
+    } while ((findMatches().size > 0 || !hasValidMoves()) && attempts < 100);
 }
