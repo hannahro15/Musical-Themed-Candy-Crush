@@ -43,6 +43,9 @@ body {
     width: 100%;
     max-width: 432px;
     margin: 0 auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .cell {
@@ -54,6 +57,8 @@ body {
     box-sizing: border-box;
     border: 1px solid black;
     font-size: clamp(16px, 4vw, 24px);
+    touch-action: none;
+    cursor: pointer;
 }
 
 #game-board-container {
