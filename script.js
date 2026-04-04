@@ -18,6 +18,9 @@ const gameState = {
     isResolving: false,
 };
 let draggedCell = null;
+let touchStartCell = null;
+let touchStartX = 0;
+let touchStartY = 0;
 
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
@@ -25,6 +28,9 @@ playBtn.addEventListener('click', handlePlayClick);
 gameBoard.addEventListener('dragstart', handleDragStart);
 gameBoard.addEventListener('dragover', e => e.preventDefault());
 gameBoard.addEventListener('drop', handleDrop);
+gameBoard.addEventListener('touchstart', handleTouchStart, { passive: false });
+gameBoard.addEventListener('touchmove', handleTouchMove, { passive: false });
+gameBoard.addEventListener('touchend', handleTouchEnd);
 
 // ── Event handlers ───────────────────────────────────────────────────────────
 
@@ -58,11 +64,72 @@ async function handleDrop(e) {
 
     if (!target.classList.contains('cell') || !areAdjacent(source, target)) return;
 
+    await trySwap(source, target);
+}
+
+// ── Touch handlers ───────────────────────────────────────────────────────────
+
+function handleTouchStart(e) {
+    if (gameState.isResolving) return;
+    const touch = e.touches[0];
+    const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!cell || !cell.classList.contains('cell')) return;
+    e.preventDefault();
+    touchStartCell = cell;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+}
+
+function handleTouchMove(e) {
+    if (touchStartCell) e.preventDefault();
+}
+
+async function handleTouchEnd(e) {
+    if (gameState.isResolving || !touchStartCell) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    const source = touchStartCell;
+    touchStartCell = null;
+
+    // Need a minimum swipe distance (20px) to register
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+
+    // Determine swipe direction and find target cell
+    const children = [...gameBoard.children];
+    const idx = children.indexOf(source);
+    if (idx === -1) return;
+
+    const row = Math.floor(idx / BOARD_SIZE);
+    const col = idx % BOARD_SIZE;
+    let targetIdx = -1;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal swipe
+        targetIdx = dx > 0 ? idx + 1 : idx - 1;
+        // Don't wrap across rows
+        const targetCol = dx > 0 ? col + 1 : col - 1;
+        if (targetCol < 0 || targetCol >= BOARD_SIZE) return;
+    } else {
+        // Vertical swipe
+        targetIdx = dy > 0 ? idx + BOARD_SIZE : idx - BOARD_SIZE;
+        if (targetIdx < 0 || targetIdx >= children.length) return;
+    }
+
+    const target = children[targetIdx];
+    if (!target) return;
+
+    await trySwap(source, target);
+}
+
+// ── Shared swap logic ────────────────────────────────────────────────────────
+
+async function trySwap(source, target) {
     swapCells(source, target);
 
     const matched = findMatches();
     if (matched.size === 0) {
-        swapCells(source, target); // revert — no match formed
+        swapCells(source, target);
     } else {
         gameState.movesLeft--;
         updateMovesDisplay();
