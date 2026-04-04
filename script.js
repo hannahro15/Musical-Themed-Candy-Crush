@@ -230,3 +230,17 @@ function scoreForMatch(size) {
     }
     return 0;
 }
+
+function gameOverIfNoMatches() {
+    const cells = getCellGrid();
+    for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+            const sym = cells[r][c].textContent;
+            if (!sym) continue;
+            // Check right and down for potential matches
+            if (c < BOARD_SIZE - 1 && cells[r][c + 1].textContent === sym) return false;
+            if (r < BOARD_SIZE - 1 && cells[r + 1][c].textContent === sym) return false;
+        }
+    }
+    alert('Game Over! No more matches available.');
+}
