@@ -9,10 +9,12 @@ const heading = document.querySelector('h1');
 const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
 const movesDisplay = document.getElementById('movesDisplay');
+const scoreDisplay = document.getElementById('scoreDisplay');
 
 // Game state
 const gameState = {
     movesLeft: INITIAL_MOVES,
+    score: 0,
     isResolving: false,
 };
 let draggedCell = null;
@@ -32,10 +34,13 @@ function handlePlayClick() {
     document.getElementById('game-board-container').classList.remove('hidden');
     gameBoard.classList.remove('hidden');
     movesDisplay.classList.remove('hidden');
+    scoreDisplay.classList.remove('hidden');
 
     if (gameBoard.children.length === 0) {
         gameState.movesLeft = INITIAL_MOVES;
+        gameState.score = 0;
         updateMovesDisplay();
+        updateScoreDisplay();
         generateGameBoard();
     }
 }
@@ -126,6 +131,8 @@ async function resolveBoard(matched) {
     gameState.isResolving = true;
     try {
         while (matched.size > 0) {
+            gameState.score += scoreForMatch(matched.size);
+            updateScoreDisplay();
             matched.forEach(cell => cell.classList.add('matched'));
             await delay(300);
             matched.forEach(cell => { cell.classList.remove('matched'); cell.textContent = ''; });
@@ -167,6 +174,10 @@ function updateMovesDisplay() {
     movesDisplay.textContent = `Moves: ${gameState.movesLeft}`;
 }
 
+function updateScoreDisplay() {
+    scoreDisplay.textContent = `Score: ${gameState.score}`;
+}
+
 // ── Utility functions ─────────────────────────────────────────────────────────
 
 function getRandomSymbol() {
@@ -205,4 +216,17 @@ function areAdjacent(a, b) {
     const ia = children.indexOf(a), ib = children.indexOf(b);
     const diff = Math.abs(ia - ib);
     return diff === BOARD_SIZE || (diff === 1 && Math.floor(ia / BOARD_SIZE) === Math.floor(ib / BOARD_SIZE));
+}
+
+function scoreForMatch(size) {
+    if (size == 3) { 
+        return 10;
+    } else if (size == 4) {
+        return 20;
+    } else if (size == 5) {
+        return 40;
+    } else if (size > 5) {
+        return 60;
+    }
+    return 0;
 }
