@@ -10,7 +10,8 @@ body {
     padding: 30px;
     border: solid 2px black;
     min-height: 300px;
-    min-width: 400px;
+    width: 90vw;
+    max-width: 500px;
     box-sizing: border-box;
 }
 
@@ -39,18 +40,24 @@ body {
 #gameBoard {
     display: flex;
     flex-wrap: wrap;
-    width: 435px; 
+    width: 100%;
+    max-width: 432px;
+    margin: 0 auto;
 }
 
 .cell {
-    width: 50px;
-    height: 50px;
+    width: 12.5%;
     display: flex;
+    aspect-ratio: 1;
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
     border: 1px solid black;
-    font-size: 24px;
+    font-size: clamp(16px, 4vw, 24px);
+}
+
+#game-board-container {
+    text-align: center;
 }
 
 #gameBoard .cell {
