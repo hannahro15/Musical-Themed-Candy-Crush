@@ -53,18 +53,15 @@ function handleDragStart(e) {
     if (!e.target.classList.contains('cell')) return;
     draggedCell = e.target;
 }
-
 async function handleDrop(e) {
     e.preventDefault();
     if (gameState.isResolving || !draggedCell) return;
 
-    const source = draggedCell;
     const target = e.target;
+    if (target.classList.contains('cell') && areAdjacent(draggedCell, target)) {
+        await trySwap(draggedCell, target);
+    }
     draggedCell = null;
-
-    if (!target.classList.contains('cell') || !areAdjacent(source, target)) return;
-
-    await trySwap(source, target);
 }
 
 // ── Touch handlers ───────────────────────────────────────────────────────────
@@ -73,7 +70,7 @@ function handleTouchStart(e) {
     if (gameState.isResolving) return;
     const touch = e.touches[0];
     const cell = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!cell || !cell.classList.contains('cell')) return;
+    if (!cell?.classList.contains('cell')) return;
     e.preventDefault();
     touchStartCell = cell;
     touchStartX = touch.clientX;
@@ -90,33 +87,26 @@ async function handleTouchEnd(e) {
     const touch = e.changedTouches[0];
     const dx = touch.clientX - touchStartX;
     const dy = touch.clientY - touchStartY;
-    const source = touchStartCell;
     touchStartCell = null;
 
-    // Need a minimum swipe distance (20px) to register
     if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
 
-    // Find source position
     const children = [...gameBoard.children];
-    const idx = children.indexOf(source);
+    const idx = children.indexOf(e.target.closest('.cell'));
     if (idx === -1) return;
 
     const col = idx % BOARD_SIZE;
-    let targetIdx;
+    let targetIdx = idx;
 
-    // Determine swipe direction
     if (Math.abs(dx) > Math.abs(dy)) {
-        // Horizontal swipe - check we don't wrap across rows
-        if (dx > 0 && col < BOARD_SIZE - 1) targetIdx = idx + 1;
-        else if (dx < 0 && col > 0) targetIdx = idx - 1;
-        else return;
+        targetIdx += dx > 0 && col < BOARD_SIZE - 1 ? 1 : dx < 0 && col > 0 ? -1 : 0;
     } else {
-        // Vertical swipe - check we stay in bounds
-        targetIdx = dy > 0 ? idx + BOARD_SIZE : idx - BOARD_SIZE;
-        if (targetIdx < 0 || targetIdx >= children.length) return;
+        targetIdx += dy > 0 ? BOARD_SIZE : -BOARD_SIZE;
     }
 
-    await trySwap(source, children[targetIdx]);
+    if (targetIdx !== idx && targetIdx >= 0 && targetIdx < children.length) {
+        await trySwap(children[idx], children[targetIdx]);
+    }
 }
 
 // ── Shared swap logic ────────────────────────────────────────────────────────
@@ -242,13 +232,15 @@ function getRandomSymbol() {
 }
 
 // Pick a random symbol that won't form a 3-in-a-row match at (row, col)
-// given the partially-filled grid built so far.
 function safeSymbol(grid, row, col) {
     const forbidden = new Set();
-    if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) forbidden.add(grid[row][col - 1]);
-    if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) forbidden.add(grid[row - 1][col]);
-    const pool = SYMBOLS.filter(s => !forbidden.has(s));
-    return pool[Math.floor(Math.random() * pool.length)];
+    if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) 
+        forbidden.add(grid[row][col - 1]);
+    if (row >= 2 && grid[row - 1][col] === grid[row - 2][col]) 
+        forbidden.add(grid[row - 1][col]);
+    
+    const available = SYMBOLS.filter(s => !forbidden.has(s));
+    return available[Math.floor(Math.random() * available.length)];
 }
 
 // Function to generate the game board
@@ -270,9 +262,10 @@ function generateGameBoard() {
 
 function areAdjacent(a, b) {
     const children = [...gameBoard.children];
-    const ia = children.indexOf(a), ib = children.indexOf(b);
+    const [ia, ib] = [children.indexOf(a), children.indexOf(b)];
     const diff = Math.abs(ia - ib);
-    return diff === BOARD_SIZE || (diff === 1 && Math.floor(ia / BOARD_SIZE) === Math.floor(ib / BOARD_SIZE));
+    const sameRow = Math.floor(ia / BOARD_SIZE) === Math.floor(ib / BOARD_SIZE);
+    return diff === BOARD_SIZE || (diff === 1 && sameRow);
 }
 
 // Points awarded based on number of matched cells
@@ -292,16 +285,20 @@ function hasValidMoves() {
             // Try swap right
             if (c < BOARD_SIZE - 1) {
                 swapCells(cells[r][c], cells[r][c + 1]);
-                const found = findMatches().size > 0;
+                if (findMatches().size > 0) {
+                    swapCells(cells[r][c], cells[r][c + 1]);
+                    return true;
+                }
                 swapCells(cells[r][c], cells[r][c + 1]);
-                if (found) return true;
             }
             // Try swap down
             if (r < BOARD_SIZE - 1) {
                 swapCells(cells[r][c], cells[r + 1][c]);
-                const found = findMatches().size > 0;
+                if (findMatches().size > 0) {
+                    swapCells(cells[r][c], cells[r + 1][c]);
+                    return true;
+                }
                 swapCells(cells[r][c], cells[r + 1][c]);
-                if (found) return true;
             }
         }
     }
@@ -310,16 +307,16 @@ function hasValidMoves() {
 
 // Shuffle all board symbols until the board has valid moves and no existing matches
 function shuffleBoard() {
-    const flat = Array.from(gameBoard.children);
+    const cells = Array.from(gameBoard.children);
     let attempts = 0;
+    
     do {
-        const symbols = flat.map(cell => cell.textContent);
+        const symbols = cells.map(cell => cell.textContent);
+        
         // Fisher-Yates shuffle
         for (let i = symbols.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
         }
-        flat.forEach((cell, idx) => { cell.textContent = symbols[idx]; });
-        attempts++;
-    } while ((findMatches().size > 0 || !hasValidMoves()) && attempts < 100);
-}
+        
+        cells.forEach((cell, idx) => cell.textContent = symbols[idx]);
