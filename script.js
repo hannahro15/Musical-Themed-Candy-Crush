@@ -29,6 +29,7 @@ gameBoard.addEventListener('drop', handleDrop);
 function handlePlayClick() {
     heading.classList.add('hidden');
     menu.classList.add('hidden');
+    document.getElementById('game-board-container').classList.remove('hidden');
     gameBoard.classList.remove('hidden');
     movesDisplay.classList.remove('hidden');
 
