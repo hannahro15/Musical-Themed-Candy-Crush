@@ -15,17 +15,6 @@ Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 
 - You have **20 moves** — make them count!
 
-
-## About
-
-Match three or more musical note candies to clear them from the board. Create special combos and progress through levels with a musical twist!
-
-## How to Play
-
-1. Swap adjacent candies to create matches of 3 or more
-2. Match 4+ candies to create special power-ups
-3. Complete level objectives before running out of moves
-
 ## Getting Started
 
 1. Clone the repository:
