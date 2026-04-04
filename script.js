@@ -86,6 +86,7 @@ function handleTouchMove(e) {
 
 async function handleTouchEnd(e) {
     if (gameState.isResolving || !touchStartCell) return;
+    
     const touch = e.changedTouches[0];
     const dx = touch.clientX - touchStartX;
     const dy = touch.clientY - touchStartY;
@@ -95,31 +96,27 @@ async function handleTouchEnd(e) {
     // Need a minimum swipe distance (20px) to register
     if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
 
-    // Determine swipe direction and find target cell
+    // Find source position
     const children = [...gameBoard.children];
     const idx = children.indexOf(source);
     if (idx === -1) return;
 
-    const row = Math.floor(idx / BOARD_SIZE);
     const col = idx % BOARD_SIZE;
-    let targetIdx = -1;
+    let targetIdx;
 
+    // Determine swipe direction
     if (Math.abs(dx) > Math.abs(dy)) {
-        // Horizontal swipe
-        targetIdx = dx > 0 ? idx + 1 : idx - 1;
-        // Don't wrap across rows
-        const targetCol = dx > 0 ? col + 1 : col - 1;
-        if (targetCol < 0 || targetCol >= BOARD_SIZE) return;
+        // Horizontal swipe - check we don't wrap across rows
+        if (dx > 0 && col < BOARD_SIZE - 1) targetIdx = idx + 1;
+        else if (dx < 0 && col > 0) targetIdx = idx - 1;
+        else return;
     } else {
-        // Vertical swipe
+        // Vertical swipe - check we stay in bounds
         targetIdx = dy > 0 ? idx + BOARD_SIZE : idx - BOARD_SIZE;
         if (targetIdx < 0 || targetIdx >= children.length) return;
     }
 
-    const target = children[targetIdx];
-    if (!target) return;
-
-    await trySwap(source, target);
+    await trySwap(source, children[targetIdx]);
 }
 
 // ── Shared swap logic ────────────────────────────────────────────────────────
@@ -278,10 +275,13 @@ function areAdjacent(a, b) {
     return diff === BOARD_SIZE || (diff === 1 && Math.floor(ia / BOARD_SIZE) === Math.floor(ib / BOARD_SIZE));
 }
 
-const SCORE_TABLE = { 3: 10, 4: 20, 5: 40 };
-
+// Points awarded based on number of matched cells
 function scoreForMatch(size) {
-    return SCORE_TABLE[size] || (size > 5 ? 60 : 0);
+    if (size === 3) return 10;
+    if (size === 4) return 20;
+    if (size === 5) return 40;
+    if (size > 5) return 60;
+    return 0;
 }
 
 // Check if any adjacent swap produces at least one 3-in-a-row
