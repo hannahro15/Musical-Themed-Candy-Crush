@@ -28,6 +28,8 @@ const level1Counters = document.getElementById('level1-counters');
 const timerDisplay = document.getElementById('timerDisplay');
 const restartBtn = document.getElementById('restartBtn');
 const restartContainer = document.getElementById('restartContainer');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
+const nextLevelContainer = document.getElementById('nextLevelContainer');
 
 // Game state
 const gameState = {
@@ -51,6 +53,7 @@ let touchStartY = 0;
 
 playButton.addEventListener('click', handlePlayClick);
 restartBtn.addEventListener('click', handleRestartLevel);
+nextLevelBtn.addEventListener('click', handleNextLevel);
 gameBoard.addEventListener('dragstart', handleDragStart);
 gameBoard.addEventListener('dragover', event => event.preventDefault());
 gameBoard.addEventListener('drop', handleDrop);
@@ -475,18 +478,48 @@ function showLevel1Result(won, timedOut = false) {
         scoreDisplay.textContent = `Level Complete! Score: ${gameState.score}`;
         movesDisplay.textContent = '🎉 You Win!';
         restartContainer.classList.add('hidden');
+        nextLevelContainer.classList.remove('hidden');
     } else if (timedOut) {
         scoreDisplay.textContent = `Time's up! Score: ${gameState.score}`;
         movesDisplay.textContent = '⏰ Game Over!';
         restartContainer.classList.remove('hidden');
+        nextLevelContainer.classList.add('hidden');
     } else {
         scoreDisplay.textContent = `Level Failed. Score: ${gameState.score}`;
         movesDisplay.textContent = 'Game Over!';
         restartContainer.classList.remove('hidden');
+        nextLevelContainer.classList.add('hidden');
     }
     level1Counters.classList.add('hidden');
     gameBoard.classList.add('hidden');
     timerDisplay.classList.add('hidden');
+}
+
+function handleNextLevel() {
+    // Placeholder for Level 2 setup
+    gameState.level = 2;
+    document.getElementById('levelDisplay').textContent = `Level 2`;
+    // Hide result containers
+    nextLevelContainer.classList.add('hidden');
+    restartContainer.classList.add('hidden');
+    // Show board and UI
+    [gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay')]
+        .forEach(element => element.classList.remove('hidden'));
+    // For now, just reset the board as a placeholder for Level 2
+    // You can add Level 2 logic here
+    gameState.movesLeft = 20;
+    gameState.score = 0;
+    gameState.violinsLeft = 0;
+    gameState.pianosLeft = 0;
+    gameState.levelComplete = false;
+    gameState.timer = 60;
+    gameState.timerActive = true;
+    updateMovesDisplay();
+    updateScoreDisplay();
+    updateLevel1Counters();
+    updateTimerDisplay();
+    generateGameBoard();
+    startTimer();
 }
 
 // function handlePlayAgain() {}
