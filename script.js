@@ -38,10 +38,10 @@ gameBoard.addEventListener('touchend', handleTouchEnd);
 // ── Event handlers ───────────────────────────────────────────────────────────
 
 function handlePlayClick() {
+    gameEndModal.classList.add('hidden'); // Always hide modal when starting
     [heading, menu].forEach(element => element.classList.add('hidden'));
     [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay]
         .forEach(element => element.classList.remove('hidden'));
-
     if (gameBoard.children.length === 0) {
         gameState.movesLeft = INITIAL_MOVES;
         gameState.score = 0;
@@ -118,26 +118,31 @@ async function handleTouchEnd(event) {
 // ── Shared swap logic ────────────────────────────────────────────────────────
 
 async function trySwap(sourceCell, targetCell) {
-    if (gameState.movesLeft <= 0) return; // Prevent moves when game is over
-    
+    if (gameState.movesLeft <= 0 || gameState.isResolving) return;
+    gameState.isResolving = true;
     swapCellContents(sourceCell, targetCell);
-
-    const matchedCells = findMatches();
-    if (matchedCells.size === 0) {
+    let matchedGroups = findMatches();
+    if (matchedGroups.length === 0) {
         swapCellContents(sourceCell, targetCell);
+        gameState.isResolving = false;
     } else {
         gameState.movesLeft--;
         updateMovesDisplay();
-        await resolveBoard(matchedCells);
-
+        await resolveBoard(matchedGroups);
         if (gameState.movesLeft === 0) {
             showGameEndModal();
             return;
         }
-
         if (!hasValidMoves()) {
             shuffleBoard();
         }
+        // After cascades, check for new matches before allowing next move
+        let postCascadeGroups = findMatches();
+        while (postCascadeGroups.length > 0) {
+            await resolveBoard(postCascadeGroups);
+            postCascadeGroups = findMatches();
+        }
+        gameState.isResolving = false;
     }
 }
 
@@ -157,8 +162,10 @@ function getCellGrid() {
 }
 
 function findMatches() {
-    const matchedCells = new Set();
+    // Returns an array of match groups, each group is an array of cells
     const grid = getCellGrid();
+    const matchedGroups = [];
+    const visited = new Set();
 
     function scanLineForMatches(line) {
         let startIndex = 0;
@@ -168,7 +175,14 @@ function findMatches() {
             let endIndex = startIndex + 1;
             while (endIndex < line.length && line[endIndex].textContent === symbol) endIndex++;
             if (endIndex - startIndex >= 3) {
-                for (let i = startIndex; i < endIndex; i++) matchedCells.add(line[i]);
+                const group = [];
+                for (let i = startIndex; i < endIndex; i++) {
+                    if (!visited.has(line[i])) {
+                        group.push(line[i]);
+                        visited.add(line[i]);
+                    }
+                }
+                if (group.length > 0) matchedGroups.push(group);
             }
             startIndex = endIndex;
         }
@@ -177,26 +191,31 @@ function findMatches() {
     for (let row = 0; row < BOARD_SIZE; row++) scanLineForMatches(grid[row]);
     for (let col = 0; col < BOARD_SIZE; col++) scanLineForMatches(grid.map(row => row[col]));
 
-    return matchedCells;
+    return matchedGroups;
 }
 
 // ── Cascade resolution ────────────────────────────────────────────────────────
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function resolveBoard(matchedCells) {
+async function resolveBoard(matchedGroups) {
     gameState.isResolving = true;
     try {
-        while (matchedCells.size > 0) {
-            gameState.score += scoreForMatch(matchedCells.size);
+        while (matchedGroups.length > 0) {
+            // Score for all groups in this cascade
+            for (const group of matchedGroups) {
+                gameState.score += scoreForMatch(group.length);
+                group.forEach(cell => cell.classList.add('matched'));
+            }
             updateScoreDisplay();
-            matchedCells.forEach(cell => cell.classList.add('matched'));
             await delay(300);
-            matchedCells.forEach(cell => { cell.classList.remove('matched'); cell.textContent = ''; });
+            for (const group of matchedGroups) {
+                group.forEach(cell => { cell.classList.remove('matched'); cell.textContent = ''; });
+            }
             await delay(150);
             applyGravity();
             await delay(300);
-            matchedCells = findMatches();
+            matchedGroups = findMatches();
         }
     } finally {
         gameState.isResolving = false;
@@ -327,7 +346,7 @@ function showGameEndModal() {
 }
 
 function handlePlayAgain() {
-    gameEndModal.classList.add('hidden');
+    gameEndModal.classList.add('hidden'); // Always hide modal when restarting
     gameState.movesLeft = INITIAL_MOVES;
     gameState.score = 0;
     updateMovesDisplay();
