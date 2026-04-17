@@ -118,11 +118,13 @@ async function handleTouchEnd(event) {
 // ── Shared swap logic ────────────────────────────────────────────────────────
 
 async function trySwap(sourceCell, targetCell) {
-    if (gameState.movesLeft <= 0) return; // Prevent moves when game is over
+    if (gameState.movesLeft <= 0 || gameState.isResolving) return; // Prevent moves when game is over or resolving
+    gameState.isResolving = true;
     swapCellContents(sourceCell, targetCell);
     const matchedGroups = findMatches();
     if (matchedGroups.length === 0) {
         swapCellContents(sourceCell, targetCell);
+        gameState.isResolving = false;
     } else {
         gameState.movesLeft--;
         updateMovesDisplay();
@@ -134,6 +136,7 @@ async function trySwap(sourceCell, targetCell) {
         if (!hasValidMoves()) {
             shuffleBoard();
         }
+        gameState.isResolving = false;
     }
 }
 
