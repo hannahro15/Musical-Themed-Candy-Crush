@@ -118,10 +118,10 @@ async function handleTouchEnd(event) {
 // ── Shared swap logic ────────────────────────────────────────────────────────
 
 async function trySwap(sourceCell, targetCell) {
-    if (gameState.movesLeft <= 0 || gameState.isResolving) return; // Prevent moves when game is over or resolving
+    if (gameState.movesLeft <= 0 || gameState.isResolving) return;
     gameState.isResolving = true;
     swapCellContents(sourceCell, targetCell);
-    const matchedGroups = findMatches();
+    let matchedGroups = findMatches();
     if (matchedGroups.length === 0) {
         swapCellContents(sourceCell, targetCell);
         gameState.isResolving = false;
@@ -135,6 +135,12 @@ async function trySwap(sourceCell, targetCell) {
         }
         if (!hasValidMoves()) {
             shuffleBoard();
+        }
+        // After cascades, check for new matches before allowing next move
+        let postCascadeGroups = findMatches();
+        while (postCascadeGroups.length > 0) {
+            await resolveBoard(postCascadeGroups);
+            postCascadeGroups = findMatches();
         }
         gameState.isResolving = false;
     }
