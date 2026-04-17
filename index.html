@@ -13,24 +13,35 @@
             <button id="playBtn">Play Game</button>
             <button id="howToPlayBtn">How to Play</button>
         </div>
-        <div>
-        <div id="movesDisplay" class="hidden"></div>
-        <div id="scoreDisplay" class="hidden"></div>
-        </div>
         <div id="game-board-container" class="hidden">
-           <div id="gameBoard" class="hidden"></div>
-        </div>
-
-        <div id="gameEndModal" class="hidden">
-            <div class="modal-content">
-                <h2>Well Done!</h2>
-                <p>Your score is: <span id="finalScore"></span></p>
-                <button id="playAgainBtn">Play Again</button>
+            <div id="score-moves-wrapper">
+                <div class="level-bar">
+                    <div id="levelDisplay" class="hidden">Level 1</div>
+                </div>
+                <div class="main-bar">
+                    <div class="left-bar">
+                        <div id="level1-counters" class="hidden symbol-row">
+                            <span id="violinCounter">🎻: 10</span>
+                            <span id="pianoCounter">🎹: 10</span>
+                        </div>
+                    </div>
+                    <div class="middle-bar">
+                        <div id="objectiveDisplay" class="hidden">Collect 6 violins and 6 pianos!</div>
+                    </div>
+                    <div class="right-bar">
+                        <div id="movesDisplay" class="hidden moves-right"></div>
+                        <div id="scoreDisplay" class="hidden score-right"></div>
+                        <div id="timerDisplay" class="hidden"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="gameBoard" class="hidden"></div>
+            <div id="restartContainer" class="hidden" style="text-align:center; margin-top: 16px;">
+                <button id="restartBtn">Restart Level</button>
             </div>
         </div>
+        <!-- Game end modal removed -->
     </div>
-
-     </div>
     <script src="script.js"></script>
 </body>
 </html>
