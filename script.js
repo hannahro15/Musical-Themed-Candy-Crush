@@ -1,7 +1,19 @@
+// Hide level and counters on menu (home) page
+function showMenuPage() {
+    document.getElementById('levelDisplay').classList.add('hidden');
+    level1Counters.classList.add('hidden');
+}
+
+// Hide level and counters on load
+document.addEventListener('DOMContentLoaded', () => {
+    showMenuPage();
+});
 // Game configuration
 const SYMBOLS = ['🎵', '🎶', '🎸', '🎹', '🎻', '🎷', '🎺', '🥁'];
 const BOARD_SIZE = 8;
-const INITIAL_MOVES = 20;
+const LEVEL1_MOVES = 15;
+const LEVEL1_VIOLINS = 6;
+const LEVEL1_PIANOS = 6;
 
 // DOM elements — script runs after <body>, so these are available immediately
 const playButton = document.getElementById('playBtn');
@@ -10,15 +22,25 @@ const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
 const movesDisplay = document.getElementById('movesDisplay');
 const scoreDisplay = document.getElementById('scoreDisplay');
-const gameEndModal = document.getElementById('gameEndModal');
-const finalScoreDisplay = document.getElementById('finalScore');
-const playAgainButton = document.getElementById('playAgainBtn');
+const violinCounter = document.getElementById('violinCounter');
+const pianoCounter = document.getElementById('pianoCounter');
+const level1Counters = document.getElementById('level1-counters');
+const timerDisplay = document.getElementById('timerDisplay');
+const restartBtn = document.getElementById('restartBtn');
+const restartContainer = document.getElementById('restartContainer');
 
 // Game state
 const gameState = {
-    movesLeft: INITIAL_MOVES,
+    movesLeft: LEVEL1_MOVES,
     score: 0,
     isResolving: false,
+    violinsLeft: LEVEL1_VIOLINS,
+    pianosLeft: LEVEL1_PIANOS,
+    level: 1,
+    levelComplete: false,
+    timer: 60,
+    timerInterval: null,
+    timerActive: false,
 };
 let draggedCell = null;
 let touchStartCell = null;
@@ -28,7 +50,7 @@ let touchStartY = 0;
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 playButton.addEventListener('click', handlePlayClick);
-playAgainButton.addEventListener('click', handlePlayAgain);
+restartBtn.addEventListener('click', handleRestartLevel);
 gameBoard.addEventListener('dragstart', handleDragStart);
 gameBoard.addEventListener('dragover', event => event.preventDefault());
 gameBoard.addEventListener('drop', handleDrop);
@@ -38,18 +60,72 @@ gameBoard.addEventListener('touchend', handleTouchEnd);
 // ── Event handlers ───────────────────────────────────────────────────────────
 
 function handlePlayClick() {
-    gameEndModal.classList.add('hidden'); // Always hide modal when starting
+    // Always reset and start Level 1
     [heading, menu].forEach(element => element.classList.add('hidden'));
-    [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay]
+    [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay')]
         .forEach(element => element.classList.remove('hidden'));
-    if (gameBoard.children.length === 0) {
-        gameState.movesLeft = INITIAL_MOVES;
-        gameState.score = 0;
-        updateMovesDisplay();
-        updateScoreDisplay();
-        generateGameBoard();
-    }
+    level1Counters.classList.remove('hidden');
+    restartContainer.classList.add('hidden');
+    // Optionally update the level display text if you want to support more levels in the future
+    document.getElementById('levelDisplay').textContent = `Level ${gameState.level}`;
+    // Level 1 setup
+    gameState.movesLeft = LEVEL1_MOVES;
+    gameState.score = 0;
+    gameState.violinsLeft = LEVEL1_VIOLINS;
+    gameState.pianosLeft = LEVEL1_PIANOS;
+    gameState.level = 1;
+    gameState.levelComplete = false;
+    gameState.timer = 60;
+    gameState.timerActive = true;
+    updateMovesDisplay();
+    updateScoreDisplay();
+    updateLevel1Counters();
+    updateTimerDisplay();
+    generateGameBoard();
+    startTimer();
 }
+
+function handleRestartLevel() {
+    // Reset everything as if starting the level fresh
+    [gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay')]
+        .forEach(element => element.classList.remove('hidden'));
+    level1Counters.classList.remove('hidden');
+    restartContainer.classList.add('hidden');
+    gameState.movesLeft = LEVEL1_MOVES;
+    gameState.score = 0;
+    gameState.violinsLeft = LEVEL1_VIOLINS;
+    gameState.pianosLeft = LEVEL1_PIANOS;
+    gameState.level = 1;
+    gameState.levelComplete = false;
+    gameState.timer = 60;
+    gameState.timerActive = true;
+    updateMovesDisplay();
+    updateScoreDisplay();
+    updateLevel1Counters();
+    updateTimerDisplay();
+    generateGameBoard();
+    startTimer();
+}
+function updateTimerDisplay() {
+    timerDisplay.textContent = `Time: ${gameState.timer}s`;
+}
+
+function startTimer() {
+    if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+    gameState.timerInterval = setInterval(() => {
+        if (!gameState.timerActive) return;
+        gameState.timer--;
+        updateTimerDisplay();
+        if (gameState.timer <= 0) {
+            gameState.timer = 0;
+            updateTimerDisplay();
+            clearInterval(gameState.timerInterval);
+            gameState.timerActive = false;
+            showLevel1Result(false, true);
+        }
+    }, 1000);
+}
+
 
 function handleDragStart(event) {
     if (gameState.isResolving) { event.preventDefault(); return; }
@@ -118,7 +194,7 @@ async function handleTouchEnd(event) {
 // ── Shared swap logic ────────────────────────────────────────────────────────
 
 async function trySwap(sourceCell, targetCell) {
-    if (gameState.movesLeft <= 0 || gameState.isResolving) return;
+    if (gameState.movesLeft <= 0 || gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
     gameState.isResolving = true;
     swapCellContents(sourceCell, targetCell);
     let matchedGroups = findMatches();
@@ -128,9 +204,10 @@ async function trySwap(sourceCell, targetCell) {
     } else {
         gameState.movesLeft--;
         updateMovesDisplay();
-        await resolveBoard(matchedGroups);
+        await resolveBoardAndLevel1(matchedGroups);
+        if (gameState.levelComplete) return;
         if (gameState.movesLeft === 0) {
-            showGameEndModal();
+            showLevel1Result();
             return;
         }
         if (!hasValidMoves()) {
@@ -139,7 +216,8 @@ async function trySwap(sourceCell, targetCell) {
         // After cascades, check for new matches before allowing next move
         let postCascadeGroups = findMatches();
         while (postCascadeGroups.length > 0) {
-            await resolveBoard(postCascadeGroups);
+            await resolveBoardAndLevel1(postCascadeGroups);
+            if (gameState.levelComplete) return;
             postCascadeGroups = findMatches();
         }
         gameState.isResolving = false;
@@ -198,6 +276,48 @@ function findMatches() {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Level 1: resolve board and update counters
+async function resolveBoardAndLevel1(matchedGroups) {
+    gameState.isResolving = true;
+    try {
+        while (matchedGroups.length > 0) {
+            for (const group of matchedGroups) {
+                // Level 1: count violins and pianos
+                let violins = 0, pianos = 0;
+                for (const cell of group) {
+                    if (cell.textContent === '🎻') violins++;
+                    if (cell.textContent === '🎹') pianos++;
+                }
+                if (violins > 0) gameState.violinsLeft = Math.max(0, gameState.violinsLeft - violins);
+                if (pianos > 0) gameState.pianosLeft = Math.max(0, gameState.pianosLeft - pianos);
+                updateLevel1Counters();
+                // Only award score if group contains at least one violin or piano
+                if (violins > 0 || pianos > 0) {
+                    gameState.score += scoreForMatch(group.length);
+                }
+                group.forEach(cell => cell.classList.add('matched'));
+            }
+            updateScoreDisplay();
+            await delay(300);
+            for (const group of matchedGroups) {
+                group.forEach(cell => { cell.classList.remove('matched'); cell.textContent = ''; });
+            }
+            await delay(150);
+            applyGravity();
+            await delay(300);
+            matchedGroups = findMatches();
+            // Check win condition after each cascade
+            if (gameState.violinsLeft === 0 && gameState.pianosLeft === 0) {
+                gameState.levelComplete = true;
+                showLevel1Result(true);
+                return;
+            }
+        }
+    } finally {
+        gameState.isResolving = false;
+    }
+}
+
 async function resolveBoard(matchedGroups) {
     gameState.isResolving = true;
     try {
@@ -244,6 +364,11 @@ function applyGravity() {
 
 function updateMovesDisplay() {
     movesDisplay.textContent = `Moves: ${gameState.movesLeft}`;
+}
+
+function updateLevel1Counters() {
+    violinCounter.textContent = `🎻: ${gameState.violinsLeft}`;
+    pianoCounter.textContent = `🎹: ${gameState.pianosLeft}`;
 }
 
 function updateScoreDisplay() {
@@ -305,7 +430,7 @@ function hasValidMoves() {
         for (let col = 0; col < BOARD_SIZE; col++) {
             if (col < BOARD_SIZE - 1) {
                 swapCellContents(grid[row][col], grid[row][col + 1]);
-                if (findMatches().size > 0) {
+                if (findMatches().length > 0) {
                     swapCellContents(grid[row][col], grid[row][col + 1]);
                     return true;
                 }
@@ -313,7 +438,7 @@ function hasValidMoves() {
             }
             if (row < BOARD_SIZE - 1) {
                 swapCellContents(grid[row][col], grid[row + 1][col]);
-                if (findMatches().size > 0) {
+                if (findMatches().length > 0) {
                     swapCellContents(grid[row][col], grid[row + 1][col]);
                     return true;
                 }
@@ -337,19 +462,31 @@ function shuffleBoard() {
         }
         
         allCells.forEach((cell, index) => cell.textContent = symbols[index]);
-    } while (findMatches().size > 0 && attempts++ < 5);
+    } while (findMatches().length > 0 && attempts++ < 5);
 }
 
-function showGameEndModal() {
-    finalScoreDisplay.textContent = gameState.score;
-    gameEndModal.classList.remove('hidden');
+
+
+function showLevel1Result(won, timedOut = false) {
+    gameState.levelComplete = true;
+    gameState.timerActive = false;
+    if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+    if (won) {
+        scoreDisplay.textContent = `Level Complete! Score: ${gameState.score}`;
+        movesDisplay.textContent = '🎉 You Win!';
+        restartContainer.classList.add('hidden');
+    } else if (timedOut) {
+        scoreDisplay.textContent = `Time's up! Score: ${gameState.score}`;
+        movesDisplay.textContent = '⏰ Game Over!';
+        restartContainer.classList.remove('hidden');
+    } else {
+        scoreDisplay.textContent = `Level Failed. Score: ${gameState.score}`;
+        movesDisplay.textContent = 'Game Over!';
+        restartContainer.classList.remove('hidden');
+    }
+    level1Counters.classList.add('hidden');
+    gameBoard.classList.add('hidden');
+    timerDisplay.classList.add('hidden');
 }
 
-function handlePlayAgain() {
-    gameEndModal.classList.add('hidden'); // Always hide modal when restarting
-    gameState.movesLeft = INITIAL_MOVES;
-    gameState.score = 0;
-    updateMovesDisplay();
-    updateScoreDisplay();
-    generateGameBoard();
-}
+// function handlePlayAgain() {}
