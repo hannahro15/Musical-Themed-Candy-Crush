@@ -38,10 +38,10 @@ gameBoard.addEventListener('touchend', handleTouchEnd);
 // ── Event handlers ───────────────────────────────────────────────────────────
 
 function handlePlayClick() {
+    gameEndModal.classList.add('hidden'); // Always hide modal when starting
     [heading, menu].forEach(element => element.classList.add('hidden'));
     [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay]
         .forEach(element => element.classList.remove('hidden'));
-
     if (gameBoard.children.length === 0) {
         gameState.movesLeft = INITIAL_MOVES;
         gameState.score = 0;
@@ -346,7 +346,7 @@ function showGameEndModal() {
 }
 
 function handlePlayAgain() {
-    gameEndModal.classList.add('hidden');
+    gameEndModal.classList.add('hidden'); // Always hide modal when restarting
     gameState.movesLeft = INITIAL_MOVES;
     gameState.score = 0;
     updateMovesDisplay();
