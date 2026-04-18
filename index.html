@@ -15,33 +15,25 @@
         </div>
         <div id="game-board-container" class="hidden">
             <div id="score-moves-wrapper">
-                <div class="level-bar">
-                    <div id="levelDisplay" class="hidden">Level 1</div>
+                <div class="top-bar-custom">
+                    <div id="livesDisplay" class="lives-bar"><span class="heart">❤️</span> <span id="livesCount">5</span></div>
+                    <div id="levelDisplay" class="hidden level-center">LEVEL 1</div>
                 </div>
-                <div class="main-bar">
-                    <div class="left-bar">
-                        <div id="level1-counters" class="hidden symbol-row">
-                            <span id="violinCounter">🎻: 10</span>
-                            <span id="pianoCounter">🎹: 10</span>
-                        </div>
-                    </div>
-                    <div class="middle-bar">
-                        <div id="objectiveDisplay" class="hidden">Collect 6 violins and 6 pianos!</div>
-                    </div>
-                    <div class="right-bar">
-                        <div id="livesDisplay" class="hidden lives-right"></div>
-                        <div id="movesDisplay" class="hidden moves-right"></div>
-                        <div id="scoreDisplay" class="hidden score-right"></div>
-                        <div id="timerDisplay" class="hidden"></div>
-                    </div>
+                <div id="level1-counters" class="symbol-counters-row">
+                    <span id="violinCounter">🎻: 10</span>
+                    <span id="pianoCounter">🎹: 10</span>
+                </div>
+                <div class="moves-score-timer-row">
+                    <div id="movesDisplay" class="hidden moves-horizontal">Moves: 0</div>
+                    <div id="scoreDisplay" class="hidden score-horizontal">Score: 0</div>
+                    <div id="timerDisplay" class="hidden timer-horizontal">Time: 0s</div>
+                </div>
                 </div>
             </div>
-            <div id="gameBoard" class="hidden"></div>
+            <div id="gameBoard"></div>
             <div id="restartContainer" class="hidden" style="text-align:center; margin-top: 16px;">
                 <button id="restartBtn">Restart Level</button>
-            </div>
-            <div id="nextLevelContainer" class="hidden" style="text-align:center; margin-top: 16px;">
-                <button id="nextLevelBtn">Next Level</button>
+                <button id="nextLevelBtn" class="hidden">Next Level</button>
             </div>
         </div>
         <!-- Game end modal removed -->
