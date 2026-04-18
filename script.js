@@ -41,6 +41,7 @@ const gameState = {
     timer: 60,
     timerInterval: null,
     timerActive: false,
+    lives: 5,
 };
 let draggedCell = null;
 let touchStartCell = null;
