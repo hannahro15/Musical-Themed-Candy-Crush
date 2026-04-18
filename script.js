@@ -17,6 +17,7 @@ const LEVEL1_PIANOS = 6;
 
 // DOM elements — script runs after <body>, so these are available immediately
 const playButton = document.getElementById('playBtn');
+// No level map functionality
 const heading = document.querySelector('h1');
 const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
@@ -26,12 +27,14 @@ const violinCounter = document.getElementById('violinCounter');
 const pianoCounter = document.getElementById('pianoCounter');
 const level1Counters = document.getElementById('level1-counters');
 const timerDisplay = document.getElementById('timerDisplay');
+const livesDisplay = document.getElementById('livesDisplay');
 const restartBtn = document.getElementById('restartBtn');
 const restartContainer = document.getElementById('restartContainer');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const nextLevelContainer = document.getElementById('nextLevelContainer');
 
 // Game state
+const INITIAL_LIVES = 5;
 const gameState = {
     movesLeft: LEVEL1_MOVES,
     score: 0,
@@ -43,7 +46,17 @@ const gameState = {
     timer: 60,
     timerInterval: null,
     timerActive: false,
+    maxUnlockedLevel: getMaxUnlockedLevel(),
+    lives: null, // Set on Play Game
 };
+
+function getMaxUnlockedLevel() {
+    return parseInt(localStorage.getItem('maxUnlockedLevel') || '1', 10);
+}
+
+function setMaxUnlockedLevel(level) {
+    localStorage.setItem('maxUnlockedLevel', String(level));
+}
 let draggedCell = null;
 let touchStartCell = null;
 let touchStartX = 0;
@@ -52,6 +65,8 @@ let touchStartY = 0;
 // ── Setup ─────────────────────────────────────────────────────────────────────
 
 playButton.addEventListener('click', handlePlayClick);
+// No event listener needed for levelMapBtn (now a link)
+
 restartBtn.addEventListener('click', handleRestartLevel);
 nextLevelBtn.addEventListener('click', handleNextLevel);
 gameBoard.addEventListener('dragstart', handleDragStart);
@@ -63,23 +78,25 @@ gameBoard.addEventListener('touchend', handleTouchEnd);
 // ── Event handlers ───────────────────────────────────────────────────────────
 
 function handlePlayClick() {
-    // Always reset and start Level 1
+    // Start at the latest unlocked level
+    gameState.level = gameState.maxUnlockedLevel;
     [heading, menu].forEach(element => element.classList.add('hidden'));
-    [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay')]
+    [document.getElementById('game-board-container'), gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay'), livesDisplay]
         .forEach(element => element.classList.remove('hidden'));
     level1Counters.classList.remove('hidden');
     restartContainer.classList.add('hidden');
-    // Optionally update the level display text if you want to support more levels in the future
     document.getElementById('levelDisplay').textContent = `Level ${gameState.level}`;
-    // Level 1 setup
+    // For now, only Level 1 logic is implemented
     gameState.movesLeft = LEVEL1_MOVES;
     gameState.score = 0;
     gameState.violinsLeft = LEVEL1_VIOLINS;
     gameState.pianosLeft = LEVEL1_PIANOS;
-    gameState.level = 1;
     gameState.levelComplete = false;
     gameState.timer = 60;
     gameState.timerActive = true;
+    // Only set lives to 5 if starting from menu (not on restart)
+    if (gameState.lives === null) gameState.lives = INITIAL_LIVES;
+    updateLivesDisplay();
     updateMovesDisplay();
     updateScoreDisplay();
     updateLevel1Counters();
@@ -87,10 +104,22 @@ function handlePlayClick() {
     generateGameBoard();
     startTimer();
 }
+function updateLivesDisplay() {
+    livesDisplay.textContent = `❤️ Lives: ${gameState.lives}`;
+}
 
 function handleRestartLevel() {
+    // If out of lives, reset to menu
+    if (gameState.lives === 0) {
+        showMenuPage();
+        // Reset lives for next session
+        gameState.lives = null;
+        [gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay'), livesDisplay, level1Counters, restartContainer, nextLevelContainer]
+            .forEach(element => element.classList.add('hidden'));
+        return;
+    }
     // Reset everything as if starting the level fresh
-    [gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay')]
+    [gameBoard, movesDisplay, scoreDisplay, timerDisplay, document.getElementById('levelDisplay'), livesDisplay]
         .forEach(element => element.classList.remove('hidden'));
     level1Counters.classList.remove('hidden');
     restartContainer.classList.add('hidden');
@@ -102,6 +131,7 @@ function handleRestartLevel() {
     gameState.levelComplete = false;
     gameState.timer = 60;
     gameState.timerActive = true;
+    updateLivesDisplay();
     updateMovesDisplay();
     updateScoreDisplay();
     updateLevel1Counters();
@@ -475,24 +505,51 @@ function showLevel1Result(won, timedOut = false) {
     gameState.timerActive = false;
     if (gameState.timerInterval) clearInterval(gameState.timerInterval);
     if (won) {
+        // Unlock next level if not already unlocked
+        if (gameState.level >= gameState.maxUnlockedLevel) {
+            setMaxUnlockedLevel(gameState.level + 1);
+            gameState.maxUnlockedLevel = gameState.level + 1;
+        }
         scoreDisplay.textContent = `Level Complete! Score: ${gameState.score}`;
         movesDisplay.textContent = '🎉 You Win!';
         restartContainer.classList.add('hidden');
         nextLevelContainer.classList.remove('hidden');
+        // Reset lives on win
+        gameState.lives = INITIAL_LIVES;
+        updateLivesDisplay();
     } else if (timedOut) {
-        scoreDisplay.textContent = `Time's up! Score: ${gameState.score}`;
-        movesDisplay.textContent = '⏰ Game Over!';
-        restartContainer.classList.remove('hidden');
-        nextLevelContainer.classList.add('hidden');
+        gameState.lives = Math.max(0, gameState.lives - 1);
+        updateLivesDisplay();
+        if (gameState.lives === 0) {
+            scoreDisplay.textContent = 'Game Over!';
+            movesDisplay.textContent = '';
+            restartContainer.classList.remove('hidden');
+            nextLevelContainer.classList.add('hidden');
+        } else {
+            scoreDisplay.textContent = `Time's up! Score: ${gameState.score}`;
+            movesDisplay.textContent = '⏰ Game Over!';
+            restartContainer.classList.remove('hidden');
+            nextLevelContainer.classList.add('hidden');
+        }
     } else {
-        scoreDisplay.textContent = `Level Failed. Score: ${gameState.score}`;
-        movesDisplay.textContent = 'Game Over!';
-        restartContainer.classList.remove('hidden');
-        nextLevelContainer.classList.add('hidden');
+        gameState.lives = Math.max(0, gameState.lives - 1);
+        updateLivesDisplay();
+        if (gameState.lives === 0) {
+            scoreDisplay.textContent = 'Game Over!';
+            movesDisplay.textContent = '';
+            restartContainer.classList.remove('hidden');
+            nextLevelContainer.classList.add('hidden');
+        } else {
+            scoreDisplay.textContent = `Level Failed. Score: ${gameState.score}`;
+            movesDisplay.textContent = 'Game Over!';
+            restartContainer.classList.remove('hidden');
+            nextLevelContainer.classList.add('hidden');
+        }
     }
     level1Counters.classList.add('hidden');
     gameBoard.classList.add('hidden');
     timerDisplay.classList.add('hidden');
+    livesDisplay.classList.remove('hidden');
 }
 
 function handleNextLevel() {
