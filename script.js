@@ -27,6 +27,7 @@ const pianoCounter = document.getElementById('pianoCounter');
 const level1Counters = document.getElementById('level1-counters');
 const timerDisplay = document.getElementById('timerDisplay');
 const restartBtn = document.getElementById('restartBtn');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
 const restartContainer = document.getElementById('restartContainer');
 
 // Game state
@@ -52,6 +53,26 @@ let touchStartY = 0;
 
 playButton.addEventListener('click', handlePlayClick);
 restartBtn.addEventListener('click', handleRestartLevel);
+if (nextLevelBtn) nextLevelBtn.addEventListener('click', handleNextLevel);
+// Show next level or restart button based on success
+function showLevelEnd(success) {
+    restartContainer.classList.remove('hidden');
+    if (success) {
+        nextLevelBtn.classList.remove('hidden');
+        restartBtn.classList.add('hidden');
+    } else {
+        nextLevelBtn.classList.add('hidden');
+        restartBtn.classList.remove('hidden');
+    }
+}
+
+// Example: call showLevelEnd(true) on win, showLevelEnd(false) on fail
+
+function handleNextLevel() {
+    // Placeholder: implement next level logic here
+    // For now, just restart level 1
+    handleRestartLevel();
+}
 gameBoard.addEventListener('dragstart', handleDragStart);
 gameBoard.addEventListener('dragover', event => event.preventDefault());
 gameBoard.addEventListener('drop', handleDrop);
