@@ -37,6 +37,7 @@ Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 - HTML5
 - CSS3
 - JavaScript
+- [GitHub Copilot](https://github.com/features/copilot) for AI-assisted development
 
 # Getting Started
 

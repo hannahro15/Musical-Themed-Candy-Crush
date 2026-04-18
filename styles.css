@@ -7,6 +7,8 @@
     justify-content: center;
     gap: 24px;
     margin-bottom: 18px;
+    /* Responsive: stack vertically on small screens */
+    flex-wrap: wrap;
 }
 .top-bar-custom {
     width: 100%;
@@ -52,6 +54,9 @@
     text-align: center;
     border: 2px solid #e0e0f7;
     background: linear-gradient(90deg, #f3f3fa 80%, #e6eaff 100%);
+    padding: 8px 12px;
+    box-sizing: border-box;
+    transition: font-size 0.2s, padding 0.2s;
 }
 
 /* Level indicator bar */
@@ -68,6 +73,7 @@
     align-items: stretch;
     gap: 18px;
 }
+
 .counters-row {
     width: 100%;
     display: flex;
@@ -184,6 +190,12 @@ body {
     font-weight: bold;
     margin-bottom: 10px;
     background-color: #6c6c96;
+    border-radius: 14px;
+    color: black;
+    padding: 6px 10px;
+    min-width: 80px;
+    box-sizing: border-box;
+    transition: font-size 0.2s, padding 0.2s;
 }
 
 .symbol-counters-row {
@@ -201,4 +213,31 @@ body {
     margin-bottom: 18px;
 }
 
+/* Responsive styles for mobile */
+@media (max-width: 600px) {
+    .moves-score-timer-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    .moves-horizontal, .score-horizontal, .timer-horizontal {
+        font-size: 1.05em;
+        min-width: 0;
+        width: 100%;
+        padding: 10px 0;
+        margin-bottom: 0;
+    }
+    #movesDisplay, #scoreDisplay, #timerDisplay {
+        font-size: 1.05em;
+        min-width: 0;
+        width: 100%;
+        padding: 10px 0;
+        margin-bottom: 0;
+    }
+    .symbol-counters-row {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 8px;
+    }
+}
 
