@@ -15,8 +15,8 @@ function showMenuPage() {
 }
 // Game constants (define at the top so all logic works)
 const LEVEL1_MOVES = 15;
-const LEVEL1_VIOLINS = 10;
-const LEVEL1_PIANOS = 10;
+const LEVEL1_VIOLINS = 6;
+const LEVEL1_PIANOS = 6;
 const BOARD_SIZE = 8;
 const SYMBOLS = ['🎵', '🎶', '🎸', '🎹', '🎻', '🎷', '🎺', '🥁'];
 
