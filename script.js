@@ -1,9 +1,11 @@
 
+
 import { getLevelConfig } from './levels.js';
 import { showMenuPage, updateLivesDisplay, updateMovesDisplay, updateScoreDisplay, updateLevel1Counters, updateTimerDisplay } from './ui.js';
-import { getSafeSymbol, generateGameBoard } from './board.js';
+import { getSafeSymbol, generateGameBoard, findMatches } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
-
+import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
+import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
 
 // --- DOM Elements ---
 const playButton = document.getElementById('playBtn');
@@ -35,7 +37,10 @@ let gameState = {
   lives: INITIAL_LIVES,
 };
 
-// --- Main Orchestration ---
+/**
+ * Starts a new level and initializes the game state and UI.
+ * @param {number} levelNum
+ */
 function startLevel(levelNum = 1) {
   const config = getLevelConfig(levelNum);
   gameState = {
@@ -67,10 +72,159 @@ function startLevel(levelNum = 1) {
   updateScoreDisplay(scoreDisplay, gameState.score);
   updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
   updateTimerDisplay(timerDisplay, gameState.timer);
+
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
+  wireUpCellEvents();
   startTimer();
 }
 
+// --- Drag/Touch State ---
+let draggedCell = null;
+let touchStartCell = null;
+let touchStartX = 0;
+let touchStartY = 0;
+
+function setDraggedCell(cell) {
+  draggedCell = cell;
+}
+function setTouchStartCell(cell) {
+  touchStartCell = cell;
+}
+function setTouchStartX(x) {
+  touchStartX = x;
+}
+function setTouchStartY(y) {
+  touchStartY = y;
+}
+
+/**
+ * Wires up drag and touch event listeners for all board cells.
+ */
+function wireUpCellEvents() {
+  const cells = Array.from(gameBoard.children);
+  cells.forEach(cell => {
+    cell.addEventListener('dragstart', onDragStart);
+    cell.addEventListener('drop', onDrop);
+    cell.addEventListener('touchstart', onTouchStart);
+    cell.addEventListener('touchend', onTouchEnd);
+  });
+}
+
+function onDragStart(e) {
+  handleDragStart(e, gameState, setDraggedCell);
+}
+function onDrop(e) {
+  handleDrop(e, gameState, draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap);
+}
+function onTouchStart(e) {
+  handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard);
+}
+function onTouchEnd(e) {
+  handleTouchEnd(e, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
+}
+
+/**
+ * Attempts to swap two cells and resolve matches.
+ * @param {HTMLElement} sourceCell
+ * @param {HTMLElement} targetCell
+ */
+async function trySwap(sourceCell, targetCell) {
+  if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
+  gameState.isResolving = true;
+
+  swapCellContents(sourceCell, targetCell);
+
+  // Wait a short moment so the swap is visible before clearing matches
+  await new Promise(res => setTimeout(res, 180));
+
+
+  // Detect matches after swap
+  let matches = findMatches(gameBoard, BOARD_SIZE);
+
+  // Only swap back if neither swapped cell is in a match
+  const swappedInMatch = matches.some(group => group.includes(sourceCell) || group.includes(targetCell));
+  if (matches.length === 0 || !swappedInMatch) {
+    // No match, or match does not involve swapped cells: swap back
+    swapCellContents(sourceCell, targetCell);
+    gameState.isResolving = false;
+    return;
+  }
+
+  // At least one match: resolve all matches
+  let scoreGained = 0;
+  while (matches.length > 0) {
+    // Animate matched cells
+    for (const group of matches) {
+      scoreGained += scoreForMatch(group.length);
+      for (const cell of group) {
+        cell.classList.add('matched');
+      }
+    }
+    await new Promise(res => setTimeout(res, 250)); // Animation delay
+    // Remove matched cells
+    for (const group of matches) {
+      for (const cell of group) {
+        cell.textContent = '';
+        cell.classList.remove('matched');
+      }
+    }
+    // Drop cells down and refill
+    dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
+    wireUpCellEvents(); // Ensure new cells are interactive
+    matches = findMatches(gameBoard, BOARD_SIZE);
+  }
+
+  // Update score and moves
+  gameState.score += scoreGained;
+  gameState.movesLeft--;
+  updateScoreDisplay(scoreDisplay, gameState.score);
+  updateMovesDisplay(movesDisplay, gameState.movesLeft);
+
+  // TODO: Update level counters if needed (violins/pianos)
+
+  gameState.isResolving = false;
+}
+// Drop and refill logic for match-3
+/**
+ * Drops cells down and refills empty spots with new symbols.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @param {string[]} SYMBOLS
+ * @param {function} getSafeSymbol
+ */
+function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
+  const grid = [];
+  const allCells = Array.from(gameBoard.children);
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    grid[row] = [];
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      grid[row][col] = allCells[row * BOARD_SIZE + col];
+    }
+  }
+  for (let col = 0; col < BOARD_SIZE; col++) {
+    let emptySpots = 0;
+    for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+      if (!grid[row][col].textContent) {
+        emptySpots++;
+      } else if (emptySpots > 0) {
+        grid[row + emptySpots][col].textContent = grid[row][col].textContent;
+        grid[row][col].textContent = '';
+      }
+    }
+    for (let row = 0; row < emptySpots; row++) {
+      grid[row][col].textContent = getSafeSymbol(
+        grid.map(r => r.map(c => c.textContent)),
+        row,
+        col,
+        SYMBOLS
+      );
+    }
+  }
+}
+
+/**
+ * Starts the countdown timer for the level.
+ */
 function startTimer() {
   if (gameState.timerInterval) clearInterval(gameState.timerInterval);
   gameState.timerInterval = setInterval(() => {
@@ -87,11 +241,17 @@ function startTimer() {
   }, 1000);
 }
 
+/**
+ * Handles Play Game button click.
+ */
 function handlePlayClick() {
   gameState.lives = INITIAL_LIVES;
   startLevel(1);
 }
 
+/**
+ * Handles Restart Level button click.
+ */
 function handleRestartLevel() {
   if (gameState.lives === 0) {
     showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
@@ -102,10 +262,23 @@ function handleRestartLevel() {
 }
 
 // --- Event Listeners ---
-document.addEventListener('DOMContentLoaded', () => {
-  showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
-});
-playButton.addEventListener('click', handlePlayClick);
-restartBtn.addEventListener('click', handleRestartLevel);
-// Add more event listeners as needed (drag, drop, touch, etc.)
 
+
+/**
+ * Attaches main menu and restart event listeners.
+ */
+function attachEventListeners() {
+  if (playButton) playButton.addEventListener('click', handlePlayClick);
+  if (restartBtn) restartBtn.addEventListener('click', handleRestartLevel);
+}
+
+// --- Initialization ---
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+    attachEventListeners();
+  });
+} else {
+  showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+  attachEventListeners();
+}
