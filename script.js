@@ -103,7 +103,16 @@ function setTouchStartY(y) {
 function wireUpCellEvents() {
   const cells = Array.from(gameBoard.children);
   cells.forEach(cell => {
+    // Remove previous listeners by cloning the node
+    const newCell = cell.cloneNode(true);
+    newCell.draggable = true;
+    cell.replaceWith(newCell);
+  });
+  // Re-query after replacement
+  const updatedCells = Array.from(gameBoard.children);
+  updatedCells.forEach(cell => {
     cell.addEventListener('dragstart', onDragStart);
+    cell.addEventListener('dragover', e => e.preventDefault()); // Allow drop
     cell.addEventListener('drop', onDrop);
     cell.addEventListener('touchstart', onTouchStart);
     cell.addEventListener('touchend', onTouchEnd);
@@ -152,6 +161,7 @@ async function trySwap(sourceCell, targetCell) {
 
   // At least one match: resolve all matches
   let scoreGained = 0;
+
   while (matches.length > 0) {
     // Animate matched cells
     for (const group of matches) {
@@ -171,6 +181,10 @@ async function trySwap(sourceCell, targetCell) {
     // Drop cells down and refill
     dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
     wireUpCellEvents(); // Ensure new cells are interactive
+
+    // Update symbol counters after board changes
+    updateSymbolCounters();
+
     matches = findMatches(gameBoard, BOARD_SIZE);
   }
 
@@ -180,7 +194,22 @@ async function trySwap(sourceCell, targetCell) {
   updateScoreDisplay(scoreDisplay, gameState.score);
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
 
-  // TODO: Update level counters if needed (violins/pianos)
+
+  // Update symbol counters after all matches resolved
+  updateSymbolCounters();
+// Update the violin and piano counters based on the current board
+function updateSymbolCounters() {
+  const allCells = Array.from(gameBoard.children);
+  let violins = 0;
+  let pianos = 0;
+  for (const cell of allCells) {
+    if (cell.textContent === '🎻') violins++;
+    if (cell.textContent === '🎹') pianos++;
+  }
+  gameState.violinsLeft = violins;
+  gameState.pianosLeft = pianos;
+  updateLevel1Counters(violinCounter, pianoCounter, violins, pianos);
+}
 
   gameState.isResolving = false;
 }
