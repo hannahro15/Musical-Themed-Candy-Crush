@@ -1,7 +1,16 @@
+
 # Musical-Themed Candy Crush
 
-A musical twist on the classic match-3 game!  
+![Game Screenshot](images/game-screenshot.png)
+
+A musical twist on the classic match-3 game!
 Match musical instrument symbols to complete level objectives.
+
+---
+
+**Note:** This is a solo project. Much of the game logic and code was generated with the help of AI (GitHub Copilot), especially the core mechanics and modular structure. The project was originally started by following a YouTube tutorial for a basic match-3 game, then heavily customised and extended with AI assistance.
+
+---
 
 Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 
@@ -23,6 +32,7 @@ Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 - Match **5** tiles → 40 points
 - Match at least 6 tiles - 60 points
 
+
 ## Features
 
 - Musical-themed match-3 gameplay
@@ -30,28 +40,45 @@ Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 - Move and timer limits
 - Touch and mouse controls
 - Responsive info bar above the board
-- Solo project with AI-assisted development for complicated logic
+- Modular JavaScript codebase for easy maintenance and extension
+- Flexible level logic (easy to add new levels/objectives)
 
 # Technologies Used
 
 - HTML5
 - CSS3
-- JavaScript
+- JavaScript (modular ES modules)
 - [GitHub Copilot](https://github.com/features/copilot) for AI-assisted development
+
+---
+
+## Project Structure
+
+The codebase is split into modular files for clarity and maintainability:
+
+- `constants.js` – Core constants (board size, symbols, lives)
+- `ui.js` – UI helper functions (show/hide screens, update displays)
+- `game.js` – Core game logic (swapping, scoring, adjacency)
+- `board.js` – Board/grid logic and match finding
+- `interaction.js` – Event handlers for drag/touch
+- `levels.js` – Level configuration and win conditions
+- `script.js` – Main orchestrator (wires up everything, no helpers/constants)
 
 # Getting Started
 
+
 1. Clone the repository:
-```bash
-git clone https://github.com/hannahro15/Musical-Themed-Candy-Crush.git
-```
+   ```bash
+   git clone https://github.com/hannahro15/Musical-Themed-Candy-Crush.git
+   ```
 
 2. Open `index.html` in your web browser
 
+
 # Credits
 
-Developed by Hannah Olbrich.  
-Emoji icons from [Unicode](https://unicode.org/emoji/).  
+Developed by Hannah Olbrich (solo project).
+Emoji icons from [Unicode](https://unicode.org/emoji/).
 AI-assisted development with GitHub Copilot.
 
 
