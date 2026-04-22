@@ -45,7 +45,7 @@ export function getSafeSymbol(grid, row, col, SYMBOLS) {
   return availableSymbols[Math.floor(Math.random() * availableSymbols.length)];
 }
 
-export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
+export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
   let attempts = 0;
   let hasMove = false;
   do {
@@ -63,16 +63,12 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol)
       }
     }
     // Check for at least one possible move
-    if (typeof window !== 'undefined' && window.hasPossibleMoves) {
-      hasMove = window.hasPossibleMoves(gameBoard, BOARD_SIZE);
-    } else {
-      hasMove = true; // fallback, should not happen
-    }
+    hasMove = hasPossibleMoves(gameBoard, BOARD_SIZE);
     attempts++;
   } while (!hasMove && attempts < 20);
-  // Defensive: always re-attach listeners after board generation
-  if (typeof window !== 'undefined' && window.wireUpCellEvents) {
-    window.wireUpCellEvents();
+  // Always re-attach listeners after board generation
+  if (typeof wireUpCellEvents === 'function') {
+    wireUpCellEvents();
   }
 }
 
@@ -104,7 +100,7 @@ export function hasPossibleMoves(gameBoard, BOARD_SIZE) {
   return false;
 }
 
-export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
+export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
   let allCells = Array.from(gameBoard.children);
   let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
   let attempts = 0;
@@ -118,10 +114,13 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
     });
     attempts++;
     if (attempts > 20) {
-      generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
+      generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents);
       break;
     }
   } while (!hasPossibleMoves(gameBoard, BOARD_SIZE));
+  if (typeof wireUpCellEvents === 'function') {
+    wireUpCellEvents();
+  }
 }
 
 export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {

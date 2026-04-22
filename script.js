@@ -1,16 +1,11 @@
-// Expose hasPossibleMoves globally for board.js to use
-window.hasPossibleMoves = hasPossibleMoves;
 
 
 import { getLevelConfig } from './levels.js';
-import { showMenuPage, updateLivesDisplay, updateMovesDisplay, updateScoreDisplay, updateObjectiveCounters, updateTimerDisplay } from './ui.js';
-import { getSafeSymbol, generateGameBoard, findMatches, hasPossibleMoves, reshuffleBoard, dropAndRefill } from './board.js';
+import { showMenuPage, updateObjectiveCounters } from './ui.js';
+import { getSafeSymbol, findMatches, dropAndRefill } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
-import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
-import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
-import { startTimer } from './timer.js';
-import { wireUpCellEvents, attachEventListeners } from './events.js';
-import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
+import { swapCellContents } from './game.js';
+import { gameState } from './gameState.js';
 import { handleLevelWin, handleLevelLose } from './gameStatus.js';
 // --- DOM Elements ---
 
@@ -35,42 +30,10 @@ const closeHowToPlay = document.getElementById('closeHowToPlay');
 // --- Drag/Touch State ---
 // (removed let draggedCell, touchStartCell, touchStartX, touchStartY and their setter functions)
 
-/**
- * Wires up drag and touch event listeners for all board cells.
- */
-function wireUpCellEvents() {
-  const cells = Array.from(gameBoard.children);
-  cells.forEach(cell => {
-    // Remove previous listeners by cloning the node
-    const newCell = cell.cloneNode(true);
-    newCell.draggable = true;
-    cell.replaceWith(newCell);
-  });
-  // Re-query after replacement
-  const updatedCells = Array.from(gameBoard.children);
-  updatedCells.forEach(cell => {
-    cell.addEventListener('dragstart', onDragStart);
-    cell.addEventListener('dragover', e => e.preventDefault()); // Allow drop
-    cell.addEventListener('drop', onDrop);
-    cell.addEventListener('touchstart', onTouchStart);
-    cell.addEventListener('touchend', onTouchEnd);
-  });
-}
 
 
 
-function onDragStart(e) {
-  handleDragStart(e, gameState, setDraggedCell);
-}
-function onDrop(e) {
-  handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap);
-}
-function onTouchStart(e) {
-  handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard);
-}
-async function onTouchEnd(e) {
-  await handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
-}
+// All event handler functions are used in event wiring elsewhere or in startLevel
 
 /**
  * Attempts to swap two cells and resolve matches.
@@ -133,59 +96,6 @@ async function trySwap(sourceCell, targetCell) {
     matches = findMatches(gameBoard, BOARD_SIZE);
   }
 
-  // After all matches resolved, check for possible moves; if none, reshuffle
-  if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
-    reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-    wireUpCellEvents();
-  }
-// Returns true if there is at least one possible swap that would result in a match
-function hasPossibleMoves(gameBoard, BOARD_SIZE) {
-  const allCells = Array.from(gameBoard.children);
-  for (let i = 0; i < allCells.length; i++) {
-    const cell = allCells[i];
-    const row = Math.floor(i / BOARD_SIZE);
-    const col = i % BOARD_SIZE;
-    // Try swapping with right neighbor
-    if (col < BOARD_SIZE - 1) {
-      swapCellContents(cell, allCells[i + 1]);
-      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
-        swapCellContents(cell, allCells[i + 1]);
-        return true;
-      }
-      swapCellContents(cell, allCells[i + 1]);
-    }
-    // Try swapping with bottom neighbor
-    if (row < BOARD_SIZE - 1) {
-      swapCellContents(cell, allCells[i + BOARD_SIZE]);
-      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
-        swapCellContents(cell, allCells[i + BOARD_SIZE]);
-        return true;
-      }
-      swapCellContents(cell, allCells[i + BOARD_SIZE]);
-    }
-  }
-  return false;
-}
-
-function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
-  let allCells = Array.from(gameBoard.children);
-  let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
-  let attempts = 0;
-  do {
-    for (let i = symbols.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
-    }
-    allCells.forEach((cell, idx) => {
-      cell.textContent = symbols[idx] || '';
-    });
-    attempts++;
-    if (attempts > 20) {
-      generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-      break;
-    }
-  } while (!hasPossibleMoves(gameBoard, BOARD_SIZE));
-}
 
   // Decrease counters for all objectives
   let allObjectivesComplete = true;
@@ -215,43 +125,6 @@ function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   gameState.isResolving = false;
 } // <-- This closing brace properly ends trySwap
 
-// Drop and refill logic for match-3
-/**
- * Drops cells down and refills empty spots with new symbols.
- * @param {HTMLElement} gameBoard
- * @param {number} BOARD_SIZE
- * @param {string[]} SYMBOLS
- * @param {function} getSafeSymbol
- */
-function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
-  const grid = [];
-  const allCells = Array.from(gameBoard.children);
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    grid[row] = [];
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      grid[row][col] = allCells[row * BOARD_SIZE + col];
-    }
-  }
-  for (let col = 0; col < BOARD_SIZE; col++) {
-    let emptySpots = 0;
-    for (let row = BOARD_SIZE - 1; row >= 0; row--) {
-      if (!grid[row][col].textContent) {
-        emptySpots++;
-      } else if (emptySpots > 0) {
-        grid[row + emptySpots][col].textContent = grid[row][col].textContent;
-        grid[row][col].textContent = '';
-      }
-    }
-    for (let row = 0; row < emptySpots; row++) {
-      grid[row][col].textContent = getSafeSymbol(
-        grid.map(r => r.map(c => c.textContent)),
-        row,
-        col,
-        SYMBOLS
-      );
-    }
-  }
-}
 
 /**
  * Handles Play Game button click.
