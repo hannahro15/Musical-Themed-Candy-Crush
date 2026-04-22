@@ -53,8 +53,12 @@ function startLevel(levelNum = 1) {
   const config = getLevelConfig(levelNum);
   gameState.movesLeft = config.moves;
   gameState.score = 0;
-  gameState.violinsLeft = config.violins;
-  gameState.pianosLeft = config.pianos;
+  // Dynamically initialize all *_Left counters for objectives
+  if (config.objectives && Array.isArray(config.objectives)) {
+    config.objectives.forEach(obj => {
+      gameState[obj.label + 'Left'] = obj.count;
+    });
+  }
   gameState.level = levelNum;
   gameState.levelComplete = false;
   gameState.timer = config.timer;
