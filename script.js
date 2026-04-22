@@ -4,9 +4,12 @@ import { getLevelConfig } from './levels.js';
 import { showMenuPage, updateObjectiveCounters } from './ui.js';
 import { getSafeSymbol, findMatches, dropAndRefill } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
-import { swapCellContents } from './game.js';
-import { gameState } from './gameState.js';
+import { swapCellContents, scoreForMatch } from './game.js';
+import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
 import { handleLevelWin, handleLevelLose } from './gameStatus.js';
+import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
+import { startTimer } from './timer.js';
+import { attachEventListeners, wireUpCellEvents } from './events.js';
 // --- DOM Elements ---
 
 const playButton = document.getElementById('playBtn');
@@ -33,7 +36,66 @@ const closeHowToPlay = document.getElementById('closeHowToPlay');
 
 
 
-// All event handler functions are used in event wiring elsewhere or in startLevel
+
+// --- Level/Board Setup ---
+function startLevel(levelNum) {
+  const config = getLevelConfig(levelNum);
+  // Reset game state for new level
+  gameState.level = levelNum;
+  gameState.levelComplete = false;
+  gameState.movesLeft = config.moves;
+  gameState.score = 0;
+  gameState.timer = config.timer;
+  gameState.timerActive = true;
+  // Reset all objective counters
+  Object.keys(gameState).forEach(key => {
+    if (key.endsWith('Left') && key !== 'movesLeft') delete gameState[key];
+  });
+  if (config.objectives && Array.isArray(config.objectives)) {
+    config.objectives.forEach(obj => {
+      gameState[obj.label + 'Left'] = obj.count;
+    });
+  }
+  // Update UI
+  document.getElementById('levelDisplay').textContent = `LEVEL ${levelNum}`;
+  updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
+  // Generate board and wire up cell events
+  generateBoardAndWireEvents();
+  // Start timer
+  startTimer(gameState, timerDisplay, () => handleLevelLose(restartContainer, restartBtn, nextLevelBtn));
+}
+
+function generateBoardAndWireEvents() {
+  // Generate the board (board.js logic)
+  gameBoard.innerHTML = '';
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = getSafeSymbol(
+        Array.from({ length: BOARD_SIZE }, (_, r) =>
+          Array.from({ length: BOARD_SIZE }, (_, c) =>
+            (r === row && c === col) ? null : (gameBoard.children[r * BOARD_SIZE + c]?.textContent || null)
+          )
+        ),
+        row,
+        col,
+        SYMBOLS
+      );
+      cell.draggable = true;
+      gameBoard.appendChild(cell);
+    }
+  }
+  // Attach drag/touch event listeners to all cells
+  wireUpCellEvents(
+    gameBoard,
+    BOARD_SIZE,
+    (e) => handleDragStart(e, gameState, setDraggedCell),
+    (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
+    (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
+    (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
+  );
+}
 
 /**
  * Attempts to swap two cells and resolve matches.
@@ -167,6 +229,7 @@ function handleRestartLevel() {
 }
 
 // --- Initialization ---
+
 
 document.addEventListener('DOMContentLoaded', () => {
   attachEventListeners({
