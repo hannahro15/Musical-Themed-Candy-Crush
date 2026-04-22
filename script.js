@@ -231,6 +231,15 @@ function handleRestartLevel() {
 // --- Initialization ---
 
 
+
+function handleNextLevel() {
+  // Hide restart/next buttons and start next level
+  if (restartContainer) restartContainer.classList.add('hidden');
+  if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
+  if (restartBtn) restartBtn.classList.add('hidden');
+  startLevel(gameState.level + 1);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   attachEventListeners({
     playButton,
@@ -241,5 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
     handlePlayClick,
     handleRestartLevel
   });
+  if (nextLevelBtn) nextLevelBtn.addEventListener('click', handleNextLevel);
   showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
 });
