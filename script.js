@@ -10,6 +10,7 @@ import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from '.
 import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
 import { startTimer } from './timer.js';
 import { wireUpCellEvents, attachEventListeners } from './events.js';
+import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
 // --- DOM Elements ---
 
 const playButton = document.getElementById('playBtn');
@@ -28,83 +29,10 @@ const howToPlayModal = document.getElementById('howToPlayModal');
 const closeHowToPlay = document.getElementById('closeHowToPlay');
 
 // --- Game State ---
-let gameState = {
-  movesLeft: 0,
-  score: 0,
-  isResolving: false,
-  violinsLeft: 0,
-  pianosLeft: 0,
-  level: 1,
-  levelComplete: false,
-  timer: 0,
-  timerInterval: null,
-  timerActive: false,
-  lives: INITIAL_LIVES,
-};
-
-/**
- * Starts a new level and initializes the game state and UI.
- * @param {number} levelNum
- */
-function startLevel(levelNum = 1) {
-  // Hide next level and restart buttons at the start
-  if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
-  if (restartBtn) restartBtn.classList.add('hidden');
-  if (restartContainer) restartContainer.classList.add('hidden');
-  const config = getLevelConfig(levelNum);
-  gameState.movesLeft = config.moves;
-  gameState.score = 0;
-  // Remove all previous *_Left counters from gameState except movesLeft
-  Object.keys(gameState).forEach(key => {
-    if (key.endsWith('Left') && key !== 'movesLeft') delete gameState[key];
-  });
-  // Dynamically initialize all *_Left counters for objectives
-  if (config.objectives && Array.isArray(config.objectives)) {
-    config.objectives.forEach(obj => {
-      gameState[obj.label + 'Left'] = obj.count;
-    });
-  }
-  gameState.level = levelNum;
-  gameState.levelComplete = false;
-  gameState.timer = config.timer;
-  gameState.timerActive = true;
-  document.getElementById('levelDisplay').textContent = `Level ${levelNum}`;
-  updateLivesDisplay(livesDisplay, gameState.lives);
-  updateMovesDisplay(movesDisplay, gameState.movesLeft);
-  updateScoreDisplay(scoreDisplay, gameState.score);
-  updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
-  updateTimerDisplay(timerDisplay, gameState.timer);
-
-  // Reset timer before generating the board
-  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  gameState.timerActive = true;
-  gameState.timer = config.timer;
-
-  window.wireUpCellEvents = () => wireUpCellEvents(gameBoard, BOARD_SIZE, onDragStart, onDrop, onTouchStart, onTouchEnd);
-  generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-  wireUpCellEvents(gameBoard, BOARD_SIZE, onDragStart, onDrop, onTouchStart, onTouchEnd);
-  updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
-  startTimer(gameState, timerDisplay, handleLevelLose);
-}
+// (removed local gameState definition)
 
 // --- Drag/Touch State ---
-let draggedCell = null;
-let touchStartCell = null;
-let touchStartX = 0;
-let touchStartY = 0;
-
-function setDraggedCell(cell) {
-  draggedCell = cell;
-}
-function setTouchStartCell(cell) {
-  touchStartCell = cell;
-}
-function setTouchStartX(x) {
-  touchStartX = x;
-}
-function setTouchStartY(y) {
-  touchStartY = y;
-}
+// (removed let draggedCell, touchStartCell, touchStartX, touchStartY and their setter functions)
 
 /**
  * Wires up drag and touch event listeners for all board cells.
@@ -134,13 +62,13 @@ function onDragStart(e) {
   handleDragStart(e, gameState, setDraggedCell);
 }
 function onDrop(e) {
-  handleDrop(e, gameState, draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap);
+  handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap);
 }
 function onTouchStart(e) {
   handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard);
 }
 async function onTouchEnd(e) {
-  await handleTouchEnd(e, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
+  await handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
 }
 
 /**
