@@ -20,6 +20,7 @@ const timerDisplay = document.getElementById('timerDisplay');
 const livesDisplay = document.getElementById('livesDisplay');
 const restartBtn = document.getElementById('restartBtn');
 const restartContainer = document.getElementById('restartContainer');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
 
 // --- Game State ---
 let gameState = {
@@ -41,18 +42,19 @@ let gameState = {
  * @param {number} levelNum
  */
 function startLevel(levelNum = 1) {
+  // Hide next level and restart buttons at the start
+  if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
+  if (restartBtn) restartBtn.classList.add('hidden');
+  if (restartContainer) restartContainer.classList.add('hidden');
   const config = getLevelConfig(levelNum);
-  gameState = {
-    ...gameState,
-    movesLeft: config.moves,
-    score: 0,
-    violinsLeft: config.violins,
-    pianosLeft: config.pianos,
-    level: levelNum,
-    levelComplete: false,
-    timer: config.timer,
-    timerActive: true,
-  };
+  gameState.movesLeft = config.moves;
+  gameState.score = 0;
+  gameState.violinsLeft = config.violins;
+  gameState.pianosLeft = config.pianos;
+  gameState.level = levelNum;
+  gameState.levelComplete = false;
+  gameState.timer = config.timer;
+  gameState.timerActive = true;
   heading.classList.add('hidden');
   menu.classList.add('hidden');
   document.getElementById('game-board-container').classList.remove('hidden');
@@ -72,9 +74,15 @@ function startLevel(levelNum = 1) {
   updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
   updateTimerDisplay(timerDisplay, gameState.timer);
 
+  // Reset timer before generating the board
+  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+  gameState.timerActive = true;
+  gameState.timer = config.timer;
+
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
   wireUpCellEvents();
-  updateSymbolCounters(); // Ensure counters are correct after board is generated
+  // Counters for level objective (not board count)
+  updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
   startTimer();
 }
 
@@ -100,65 +108,41 @@ function setTouchStartY(y) {
 /**
  * Wires up drag and touch event listeners for all board cells.
  */
-// Unified pointer event handling for both desktop and mobile
+/**
+ * Wires up drag and touch event listeners for all board cells.
+ */
 function wireUpCellEvents() {
   const cells = Array.from(gameBoard.children);
   cells.forEach(cell => {
     // Remove previous listeners by cloning the node
     const newCell = cell.cloneNode(true);
+    newCell.draggable = true;
     cell.replaceWith(newCell);
   });
   // Re-query after replacement
   const updatedCells = Array.from(gameBoard.children);
   updatedCells.forEach(cell => {
-    cell.addEventListener('pointerdown', onPointerDown);
-    cell.addEventListener('pointerup', onPointerUp);
-    cell.addEventListener('pointerleave', onPointerLeave);
-    cell.addEventListener('pointermove', onPointerMove);
-    // Remove drag/touch events for unified pointer events
-    newCellDraggableOff(cell);
+    cell.addEventListener('dragstart', onDragStart);
+    cell.addEventListener('dragover', e => e.preventDefault()); // Allow drop
+    cell.addEventListener('drop', onDrop);
+    cell.addEventListener('touchstart', onTouchStart);
+    cell.addEventListener('touchend', onTouchEnd);
   });
 }
 
-// Remove draggable property for pointer events
-function newCellDraggableOff(cell) {
-  cell.draggable = false;
+
+
+function onDragStart(e) {
+  handleDragStart(e, gameState, setDraggedCell);
 }
-
-
-// --- Pointer Event State ---
-let pointerDownCell = null;
-let pointerDownX = 0;
-let pointerDownY = 0;
-let pointerDragging = false;
-
-function onPointerDown(e) {
-  if (gameState.isResolving) return;
-  if (!e.target.classList.contains('cell')) return;
-  pointerDownCell = e.target;
-  pointerDownX = e.clientX;
-  pointerDownY = e.clientY;
-  pointerDragging = true;
+function onDrop(e) {
+  handleDrop(e, gameState, draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap);
 }
-
-function onPointerUp(e) {
-  if (!pointerDragging || !pointerDownCell) return;
-  const upCell = document.elementFromPoint(e.clientX, e.clientY);
-  if (upCell && upCell.classList.contains('cell') && areAdjacent(pointerDownCell, upCell, gameBoard, BOARD_SIZE)) {
-    trySwap(pointerDownCell, upCell);
-  }
-  pointerDragging = false;
-  pointerDownCell = null;
+function onTouchStart(e) {
+  handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard);
 }
-
-function onPointerLeave(e) {
-  // Cancel drag if pointer leaves the cell
-  pointerDragging = false;
-  pointerDownCell = null;
-}
-
-function onPointerMove(e) {
-  // Optional: implement visual feedback for drag if desired
+function onTouchEnd(e) {
+  handleTouchEnd(e, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
 }
 
 /**
@@ -218,13 +202,96 @@ async function trySwap(sourceCell, targetCell) {
     matches = findMatches(gameBoard, BOARD_SIZE);
   }
 
-  // Decrease counters for matched violins/pianos
+  // After all matches resolved, check for possible moves; if none, reshuffle
+  if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
+    reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
+    wireUpCellEvents();
+  }
+// Returns true if there is at least one possible swap that would result in a match
+function hasPossibleMoves(gameBoard, BOARD_SIZE) {
+  const allCells = Array.from(gameBoard.children);
+  for (let i = 0; i < allCells.length; i++) {
+    const cell = allCells[i];
+    const row = Math.floor(i / BOARD_SIZE);
+    const col = i % BOARD_SIZE;
+    // Try swapping with right neighbor
+    if (col < BOARD_SIZE - 1) {
+      swapCellContents(cell, allCells[i + 1]);
+      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
+        swapCellContents(cell, allCells[i + 1]);
+        return true;
+      }
+      swapCellContents(cell, allCells[i + 1]);
+    }
+    // Try swapping with bottom neighbor
+    if (row < BOARD_SIZE - 1) {
+      swapCellContents(cell, allCells[i + BOARD_SIZE]);
+      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
+        swapCellContents(cell, allCells[i + BOARD_SIZE]);
+        return true;
+      }
+      swapCellContents(cell, allCells[i + BOARD_SIZE]);
+    }
+  }
+  return false;
+}
+
+// Reshuffles the board until there is at least one possible move
+function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
+  let allCells = Array.from(gameBoard.children);
+  let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
+  let attempts = 0;
+  do {
+    // Shuffle symbols array
+    for (let i = symbols.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
+    }
+    // Assign shuffled symbols back to cells
+    allCells.forEach((cell, idx) => {
+      cell.textContent = symbols[idx] || '';
+    });
+    attempts++;
+    // Avoid infinite loop: after 20 tries, just refill the board
+    if (attempts > 20) {
+      generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
+      break;
+    }
+  } while (!hasPossibleMoves(gameBoard, BOARD_SIZE));
+}
+
+  // Decrease counters for matched violins/pianos (level objective)
   if (violinsMatched > 0 || pianosMatched > 0) {
     gameState.violinsLeft = Math.max(0, gameState.violinsLeft - violinsMatched);
     gameState.pianosLeft = Math.max(0, gameState.pianosLeft - pianosMatched);
     updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
+    // Check for win condition after counters update
+    if (gameState.violinsLeft === 0 && gameState.pianosLeft === 0) {
+      handleLevelWin();
+      return;
+    }
   }
 
+// Show Next Level button and stop timer on win
+function handleLevelWin() {
+  gameState.levelComplete = true;
+  gameState.timerActive = false;
+  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+  if (restartContainer) restartContainer.classList.remove('hidden');
+  if (nextLevelBtn) nextLevelBtn.classList.remove('hidden');
+  if (restartBtn) restartBtn.classList.add('hidden');
+}
+
+// Show Restart Level button and stop timer on lose
+function handleLevelLose() {
+  gameState.levelComplete = true;
+  gameState.timerActive = false;
+  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+  // Always show the restart container and button
+  if (restartContainer) restartContainer.classList.remove('hidden');
+  if (restartBtn) restartBtn.classList.remove('hidden');
+  if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
+}
   // Update score and moves
   gameState.score += scoreGained;
   gameState.movesLeft--;
@@ -232,8 +299,8 @@ async function trySwap(sourceCell, targetCell) {
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
 
 
-  // Update symbol counters after all matches resolved
-  updateSymbolCounters();
+  // Optionally update board counters for debugging (not for objectives)
+  // updateSymbolCounters();
 // Update the violin and piano counters based on the current board
 function updateSymbolCounters() {
   const allCells = Array.from(gameBoard.children);
@@ -302,7 +369,7 @@ function startTimer() {
       updateTimerDisplay(timerDisplay, gameState.timer);
       clearInterval(gameState.timerInterval);
       gameState.timerActive = false;
-      // Show result (implement as needed)
+      handleLevelLose();
     }
   }, 1000);
 }
@@ -329,6 +396,11 @@ function handleRestartLevel() {
 
 // --- Event Listeners ---
 
+if (nextLevelBtn) {
+  nextLevelBtn.addEventListener('click', () => {
+    startLevel(gameState.level + 1);
+  });
+}
 
 /**
  * Attaches main menu and restart event listeners.
