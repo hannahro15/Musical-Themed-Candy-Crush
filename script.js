@@ -8,6 +8,7 @@ import { getSafeSymbol, generateGameBoard, findMatches } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
 import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
+import { startTimer } from './timer.js';
 // --- DOM Elements ---
 
 const playButton = document.getElementById('playBtn');
@@ -82,7 +83,7 @@ function startLevel(levelNum = 1) {
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
   wireUpCellEvents();
   updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
-  startTimer();
+  startTimer(gameState, timerDisplay, handleLevelLose);
 }
 
 // --- Drag/Touch State ---
@@ -350,27 +351,7 @@ function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   }
 }
 
-/**
- * Starts the countdown timer for the level.
- */
-function startTimer() {
-  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  gameState.timerInterval = setInterval(() => {
-    if (!gameState.timerActive) return;
-    gameState.timer--;
-    updateTimerDisplay(timerDisplay, gameState.timer);
-    if (gameState.timer <= 0) {
-      gameState.timer = 0;
-      updateTimerDisplay(timerDisplay, gameState.timer);
-      clearInterval(gameState.timerInterval);
-      gameState.timerActive = false;
-      // Only trigger lose if moves are still above 0
-      if (gameState.movesLeft > 0 && !gameState.levelComplete) {
-        handleLevelLose();
-      }
-    }
-  }, 1000);
-}
+
 
 /**
  * Handles Play Game button click.
