@@ -166,8 +166,10 @@ async function trySwap(sourceCell, targetCell) {
 
   // At least one match: resolve all matches
   let scoreGained = 0;
-  let violinsMatched = 0;
-  let pianosMatched = 0;
+  // Dynamically count matches for all objectives
+  const config = getLevelConfig(gameState.level);
+  const matchedCounts = {};
+  config.objectives.forEach(obj => { matchedCounts[obj.label] = 0; });
 
   while (matches.length > 0) {
     // Animate matched cells
@@ -175,8 +177,10 @@ async function trySwap(sourceCell, targetCell) {
       scoreGained += scoreForMatch(group.length);
       for (const cell of group) {
         cell.classList.add('matched');
-        if (cell.textContent === '🎻') violinsMatched++;
-        if (cell.textContent === '🎹') pianosMatched++;
+        // Count matches for all objectives
+        config.objectives.forEach(obj => {
+          if (cell.textContent === obj.symbol) matchedCounts[obj.label]++;
+        });
       }
     }
     await new Promise(res => setTimeout(res, 250)); // Animation delay
@@ -252,16 +256,21 @@ function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   } while (!hasPossibleMoves(gameBoard, BOARD_SIZE));
 }
 
-  // Decrease counters for matched violins/pianos (level objective)
-  if (violinsMatched > 0 || pianosMatched > 0) {
-    gameState.violinsLeft = Math.max(0, gameState.violinsLeft - violinsMatched);
-    gameState.pianosLeft = Math.max(0, gameState.pianosLeft - pianosMatched);
-    updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(gameState.level).objectives, gameState);
-    // Check for win condition after counters update
-    if (gameState.violinsLeft === 0 && gameState.pianosLeft === 0) {
-      handleLevelWin();
-      return;
+  // Decrease counters for all objectives
+  let allObjectivesComplete = true;
+  config.objectives.forEach(obj => {
+    const key = obj.label + 'Left';
+    if (typeof gameState[key] !== 'number') gameState[key] = obj.count;
+    if (matchedCounts[obj.label] > 0) {
+      gameState[key] = Math.max(0, gameState[key] - matchedCounts[obj.label]);
     }
+    if (gameState[key] > 0) allObjectivesComplete = false;
+  });
+  updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
+  // Check for win condition after counters update
+  if (allObjectivesComplete) {
+    handleLevelWin();
+    return;
   }
 
 // Show Next Level button and stop timer on win
