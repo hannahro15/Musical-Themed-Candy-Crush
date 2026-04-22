@@ -59,10 +59,16 @@ The codebase is split into modular files for clarity and maintainability:
 - `constants.js` – Core constants (board size, symbols, lives)
 - `ui.js` – UI helper functions (show/hide screens, update displays)
 - `game.js` – Core game logic (swapping, scoring, adjacency)
-- `board.js` – Board/grid logic and match finding
-- `interaction.js` – Event handlers for drag/touch
-- `levels.js` – Level configuration and win conditions
-- `script.js` – Main orchestrator (wires up everything, no helpers/constants)
+- `board.js` – Board/grid logic, match finding, possible moves, reshuffling, and refill logic
+- `interaction.js` – Event handlers for drag/touch/mouse interactions
+- `levels.js` – Level configuration and objectives
+- `timer.js` – Timer logic for level countdowns
+- `events.js` – Centralised event wiring and management
+- `gameState.js` – Game state management (lives, moves, current level, etc.)
+- `gameStatus.js` – Win/lose logic and end-of-level handling
+- `script.js` – Main orchestrator (initializes game, wires up modules, no helpers/constants)
+
+This modular structure makes it easy to maintain, test, and extend the game. Each file is responsible for a specific aspect of the game logic or UI.
 
 # Getting Started
 
