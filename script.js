@@ -133,8 +133,8 @@ function onDrop(e) {
 function onTouchStart(e) {
   handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard);
 }
-function onTouchEnd(e) {
-  handleTouchEnd(e, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
+async function onTouchEnd(e) {
+  await handleTouchEnd(e, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
 }
 
 /**
