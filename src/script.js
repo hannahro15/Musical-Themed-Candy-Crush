@@ -40,6 +40,11 @@ const closeHowToPlay = document.getElementById('closeHowToPlay');
 // --- Level/Board Setup ---
 function startLevel(levelNum) {
   const config = getLevelConfig(levelNum);
+  if (!config) {
+    // No more levels, show menu or win screen
+    showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+    return;
+  }
   // Reset game state for new level
   gameState.level = levelNum;
   gameState.levelComplete = false;
@@ -59,6 +64,9 @@ function startLevel(levelNum) {
   // Update UI
   document.getElementById('levelDisplay').textContent = `LEVEL ${levelNum}`;
   updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
+  updateMovesDisplay(movesDisplay, gameState.movesLeft);
+  updateScoreDisplay(scoreDisplay, gameState.score);
+  updateLivesDisplay(livesDisplay, gameState.lives);
   // Generate board and wire up cell events
   generateBoardAndWireEvents();
   // Start timer
@@ -102,6 +110,7 @@ function generateBoardAndWireEvents() {
  * @param {HTMLElement} sourceCell
  * @param {HTMLElement} targetCell
  */
+
 async function trySwap(sourceCell, targetCell) {
   if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
   gameState.isResolving = true;
@@ -110,7 +119,6 @@ async function trySwap(sourceCell, targetCell) {
 
   // Wait a short moment so the swap is visible before clearing matches
   await new Promise(res => setTimeout(res, 180));
-
 
   // Detect matches after swap
   let matches = findMatches(gameBoard, BOARD_SIZE);
@@ -130,6 +138,10 @@ async function trySwap(sourceCell, targetCell) {
   const config = getLevelConfig(gameState.level);
   const matchedCounts = {};
   config.objectives.forEach(obj => { matchedCounts[obj.label] = 0; });
+
+  // Decrement movesLeft and update display for a valid swap
+  gameState.movesLeft = Math.max(0, gameState.movesLeft - 1);
+  updateMovesDisplay(movesDisplay, gameState.movesLeft);
 
   while (matches.length > 0) {
     // Animate matched cells
@@ -154,10 +166,20 @@ async function trySwap(sourceCell, targetCell) {
     // Drop cells down and refill
     dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
     // Ensure new cells are interactive
-
+    wireUpCellEvents(
+      gameBoard,
+      BOARD_SIZE,
+      (e) => handleDragStart(e, gameState, setDraggedCell),
+      (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
+      (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
+      (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
+    );
     matches = findMatches(gameBoard, BOARD_SIZE);
   }
 
+  // Update score and display
+  gameState.score += scoreGained;
+  updateScoreDisplay(scoreDisplay, gameState.score);
 
   // Decrease counters for all objectives
   let allObjectivesComplete = true;
@@ -173,6 +195,7 @@ async function trySwap(sourceCell, targetCell) {
   // Check for win condition after counters update
   if (allObjectivesComplete) {
     handleLevelWin(restartContainer, nextLevelBtn, restartBtn);
+    gameState.isResolving = false;
     return;
   }
 
@@ -185,7 +208,7 @@ async function trySwap(sourceCell, targetCell) {
     }
   }
   gameState.isResolving = false;
-} // <-- This closing brace properly ends trySwap
+}
 
 
 /**
@@ -223,6 +246,7 @@ function handleRestartLevel() {
   if (gameState.lives === 0) {
     showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
     gameState.lives = INITIAL_LIVES;
+    updateLivesDisplay(livesDisplay, gameState.lives);
     return;
   }
   startLevel(gameState.level);
