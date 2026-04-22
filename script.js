@@ -421,8 +421,25 @@ function handleRestartLevel() {
 
 // --- Event Listeners ---
 
+
 if (nextLevelBtn) {
   nextLevelBtn.addEventListener('click', () => {
+    // Always show the game UI when advancing to the next level
+    heading.classList.add('hidden');
+    menu.classList.add('hidden');
+    document.getElementById('game-board-container').classList.remove('hidden');
+    gameBoard.classList.remove('hidden');
+    document.getElementById('score-moves-wrapper').classList.remove('hidden');
+    document.getElementById('levelDisplay').classList.remove('hidden');
+    movesDisplay.classList.remove('hidden');
+    scoreDisplay.classList.remove('hidden');
+    timerDisplay.classList.remove('hidden');
+    livesDisplay.classList.remove('hidden');
+    if (restartContainer) restartContainer.classList.add('hidden');
+    // Always show the objective counters
+    const counters = document.getElementById('objective-counters') || level1Counters;
+    counters.classList.remove('hidden');
+    // Start the next level
     startLevel(gameState.level + 1);
   });
 }
