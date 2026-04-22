@@ -11,6 +11,7 @@ import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
 import { startTimer } from './timer.js';
 import { wireUpCellEvents, attachEventListeners } from './events.js';
 import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
+import { handleLevelWin, handleLevelLose } from './gameStatus.js';
 // --- DOM Elements ---
 
 const playButton = document.getElementById('playBtn');
@@ -127,7 +128,7 @@ async function trySwap(sourceCell, targetCell) {
     }
     // Drop cells down and refill
     dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-    wireUpCellEvents(); // Ensure new cells are interactive
+    // Ensure new cells are interactive
 
     matches = findMatches(gameBoard, BOARD_SIZE);
   }
@@ -199,49 +200,21 @@ function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
   // Check for win condition after counters update
   if (allObjectivesComplete) {
-    handleLevelWin();
+    handleLevelWin(restartContainer, nextLevelBtn, restartBtn);
     return;
   }
 
-// Show Next Level button and stop timer on win
-function handleLevelWin() {
-  gameState.levelComplete = true;
-  gameState.timerActive = false;
-  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  if (restartContainer) restartContainer.classList.remove('hidden');
-  if (nextLevelBtn) nextLevelBtn.classList.remove('hidden');
-  if (restartBtn) restartBtn.classList.add('hidden'); // Hide restart button on win
-}
-
-// Show Restart Level button and stop timer on lose
-function handleLevelLose() {
-  gameState.levelComplete = true;
-  gameState.timerActive = false;
-  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  // Show the restart container and button only on lose
-  if (restartContainer) restartContainer.classList.remove('hidden');
-  if (restartBtn) restartBtn.classList.remove('hidden');
-  if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
-}
-  // Update score and moves
-  gameState.score += scoreGained;
-  gameState.movesLeft--;
-  updateScoreDisplay(scoreDisplay, gameState.score);
-  updateMovesDisplay(movesDisplay, gameState.movesLeft);
-  // If out of moves, trigger level lose
   if (gameState.movesLeft <= 0 && !gameState.levelComplete) {
     // Only trigger lose if timer is still above 0
     if (gameState.timer > 0) {
-      handleLevelLose();
+      handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
       gameState.isResolving = false;
       return;
     }
   }
-
-
-
   gameState.isResolving = false;
-}
+} // <-- This closing brace properly ends trySwap
+
 // Drop and refill logic for match-3
 /**
  * Drops cells down and refills empty spots with new symbols.
@@ -279,8 +252,6 @@ function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
     }
   }
 }
-
-
 
 /**
  * Handles Play Game button click.
