@@ -7,7 +7,9 @@ import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
 import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
 // --- DOM Elements ---
+
 const playButton = document.getElementById('playBtn');
+const howToPlayBtn = document.getElementById('howToPlayBtn');
 const heading = document.querySelector('h1');
 const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
@@ -21,6 +23,8 @@ const livesDisplay = document.getElementById('livesDisplay');
 const restartBtn = document.getElementById('restartBtn');
 const restartContainer = document.getElementById('restartContainer');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
+const howToPlayModal = document.getElementById('howToPlayModal');
+const closeHowToPlay = document.getElementById('closeHowToPlay');
 
 // --- Game State ---
 let gameState = {
@@ -410,12 +414,31 @@ if (nextLevelBtn) {
   });
 }
 
+
 /**
- * Attaches main menu and restart event listeners.
+ * Attaches main menu, restart, and modal event listeners.
  */
 function attachEventListeners() {
   if (playButton) playButton.addEventListener('click', handlePlayClick);
   if (restartBtn) restartBtn.addEventListener('click', handleRestartLevel);
+  if (howToPlayBtn && howToPlayModal) {
+    howToPlayBtn.addEventListener('click', () => {
+      howToPlayModal.classList.remove('hidden');
+    });
+  }
+  if (closeHowToPlay && howToPlayModal) {
+    closeHowToPlay.addEventListener('click', () => {
+      howToPlayModal.classList.add('hidden');
+    });
+  }
+  // Close modal if clicking outside modal content
+  if (howToPlayModal) {
+    howToPlayModal.addEventListener('click', (e) => {
+      if (e.target === howToPlayModal) {
+        howToPlayModal.classList.add('hidden');
+      }
+    });
+  }
 }
 
 // --- Initialization ---
