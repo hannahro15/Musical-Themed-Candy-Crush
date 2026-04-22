@@ -9,6 +9,7 @@ import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
 import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
 import { startTimer } from './timer.js';
+import { wireUpCellEvents, attachEventListeners } from './events.js';
 // --- DOM Elements ---
 
 const playButton = document.getElementById('playBtn');
@@ -79,9 +80,9 @@ function startLevel(levelNum = 1) {
   gameState.timerActive = true;
   gameState.timer = config.timer;
 
-  window.wireUpCellEvents = wireUpCellEvents;
+  window.wireUpCellEvents = () => wireUpCellEvents(gameBoard, BOARD_SIZE, onDragStart, onDrop, onTouchStart, onTouchEnd);
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-  wireUpCellEvents();
+  wireUpCellEvents(gameBoard, BOARD_SIZE, onDragStart, onDrop, onTouchStart, onTouchEnd);
   updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
   startTimer(gameState, timerDisplay, handleLevelLose);
 }
@@ -393,62 +394,17 @@ function handleRestartLevel() {
   startLevel(gameState.level);
 }
 
-// --- Event Listeners ---
-
-
-if (nextLevelBtn) {
-  nextLevelBtn.addEventListener('click', () => {
-    // Always show the game UI when advancing to the next level
-    heading.classList.add('hidden');
-    menu.classList.add('hidden');
-    document.getElementById('game-board-container').classList.remove('hidden');
-    gameBoard.classList.remove('hidden');
-    document.getElementById('score-moves-wrapper').classList.remove('hidden');
-    document.getElementById('levelDisplay').classList.remove('hidden');
-    movesDisplay.classList.remove('hidden');
-    scoreDisplay.classList.remove('hidden');
-    timerDisplay.classList.remove('hidden');
-    livesDisplay.classList.remove('hidden');
-    if (restartContainer) restartContainer.classList.add('hidden');
-    // Always show the objective counters
-    const counters = document.getElementById('objective-counters');
-    counters.classList.remove('hidden');
-    // Start the next level
-    startLevel(gameState.level + 1);
-  });
-}
-
-
-/**
- * Attaches main menu, restart, and modal event listeners.
- */
-function attachEventListeners() {
-  if (playButton) playButton.addEventListener('click', handlePlayClick);
-  if (restartBtn) restartBtn.addEventListener('click', handleRestartLevel);
-  if (howToPlayBtn && howToPlayModal) {
-    howToPlayBtn.addEventListener('click', () => {
-      howToPlayModal.classList.remove('hidden');
-    });
-  }
-  if (closeHowToPlay && howToPlayModal) {
-    closeHowToPlay.addEventListener('click', () => {
-      howToPlayModal.classList.add('hidden');
-    });
-  }
-  // Close modal if clicking outside modal content
-  if (howToPlayModal) {
-    howToPlayModal.addEventListener('click', (e) => {
-      if (e.target === howToPlayModal) {
-        howToPlayModal.classList.add('hidden');
-      }
-    });
-  }
-}
-
 // --- Initialization ---
 
-
 document.addEventListener('DOMContentLoaded', () => {
-  attachEventListeners();
+  attachEventListeners({
+    playButton,
+    restartBtn,
+    howToPlayBtn,
+    howToPlayModal,
+    closeHowToPlay,
+    handlePlayClick,
+    handleRestartLevel
+  });
   showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
 });
