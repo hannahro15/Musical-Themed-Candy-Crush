@@ -280,7 +280,8 @@ body {
         flex-direction: column;
         gap: 10px;
         padding: 10px 8px;
-        align-items: flex-start;
+        align-items: center;
+        justify-content: center;
     }
     .symbol-counters-row span {
         font-size: 1.15em;
@@ -292,6 +293,7 @@ body {
         min-width: 80px;
         box-shadow: 0 1px 4px rgba(60,60,120,0.07);
         display: block;
+        text-align: center;
     }
 }
 

@@ -280,7 +280,7 @@ function handleLevelWin() {
   if (gameState.timerInterval) clearInterval(gameState.timerInterval);
   if (restartContainer) restartContainer.classList.remove('hidden');
   if (nextLevelBtn) nextLevelBtn.classList.remove('hidden');
-  if (restartBtn) restartBtn.classList.add('hidden');
+  if (restartBtn) restartBtn.classList.add('hidden'); // Hide restart button on win
 }
 
 // Show Restart Level button and stop timer on lose
@@ -288,7 +288,7 @@ function handleLevelLose() {
   gameState.levelComplete = true;
   gameState.timerActive = false;
   if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  // Always show the restart container and button
+  // Show the restart container and button only on lose
   if (restartContainer) restartContainer.classList.remove('hidden');
   if (restartBtn) restartBtn.classList.remove('hidden');
   if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
