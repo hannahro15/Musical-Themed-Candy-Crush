@@ -1,3 +1,5 @@
+// Expose hasPossibleMoves globally for board.js to use
+window.hasPossibleMoves = hasPossibleMoves;
 
 
 import { getLevelConfig } from './levels.js';

@@ -46,19 +46,30 @@ export function getSafeSymbol(grid, row, col, SYMBOLS) {
 }
 
 export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
-  gameBoard.innerHTML = '';
-  const grid = Array.from({ length: BOARD_SIZE }, () => []);
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      const symbol = getSafeSymbol(grid, row, col, SYMBOLS);
-      grid[row][col] = symbol;
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.textContent = symbol;
-      cell.draggable = true;
-      gameBoard.appendChild(cell);
+  let attempts = 0;
+  let hasMove = false;
+  do {
+    gameBoard.innerHTML = '';
+    const grid = Array.from({ length: BOARD_SIZE }, () => []);
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      for (let col = 0; col < BOARD_SIZE; col++) {
+        const symbol = getSafeSymbol(grid, row, col, SYMBOLS);
+        grid[row][col] = symbol;
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.textContent = symbol;
+        cell.draggable = true;
+        gameBoard.appendChild(cell);
+      }
     }
-  }
+    // Check for at least one possible move
+    if (typeof window !== 'undefined' && window.hasPossibleMoves) {
+      hasMove = window.hasPossibleMoves(gameBoard, BOARD_SIZE);
+    } else {
+      hasMove = true; // fallback, should not happen
+    }
+    attempts++;
+  } while (!hasMove && attempts < 20);
   // Defensive: always re-attach listeners after board generation
   if (typeof window !== 'undefined' && window.wireUpCellEvents) {
     window.wireUpCellEvents();
