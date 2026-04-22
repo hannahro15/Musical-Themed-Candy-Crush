@@ -380,6 +380,7 @@ function startTimer() {
 function handlePlayClick() {
   gameState.lives = INITIAL_LIVES;
   startLevel(1);
+  gameState.level = 1;
 }
 
 /**

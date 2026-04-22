@@ -26,9 +26,17 @@ export function updateScoreDisplay(scoreDisplay, score) {
   scoreDisplay.textContent = `Score: ${score}`;
 }
 
-export function updateLevel1Counters(violinCounter, pianoCounter, violinsLeft, pianosLeft) {
-  violinCounter.textContent = `🎻: ${violinsLeft}`;
-  pianoCounter.textContent = `🎹: ${pianosLeft}`;
+
+// Dynamically update counters for any objectives
+export function updateObjectiveCounters(objectiveCountersContainer, objectives, state) {
+  if (!objectiveCountersContainer) return;
+  objectiveCountersContainer.innerHTML = '';
+  objectives.forEach(obj => {
+    const span = document.createElement('span');
+    const left = state[obj.label + 'Left'] ?? obj.count;
+    span.textContent = `${obj.symbol}: ${left}`;
+    objectiveCountersContainer.appendChild(span);
+  });
 }
 
 export function updateTimerDisplay(timerDisplay, timer) {
