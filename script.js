@@ -55,18 +55,6 @@ function startLevel(levelNum = 1) {
   gameState.levelComplete = false;
   gameState.timer = config.timer;
   gameState.timerActive = true;
-  heading.classList.add('hidden');
-  menu.classList.add('hidden');
-  document.getElementById('game-board-container').classList.remove('hidden');
-  gameBoard.classList.remove('hidden');
-  document.getElementById('score-moves-wrapper').classList.remove('hidden');
-  level1Counters.classList.remove('hidden');
-  movesDisplay.classList.remove('hidden');
-  scoreDisplay.classList.remove('hidden');
-  timerDisplay.classList.remove('hidden');
-  document.getElementById('levelDisplay').classList.remove('hidden');
-  livesDisplay.classList.remove('hidden');
-  restartContainer.classList.add('hidden');
   document.getElementById('levelDisplay').textContent = `Level ${levelNum}`;
   updateLivesDisplay(livesDisplay, gameState.lives);
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
@@ -378,9 +366,28 @@ function startTimer() {
  * Handles Play Game button click.
  */
 function handlePlayClick() {
+  // Always reset lives and level
   gameState.lives = INITIAL_LIVES;
-  startLevel(1);
   gameState.level = 1;
+
+  // Hide menu, show all game UI elements in a single place
+  heading.classList.add('hidden');
+  menu.classList.add('hidden');
+  document.getElementById('game-board-container').classList.remove('hidden');
+  gameBoard.classList.remove('hidden');
+  document.getElementById('score-moves-wrapper').classList.remove('hidden');
+  document.getElementById('levelDisplay').classList.remove('hidden');
+  movesDisplay.classList.remove('hidden');
+  scoreDisplay.classList.remove('hidden');
+  timerDisplay.classList.remove('hidden');
+  livesDisplay.classList.remove('hidden');
+  if (restartContainer) restartContainer.classList.add('hidden');
+  // Always show the objective counters
+  const counters = document.getElementById('objective-counters') || level1Counters;
+  counters.classList.remove('hidden');
+
+  // Start the first level
+  startLevel(1);
 }
 
 /**
