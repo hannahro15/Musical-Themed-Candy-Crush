@@ -17,9 +17,6 @@ const menu = document.querySelector('.menu');
 const gameBoard = document.getElementById('gameBoard');
 const movesDisplay = document.getElementById('movesDisplay');
 const scoreDisplay = document.getElementById('scoreDisplay');
-const violinCounter = document.getElementById('violinCounter');
-const pianoCounter = document.getElementById('pianoCounter');
-const level1Counters = document.getElementById('level1-counters');
 const timerDisplay = document.getElementById('timerDisplay');
 const livesDisplay = document.getElementById('livesDisplay');
 const restartBtn = document.getElementById('restartBtn');
@@ -84,7 +81,6 @@ function startLevel(levelNum = 1) {
   window.wireUpCellEvents = wireUpCellEvents;
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
   wireUpCellEvents();
-  // Counters for level objective (not board count)
   updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
   startTimer();
 }
@@ -108,9 +104,6 @@ function setTouchStartY(y) {
   touchStartY = y;
 }
 
-/**
- * Wires up drag and touch event listeners for all board cells.
- */
 /**
  * Wires up drag and touch event listeners for all board cells.
  */
@@ -243,23 +236,19 @@ function hasPossibleMoves(gameBoard, BOARD_SIZE) {
   return false;
 }
 
-// Reshuffles the board until there is at least one possible move
 function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   let allCells = Array.from(gameBoard.children);
   let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
   let attempts = 0;
   do {
-    // Shuffle symbols array
     for (let i = symbols.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
     }
-    // Assign shuffled symbols back to cells
     allCells.forEach((cell, idx) => {
       cell.textContent = symbols[idx] || '';
     });
     attempts++;
-    // Avoid infinite loop: after 20 tries, just refill the board
     if (attempts > 20) {
       generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
       break;
@@ -320,21 +309,6 @@ function handleLevelLose() {
   }
 
 
-  // Optionally update board counters for debugging (not for objectives)
-  // updateSymbolCounters();
-// Update the violin and piano counters based on the current board
-function updateSymbolCounters() {
-  const allCells = Array.from(gameBoard.children);
-  let violins = 0;
-  let pianos = 0;
-  for (const cell of allCells) {
-    if (cell.textContent === '🎻') violins++;
-    if (cell.textContent === '🎹') pianos++;
-  }
-  gameState.violinsLeft = violins;
-  gameState.pianosLeft = pianos;
-  updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(gameState.level).objectives, gameState);
-}
 
   gameState.isResolving = false;
 }
@@ -419,7 +393,7 @@ function handlePlayClick() {
   livesDisplay.classList.remove('hidden');
   if (restartContainer) restartContainer.classList.add('hidden');
   // Always show the objective counters
-  const counters = document.getElementById('objective-counters') || level1Counters;
+  const counters = document.getElementById('objective-counters');
   counters.classList.remove('hidden');
 
   // Start the first level
@@ -431,7 +405,7 @@ function handlePlayClick() {
  */
 function handleRestartLevel() {
   if (gameState.lives === 0) {
-    showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+    showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
     gameState.lives = INITIAL_LIVES;
     return;
   }
@@ -456,7 +430,7 @@ if (nextLevelBtn) {
     livesDisplay.classList.remove('hidden');
     if (restartContainer) restartContainer.classList.add('hidden');
     // Always show the objective counters
-    const counters = document.getElementById('objective-counters') || level1Counters;
+    const counters = document.getElementById('objective-counters');
     counters.classList.remove('hidden');
     // Start the next level
     startLevel(gameState.level + 1);
@@ -495,5 +469,5 @@ function attachEventListeners() {
 
 document.addEventListener('DOMContentLoaded', () => {
   attachEventListeners();
-  showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+  showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
 });
