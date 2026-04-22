@@ -4,13 +4,12 @@
 ![Game Screenshot](images/game-screenshot.png)
 
 A musical twist on the classic match-3 game!
-Match musical instrument symbols to complete level objectives.
-
----
+Match musical instrument symbols to complete level objectives!
 
 **Note:** This is a solo project. Much of the game logic and code was generated with the help of AI (GitHub Copilot), especially the core mechanics and modular structure. The project was originally started by following a YouTube tutorial for a basic match-3 game, then heavily customised and extended with AI assistance.
 
----
+**AI & Manual Testing:**
+While AI was used to accelerate development and modularisation, manual human testing remains essential for catching subtle bugs, ensuring a great user experience, and validating real-world usability. Feedback from human testers are welcome and encouraged!
 
 Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 
