@@ -53,9 +53,9 @@ function startLevel(levelNum = 1) {
   const config = getLevelConfig(levelNum);
   gameState.movesLeft = config.moves;
   gameState.score = 0;
-  // Remove all previous *_Left counters from gameState
+  // Remove all previous *_Left counters from gameState except movesLeft
   Object.keys(gameState).forEach(key => {
-    if (key.endsWith('Left')) delete gameState[key];
+    if (key.endsWith('Left') && key !== 'movesLeft') delete gameState[key];
   });
   // Dynamically initialize all *_Left counters for objectives
   if (config.objectives && Array.isArray(config.objectives)) {
