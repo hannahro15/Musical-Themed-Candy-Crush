@@ -306,6 +306,12 @@ function handleLevelLose() {
   gameState.movesLeft--;
   updateScoreDisplay(scoreDisplay, gameState.score);
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
+  // If out of moves, trigger level lose
+  if (gameState.movesLeft <= 0 && !gameState.levelComplete) {
+    handleLevelLose();
+    gameState.isResolving = false;
+    return;
+  }
 
 
   // Optionally update board counters for debugging (not for objectives)
