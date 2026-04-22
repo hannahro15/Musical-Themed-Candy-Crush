@@ -5,8 +5,6 @@ export let gameState = {
   movesLeft: 0,
   score: 0,
   isResolving: false,
-  violinsLeft: 0,
-  pianosLeft: 0,
   level: 1,
   levelComplete: false,
   timer: 0,
