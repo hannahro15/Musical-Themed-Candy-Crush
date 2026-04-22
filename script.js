@@ -6,7 +6,6 @@ import { getSafeSymbol, generateGameBoard, findMatches } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
 import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
-
 // --- DOM Elements ---
 const playButton = document.getElementById('playBtn');
 const heading = document.querySelector('h1');
@@ -75,6 +74,7 @@ function startLevel(levelNum = 1) {
 
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
   wireUpCellEvents();
+  updateSymbolCounters(); // Ensure counters are correct after board is generated
   startTimer();
 }
 
@@ -100,36 +100,65 @@ function setTouchStartY(y) {
 /**
  * Wires up drag and touch event listeners for all board cells.
  */
+// Unified pointer event handling for both desktop and mobile
 function wireUpCellEvents() {
   const cells = Array.from(gameBoard.children);
   cells.forEach(cell => {
     // Remove previous listeners by cloning the node
     const newCell = cell.cloneNode(true);
-    newCell.draggable = true;
     cell.replaceWith(newCell);
   });
   // Re-query after replacement
   const updatedCells = Array.from(gameBoard.children);
   updatedCells.forEach(cell => {
-    cell.addEventListener('dragstart', onDragStart);
-    cell.addEventListener('dragover', e => e.preventDefault()); // Allow drop
-    cell.addEventListener('drop', onDrop);
-    cell.addEventListener('touchstart', onTouchStart);
-    cell.addEventListener('touchend', onTouchEnd);
+    cell.addEventListener('pointerdown', onPointerDown);
+    cell.addEventListener('pointerup', onPointerUp);
+    cell.addEventListener('pointerleave', onPointerLeave);
+    cell.addEventListener('pointermove', onPointerMove);
+    // Remove drag/touch events for unified pointer events
+    newCellDraggableOff(cell);
   });
 }
 
-function onDragStart(e) {
-  handleDragStart(e, gameState, setDraggedCell);
+// Remove draggable property for pointer events
+function newCellDraggableOff(cell) {
+  cell.draggable = false;
 }
-function onDrop(e) {
-  handleDrop(e, gameState, draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap);
+
+
+// --- Pointer Event State ---
+let pointerDownCell = null;
+let pointerDownX = 0;
+let pointerDownY = 0;
+let pointerDragging = false;
+
+function onPointerDown(e) {
+  if (gameState.isResolving) return;
+  if (!e.target.classList.contains('cell')) return;
+  pointerDownCell = e.target;
+  pointerDownX = e.clientX;
+  pointerDownY = e.clientY;
+  pointerDragging = true;
 }
-function onTouchStart(e) {
-  handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard);
+
+function onPointerUp(e) {
+  if (!pointerDragging || !pointerDownCell) return;
+  const upCell = document.elementFromPoint(e.clientX, e.clientY);
+  if (upCell && upCell.classList.contains('cell') && areAdjacent(pointerDownCell, upCell, gameBoard, BOARD_SIZE)) {
+    trySwap(pointerDownCell, upCell);
+  }
+  pointerDragging = false;
+  pointerDownCell = null;
 }
-function onTouchEnd(e) {
-  handleTouchEnd(e, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
+
+function onPointerLeave(e) {
+  // Cancel drag if pointer leaves the cell
+  pointerDragging = false;
+  pointerDownCell = null;
+}
+
+function onPointerMove(e) {
+  // Optional: implement visual feedback for drag if desired
 }
 
 /**
@@ -161,6 +190,8 @@ async function trySwap(sourceCell, targetCell) {
 
   // At least one match: resolve all matches
   let scoreGained = 0;
+  let violinsMatched = 0;
+  let pianosMatched = 0;
 
   while (matches.length > 0) {
     // Animate matched cells
@@ -168,6 +199,8 @@ async function trySwap(sourceCell, targetCell) {
       scoreGained += scoreForMatch(group.length);
       for (const cell of group) {
         cell.classList.add('matched');
+        if (cell.textContent === '🎻') violinsMatched++;
+        if (cell.textContent === '🎹') pianosMatched++;
       }
     }
     await new Promise(res => setTimeout(res, 250)); // Animation delay
@@ -182,10 +215,14 @@ async function trySwap(sourceCell, targetCell) {
     dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
     wireUpCellEvents(); // Ensure new cells are interactive
 
-    // Update symbol counters after board changes
-    updateSymbolCounters();
-
     matches = findMatches(gameBoard, BOARD_SIZE);
+  }
+
+  // Decrease counters for matched violins/pianos
+  if (violinsMatched > 0 || pianosMatched > 0) {
+    gameState.violinsLeft = Math.max(0, gameState.violinsLeft - violinsMatched);
+    gameState.pianosLeft = Math.max(0, gameState.pianosLeft - pianosMatched);
+    updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
   }
 
   // Update score and moves
