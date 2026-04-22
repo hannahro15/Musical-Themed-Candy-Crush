@@ -308,9 +308,12 @@ function handleLevelLose() {
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
   // If out of moves, trigger level lose
   if (gameState.movesLeft <= 0 && !gameState.levelComplete) {
-    handleLevelLose();
-    gameState.isResolving = false;
-    return;
+    // Only trigger lose if timer is still above 0
+    if (gameState.timer > 0) {
+      handleLevelLose();
+      gameState.isResolving = false;
+      return;
+    }
   }
 
 
@@ -384,7 +387,10 @@ function startTimer() {
       updateTimerDisplay(timerDisplay, gameState.timer);
       clearInterval(gameState.timerInterval);
       gameState.timerActive = false;
-      handleLevelLose();
+      // Only trigger lose if moves are still above 0
+      if (gameState.movesLeft > 0 && !gameState.levelComplete) {
+        handleLevelLose();
+      }
     }
   }, 1000);
 }
