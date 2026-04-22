@@ -1,7 +1,7 @@
 
 
 import { getLevelConfig } from './levels.js';
-import { showMenuPage, updateLivesDisplay, updateMovesDisplay, updateScoreDisplay, updateLevel1Counters, updateTimerDisplay } from './ui.js';
+import { showMenuPage, updateLivesDisplay, updateMovesDisplay, updateScoreDisplay, updateObjectiveCounters, updateTimerDisplay } from './ui.js';
 import { getSafeSymbol, generateGameBoard, findMatches } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
@@ -63,7 +63,7 @@ function startLevel(levelNum = 1) {
   updateLivesDisplay(livesDisplay, gameState.lives);
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
   updateScoreDisplay(scoreDisplay, gameState.score);
-  updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
+  updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
   updateTimerDisplay(timerDisplay, gameState.timer);
 
   // Reset timer before generating the board
@@ -74,7 +74,7 @@ function startLevel(levelNum = 1) {
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
   wireUpCellEvents();
   // Counters for level objective (not board count)
-  updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
+  updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(levelNum).objectives, gameState);
   startTimer();
 }
 
@@ -256,7 +256,7 @@ function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   if (violinsMatched > 0 || pianosMatched > 0) {
     gameState.violinsLeft = Math.max(0, gameState.violinsLeft - violinsMatched);
     gameState.pianosLeft = Math.max(0, gameState.pianosLeft - pianosMatched);
-    updateLevel1Counters(violinCounter, pianoCounter, gameState.violinsLeft, gameState.pianosLeft);
+    updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(gameState.level).objectives, gameState);
     // Check for win condition after counters update
     if (gameState.violinsLeft === 0 && gameState.pianosLeft === 0) {
       handleLevelWin();
@@ -304,7 +304,7 @@ function updateSymbolCounters() {
   }
   gameState.violinsLeft = violins;
   gameState.pianosLeft = pianos;
-  updateLevel1Counters(violinCounter, pianoCounter, violins, pianos);
+  updateObjectiveCounters(document.getElementById('objective-counters'), getLevelConfig(gameState.level).objectives, gameState);
 }
 
   gameState.isResolving = false;
@@ -442,12 +442,9 @@ function attachEventListeners() {
 }
 
 // --- Initialization ---
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
-    attachEventListeners();
-  });
-} else {
-  showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+
+
+document.addEventListener('DOMContentLoaded', () => {
   attachEventListeners();
-}
+  showMenuPage(heading, menu, gameBoard, level1Counters, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+});
