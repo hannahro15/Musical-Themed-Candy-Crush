@@ -79,6 +79,7 @@ function startLevel(levelNum = 1) {
   gameState.timerActive = true;
   gameState.timer = config.timer;
 
+  window.wireUpCellEvents = wireUpCellEvents;
   generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
   wireUpCellEvents();
   // Counters for level objective (not board count)

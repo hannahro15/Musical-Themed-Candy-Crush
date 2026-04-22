@@ -59,4 +59,8 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol)
       gameBoard.appendChild(cell);
     }
   }
+  // Defensive: always re-attach listeners after board generation
+  if (typeof window !== 'undefined' && window.wireUpCellEvents) {
+    window.wireUpCellEvents();
+  }
 }
