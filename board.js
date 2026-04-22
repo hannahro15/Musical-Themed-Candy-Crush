@@ -75,3 +75,81 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol)
     window.wireUpCellEvents();
   }
 }
+
+export function hasPossibleMoves(gameBoard, BOARD_SIZE) {
+  const allCells = Array.from(gameBoard.children);
+  for (let i = 0; i < allCells.length; i++) {
+    const cell = allCells[i];
+    const row = Math.floor(i / BOARD_SIZE);
+    const col = i % BOARD_SIZE;
+    // Try swapping with right neighbor
+    if (col < BOARD_SIZE - 1) {
+      swapCellContents(cell, allCells[i + 1]);
+      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
+        swapCellContents(cell, allCells[i + 1]);
+        return true;
+      }
+      swapCellContents(cell, allCells[i + 1]);
+    }
+    // Try swapping with bottom neighbor
+    if (row < BOARD_SIZE - 1) {
+      swapCellContents(cell, allCells[i + BOARD_SIZE]);
+      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
+        swapCellContents(cell, allCells[i + BOARD_SIZE]);
+        return true;
+      }
+      swapCellContents(cell, allCells[i + BOARD_SIZE]);
+    }
+  }
+  return false;
+}
+
+export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
+  let allCells = Array.from(gameBoard.children);
+  let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
+  let attempts = 0;
+  do {
+    for (let i = symbols.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
+    }
+    allCells.forEach((cell, idx) => {
+      cell.textContent = symbols[idx] || '';
+    });
+    attempts++;
+    if (attempts > 20) {
+      generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
+      break;
+    }
+  } while (!hasPossibleMoves(gameBoard, BOARD_SIZE));
+}
+
+export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
+  const grid = [];
+  const allCells = Array.from(gameBoard.children);
+  for (let row = 0; row < BOARD_SIZE; row++) {
+    grid[row] = [];
+    for (let col = 0; col < BOARD_SIZE; col++) {
+      grid[row][col] = allCells[row * BOARD_SIZE + col];
+    }
+  }
+  for (let col = 0; col < BOARD_SIZE; col++) {
+    let emptySpots = 0;
+    for (let row = BOARD_SIZE - 1; row >= 0; row--) {
+      if (!grid[row][col].textContent) {
+        emptySpots++;
+      } else if (emptySpots > 0) {
+        grid[row + emptySpots][col].textContent = grid[row][col].textContent;
+        grid[row][col].textContent = '';
+      }
+    }
+    for (let row = 0; row < emptySpots; row++) {
+      grid[row][col].textContent = getSafeSymbol(
+        grid.map(r => r.map(c => c.textContent)),
+        row,
+        col,
+        SYMBOLS
+      );
+    }
+  }
+}

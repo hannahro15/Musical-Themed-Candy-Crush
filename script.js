@@ -4,7 +4,7 @@ window.hasPossibleMoves = hasPossibleMoves;
 
 import { getLevelConfig } from './levels.js';
 import { showMenuPage, updateLivesDisplay, updateMovesDisplay, updateScoreDisplay, updateObjectiveCounters, updateTimerDisplay } from './ui.js';
-import { getSafeSymbol, generateGameBoard, findMatches } from './board.js';
+import { getSafeSymbol, generateGameBoard, findMatches, hasPossibleMoves, reshuffleBoard, dropAndRefill } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
 import { swapCellContents, areAdjacent, scoreForMatch } from './game.js';
