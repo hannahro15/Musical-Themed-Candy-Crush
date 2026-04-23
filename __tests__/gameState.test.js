@@ -49,12 +49,34 @@ describe('gameState', () => {
   });
 
   test('setTouchStartX updates touchStartX', () => {
-    setTouchStartX(100);
-    expect(gameState.touchStartX).toBe(100);
+    setTouchStartX(42);
+    expect(gameState.touchStartX).toBe(42);
   });
 
   test('setTouchStartY updates touchStartY', () => {
-    setTouchStartY(200);
-    expect(gameState.touchStartY).toBe(200);
+    setTouchStartY(99);
+    expect(gameState.touchStartY).toBe(99);
   });
+
+  test ('setDraggedCell update the correct property in gameState', () => {
+    const cell = { id: 'cell3' };
+    setDraggedCell(cell);
+    expect(gameState.draggedCell).toBe(cell);
+  });
+
+  test('setTouchStartCell updates the correct property in gameState', () => {
+    const cell = { id: 'cell4' };
+    setTouchStartCell(cell);
+    expect(gameState.touchStartCell).toBe(cell);
+  });
+
+  test('setTouchStartX updates the correct property in gameState', () => {
+    setTouchStartX(150);
+    expect(gameState.touchStartX).toBe(150);
+  });
+
+  test('setTouchStartY updates the correct property in gameState', () => {
+    setTouchStartY(250);
+    expect(gameState.touchStartY).toBe(250);
+  });   
 });
