@@ -1,6 +1,7 @@
 // gameState.test.js - Unit tests for gameState.js
 // Add your tests here
-import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from '../src/gameState.js';
+import { gameState, resetGameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from '../src/gameState.js';
+
 
 describe('gameState', () => {
   beforeEach(() => {
@@ -57,26 +58,64 @@ describe('gameState', () => {
     setTouchStartY(99);
     expect(gameState.touchStartY).toBe(99);
   });
-
-  test ('setDraggedCell update the correct property in gameState', () => {
+  
+  test ('draggedCell can be reset to null', () => {
     const cell = { id: 'cell3' };
     setDraggedCell(cell);
     expect(gameState.draggedCell).toBe(cell);
+    setDraggedCell(null);
+    expect(gameState.draggedCell).toBeNull();
   });
-
-  test('setTouchStartCell updates the correct property in gameState', () => {
+  
+  test('touchStartCell can be reset to null', () => {
     const cell = { id: 'cell4' };
     setTouchStartCell(cell);
     expect(gameState.touchStartCell).toBe(cell);
+    setTouchStartCell(null);
+    expect(gameState.touchStartCell).toBeNull();
   });
 
-  test('setTouchStartX updates the correct property in gameState', () => {
-    setTouchStartX(150);
-    expect(gameState.touchStartX).toBe(150);
+  test('touchStartX can be reset to null', () => {
+    setTouchStartX(123);
+    expect(gameState.touchStartX).toBe(123);
+    setTouchStartX(null);
+    expect(gameState.touchStartX).toBeNull();
   });
 
-  test('setTouchStartY updates the correct property in gameState', () => {
-    setTouchStartY(250);
-    expect(gameState.touchStartY).toBe(250);
-  });   
+  test('touchStartY can be reset to null', () => {
+    setTouchStartY(456);
+    expect(gameState.touchStartY).toBe(456);
+    setTouchStartY(null);
+    expect(gameState.touchStartY).toBeNull();
+  });
+
+  test('resetGameState sets movesLeft and score correctly', () => {
+    const config = {
+      moves: 20,
+      objectives: [{ label: 'red', count: 10 }, { label: 'blue', count: 5 }],
+      timer: 60,
+    };
+    resetGameState(config);
+    expect(gameState.movesLeft).toBe(20);
+    expect(gameState.score).toBe(0);
+    expect(gameState.redLeft).toBe(10);
+    expect(gameState.blueLeft).toBe(5);
+    expect(gameState.levelComplete).toBe(false);
+    expect(gameState.timer).toBe(60);
+    expect(gameState.timerActive).toBe(true);
+  });
+
+  test ('resetGameState removes old objective counters', () => {
+    gameState.redLeft = 10;
+    gameState.blueLeft = 5;
+    const config = {
+      moves: 15,
+      objectives: [{ label: 'green', count: 8 }],
+      timer: 30,
+    };
+    resetGameState(config);
+    expect(gameState.redLeft).toBeUndefined();
+    expect(gameState.blueLeft).toBeUndefined();
+    expect(gameState.greenLeft).toBe(8);
+  });
 });
