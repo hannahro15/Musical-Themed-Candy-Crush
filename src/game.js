@@ -1,6 +1,8 @@
 // Core game logic functions
 export function swapCellContents(cellA, cellB) {
+  console.log('[swapCellContents] Swapping', cellA, cellB, 'values:', cellA.textContent, cellB.textContent);
   [cellA.textContent, cellB.textContent] = [cellB.textContent, cellA.textContent];
+  console.log('[swapCellContents] After swap:', cellA.textContent, cellB.textContent);
 }
 
 export function areAdjacent(cellA, cellB, gameBoard, BOARD_SIZE) {
@@ -8,16 +10,18 @@ export function areAdjacent(cellA, cellB, gameBoard, BOARD_SIZE) {
     const indexA = cells.indexOf(cellA);
     const indexB = cells.indexOf(cellB);
 
+    console.log('[areAdjacent] indexA:', indexA, 'indexB:', indexB);
     if (indexA === -1 || indexB === -1) return false;
 
     const rowA = Math.floor(indexA / BOARD_SIZE);
     const rowB = Math.floor(indexB / BOARD_SIZE);
 
-    // Adjacent if directly above/below or left/right in the same row
-    return (
-        Math.abs(indexA - indexB) === BOARD_SIZE ||
-        (rowA === rowB && Math.abs(indexA - indexB) === 1)
+    const adjacent = (
+      Math.abs(indexA - indexB) === BOARD_SIZE ||
+      (rowA === rowB && Math.abs(indexA - indexB) === 1)
     );
+    console.log('[areAdjacent] rowA:', rowA, 'rowB:', rowB, 'adjacent:', adjacent);
+    return adjacent;
 }
 
 export function getRandomSymbol(SYMBOLS) {

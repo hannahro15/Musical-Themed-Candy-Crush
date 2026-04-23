@@ -1,18 +1,20 @@
 // Touch and drag event handlers
 export function handleDragStart(event, gameState, setDraggedCell) {
-  if (gameState.isResolving) { event.preventDefault(); return; }
-  if (!event.target.classList.contains('cell')) return;
-  setDraggedCell(event.target);
+    if (gameState.isResolving) { event.preventDefault(); return; }
+    if (!event.target.classList.contains('cell')) return;
+    console.log('dragstart', event.target);
+    setDraggedCell(event.target);
 }
 
 export async function handleDrop(event, gameState, draggedCell, setDraggedCell, areAdjacent, trySwap) {
-  event.preventDefault();
-  if (gameState.isResolving || !draggedCell) return;
-  const targetCell = event.target;
-  if (targetCell.classList.contains('cell') && areAdjacent(draggedCell, targetCell)) {
-    await trySwap(draggedCell, targetCell);
-  }
-  setDraggedCell(null);
+    event.preventDefault();
+    if (gameState.isResolving || !draggedCell) return;
+    const targetCell = event.target;
+    console.log('drop', targetCell);
+    if (targetCell.classList.contains('cell') && areAdjacent(draggedCell, targetCell)) {
+        await trySwap(draggedCell, targetCell);
+    }
+    setDraggedCell(null);
 }
 
 export function handleTouchStart(event, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard) {

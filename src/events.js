@@ -9,6 +9,10 @@ export function wireUpCellEvents(gameBoard, BOARD_SIZE, onDragStart, onDrop, onT
     newCell.draggable = true;
     cell.replaceWith(newCell);
   });
+  // Ensure all .cell elements are draggable after replacement
+  Array.from(gameBoard.children).forEach(cell => {
+    cell.draggable = true;
+  });
   // Re-query after replacement
   const updatedCells = Array.from(gameBoard.children);
   updatedCells.forEach(cell => {

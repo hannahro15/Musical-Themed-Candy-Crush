@@ -4,7 +4,7 @@ import { getLevelConfig } from './levels.js';
 import { showMenuPage, updateObjectiveCounters, updateMovesDisplay, updateScoreDisplay, updateLivesDisplay } from './ui.js';
 import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
-import { swapCellContents, scoreForMatch } from './game.js';
+import { swapCellContents, scoreForMatch, areAdjacent } from './game.js';
 import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
 import { handleLevelWin, handleLevelLose } from './gameStatus.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
@@ -100,7 +100,11 @@ function generateBoardAndWireEvents() {
  */
 
 async function trySwap(sourceCell, targetCell) {
-  if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
+  console.log('[trySwap] called with', sourceCell, targetCell);
+  if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) {
+    console.log('[trySwap] Early exit: isResolving:', gameState.isResolving, 'levelComplete:', gameState.levelComplete, 'timerActive:', gameState.timerActive);
+    return;
+  }
   gameState.isResolving = true;
 
   swapCellContents(sourceCell, targetCell);
@@ -110,11 +114,12 @@ async function trySwap(sourceCell, targetCell) {
 
   // Detect matches after swap
   let matches = findMatches(gameBoard, BOARD_SIZE);
+  console.log('[trySwap] matches after swap:', matches);
 
   // Only swap back if neither swapped cell is in a match
   const swappedInMatch = matches.some(group => group.includes(sourceCell) || group.includes(targetCell));
   if (matches.length === 0 || !swappedInMatch) {
-    // No match, or match does not involve swapped cells: swap back
+    console.log('[trySwap] No match or swapped cells not in match, swapping back');
     swapCellContents(sourceCell, targetCell);
     gameState.isResolving = false;
     return;

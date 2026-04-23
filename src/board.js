@@ -1,4 +1,6 @@
 // Board and match logic
+import { swapCellContents } from './game.js';
+
 export function getCellGrid(gameBoard, BOARD_SIZE) {
   const allCells = Array.from(gameBoard.children);
   const grid = [];
@@ -153,8 +155,10 @@ export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   }
 }
 
-function swapCellContents(cellA, cellB) {
-  const temp = cellA.textContent;
-  cellA.textContent = cellB.textContent;
-  cellB.textContent = temp;
-}
+// Deprecated: use swapCellContents from game.js
+// function swapCellContents(cellA, cellB) {
+//   const temp = cellA.textContent;
+//   cellA.textContent = cellB.textContent;
+//   cellB.textContent = temp;
+// }
+
