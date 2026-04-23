@@ -35,5 +35,50 @@ describe('interaction', () => {
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
-  // Additional tests for handleDrop, handleTouchStart, and handleTouchEnd would go here
+  test('handleDrop tries swap when cells are adjacent', async () => {
+    const draggedCell = document.createElement('div');
+    draggedCell.classList.add('cell');
+    const targetCell = document.createElement('div');
+    targetCell.classList.add('cell');
+    const event = { target: targetCell, preventDefault: jest.fn() };
+    setDraggedCell(draggedCell);
+
+    const areAdjacent = jest.fn().mockReturnValue(true);
+    const trySwap = jest.fn().mockResolvedValue();
+
+    await handleDrop(event, gameState, draggedCell, setDraggedCell, areAdjacent, trySwap);
+    expect(areAdjacent).toHaveBeenCalledWith(draggedCell, targetCell);
+    expect(trySwap).toHaveBeenCalledWith(draggedCell, targetCell);
+    expect(gameState.draggedCell).toBeNull();
+  });
+
+  test('handleDrop does not try swap when cells are not adjacent', async () => {
+    const draggedCell = document.createElement('div');
+    draggedCell.classList.add('cell');
+    const targetCell = document.createElement('div');
+    targetCell.classList.add('cell');
+    const event = { target: targetCell, preventDefault: jest.fn() };
+    setDraggedCell(draggedCell);
+
+    const areAdjacent = jest.fn().mockReturnValue(false);
+    const trySwap = jest.fn().mockResolvedValue();
+
+    await handleDrop(event, gameState, draggedCell, setDraggedCell, areAdjacent, trySwap);
+    expect(areAdjacent).toHaveBeenCalledWith(draggedCell, targetCell);
+    expect(trySwap).not.toHaveBeenCalled();
+    expect(gameState.draggedCell).toBeNull();
+  });
+
+  test ('handleTouchStart sets touch start cell and coordinates', () => {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    const touch = { clientX: 100, clientY: 200 };
+    const event = { touches: [touch] };
+    document.elementFromPoint = jest.fn().mockReturnValue(cell);
+
+    handleTouchStart(event, gameState, setTouchStartCell, setTouchStartX, setTouchStartY);
+    expect(gameState.touchStartCell).toBe(cell);
+    expect(gameState.touchStartX).toBe(100);
+    expect(gameState.touchStartY).toBe(200);
+  });
 });
