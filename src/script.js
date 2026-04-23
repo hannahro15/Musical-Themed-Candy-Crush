@@ -168,6 +168,21 @@ async function trySwap(sourceCell, targetCell) {
       (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
     );
     matches = findMatches(gameBoard, BOARD_SIZE);
+    // After resolving matches, check for possible moves
+    if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
+      // Import reshuffleBoard dynamically to avoid circular dependency
+      import('./board.js').then(({ reshuffleBoard }) => {
+        reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, () => wireUpCellEvents(
+          gameBoard,
+          BOARD_SIZE,
+          (e) => handleDragStart(e, gameState, setDraggedCell),
+          (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
+          (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
+          (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
+        ));
+      });
+      break;
+    }
   }
 
   // Update score and display
@@ -245,9 +260,11 @@ function handleRestartLevel() {
     showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
     gameState.lives = INITIAL_LIVES;
     updateLivesDisplay(livesDisplay, gameState.lives);
+    if (restartBtn) restartBtn.classList.add('hidden');
     return;
   }
   startLevel(gameState.level);
+  if (restartBtn) restartBtn.classList.add('hidden');
 }
 
 // --- Initialization ---
