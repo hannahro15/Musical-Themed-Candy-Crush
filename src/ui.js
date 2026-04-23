@@ -41,3 +41,29 @@ export function updateObjectiveCounters(objectiveCountersContainer, objectives, 
 export function updateTimerDisplay(timerDisplay, timer) {
   timerDisplay.textContent = `Time: ${timer}s`;
 }
+
+// Add these UI functions for testing and export them
+export function updateScore(score) {
+  const scoreElement = document.getElementById('score');
+  if (scoreElement) scoreElement.textContent = String(score);
+}
+
+export function updateLevel(level) {
+  const levelElement = document.getElementById('level');
+  if (levelElement) levelElement.textContent = String(level);
+}
+
+export function updateTimer(timer) {
+  const timerElement = document.getElementById('timer');
+  if (timerElement) timerElement.textContent = String(timer);
+}
+
+export function showGameOver() {
+  const gameOverElement = document.getElementById('game-over');
+  if (gameOverElement) gameOverElement.classList.remove('hidden');
+}
+
+export function hideGameOver() {
+  const gameOverElement = document.getElementById('game-over');
+  if (gameOverElement) gameOverElement.classList.add('hidden');
+}
