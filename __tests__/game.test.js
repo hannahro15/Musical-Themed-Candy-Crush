@@ -47,4 +47,13 @@ describe('game', () => {
     expect(areAdjacent(cellA, cellD, gameBoard, BOARD_SIZE)).toBe(false);
     expect(areAdjacent(cellB, cellC, gameBoard, BOARD_SIZE)).toBe(false);
   });
+
+  test('scoreForMatch returns correct score based on match size', () => {   
+    expect(scoreForMatch(3)).toBe(10);
+    expect(scoreForMatch(4)).toBe(20);
+    expect(scoreForMatch(5)).toBe(40);
+    expect(scoreForMatch(6)).toBe(60);
+    expect(scoreForMatch(2)).toBe(0);
+    expect(scoreForMatch(0)).toBe(0);
+  });
 });
