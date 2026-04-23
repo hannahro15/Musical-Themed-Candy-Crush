@@ -2,7 +2,6 @@
 export function handleDragStart(event, gameState, setDraggedCell) {
     if (gameState.isResolving) { event.preventDefault(); return; }
     if (!event.target.classList.contains('cell')) return;
-    console.log('dragstart', event.target);
     setDraggedCell(event.target);
 }
 
@@ -10,7 +9,6 @@ export async function handleDrop(event, gameState, draggedCell, setDraggedCell, 
     event.preventDefault();
     if (gameState.isResolving || !draggedCell) return;
     const targetCell = event.target;
-    console.log('drop', targetCell);
     if (targetCell.classList.contains('cell') && areAdjacent(draggedCell, targetCell)) {
         await trySwap(draggedCell, targetCell);
     }
