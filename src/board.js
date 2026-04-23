@@ -75,31 +75,22 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol,
 }
 
 export function hasPossibleMoves(gameBoard, BOARD_SIZE) {
-  const allCells = Array.from(gameBoard.children);
-  for (let i = 0; i < allCells.length; i++) {
-    const cell = allCells[i];
-    const row = Math.floor(i / BOARD_SIZE);
-    const col = i % BOARD_SIZE;
-    // Try swapping with right neighbor
-    if (col < BOARD_SIZE - 1) {
-      swapCellContents(cell, allCells[i + 1]);
-      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
-        swapCellContents(cell, allCells[i + 1]);
-        return true;
-      }
-      swapCellContents(cell, allCells[i + 1]);
+    const allCells = Array.from(gameBoard.children);
+
+    function trySwapAndCheck(idx1, idx2) {
+        swapCellContents(allCells[idx1], allCells[idx2]);
+        const hasMatch = findMatches(gameBoard, BOARD_SIZE).length > 0;
+        swapCellContents(allCells[idx1], allCells[idx2]);
+        return hasMatch;
     }
-    // Try swapping with bottom neighbor
-    if (row < BOARD_SIZE - 1) {
-      swapCellContents(cell, allCells[i + BOARD_SIZE]);
-      if (findMatches(gameBoard, BOARD_SIZE).length > 0) {
-        swapCellContents(cell, allCells[i + BOARD_SIZE]);
-        return true;
-      }
-      swapCellContents(cell, allCells[i + BOARD_SIZE]);
+
+    for (let i = 0; i < allCells.length; i++) {
+        const row = Math.floor(i / BOARD_SIZE);
+        const col = i % BOARD_SIZE;
+        if (col < BOARD_SIZE - 1 && trySwapAndCheck(i, i + 1)) return true;
+        if (row < BOARD_SIZE - 1 && trySwapAndCheck(i, i + BOARD_SIZE)) return true;
     }
-  }
-  return false;
+    return false;
 }
 
 export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
@@ -154,11 +145,4 @@ export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
     }
   }
 }
-
-// Deprecated: use swapCellContents from game.js
-// function swapCellContents(cellA, cellB) {
-//   const temp = cellA.textContent;
-//   cellA.textContent = cellB.textContent;
-//   cellB.textContent = temp;
-// }
 
