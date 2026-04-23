@@ -1,8 +1,8 @@
 
 
 import { getLevelConfig } from './levels.js';
-import { showMenuPage, updateObjectiveCounters } from './ui.js';
-import { getSafeSymbol, findMatches, dropAndRefill } from './board.js';
+import { showMenuPage, updateObjectiveCounters, updateMovesDisplay, updateScoreDisplay, updateLivesDisplay } from './ui.js';
+import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { swapCellContents, scoreForMatch } from './game.js';
 import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
@@ -10,6 +10,7 @@ import { handleLevelWin, handleLevelLose } from './gameStatus.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
 import { startTimer } from './timer.js';
 import { attachEventListeners, wireUpCellEvents } from './events.js';
+
 // --- DOM Elements ---
 
 const playButton = document.getElementById('playBtn');
@@ -74,34 +75,21 @@ function startLevel(levelNum) {
 }
 
 function generateBoardAndWireEvents() {
-  // Generate the board (board.js logic)
-  gameBoard.innerHTML = '';
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.textContent = getSafeSymbol(
-        Array.from({ length: BOARD_SIZE }, (_, r) =>
-          Array.from({ length: BOARD_SIZE }, (_, c) =>
-            (r === row && c === col) ? null : (gameBoard.children[r * BOARD_SIZE + c]?.textContent || null)
-          )
-        ),
-        row,
-        col,
-        SYMBOLS
-      );
-      cell.draggable = true;
-      gameBoard.appendChild(cell);
-    }
-  }
-  // Attach drag/touch event listeners to all cells
-  wireUpCellEvents(
+  // Use the robust board.js logic for board generation
+  generateGameBoard(
     gameBoard,
     BOARD_SIZE,
-    (e) => handleDragStart(e, gameState, setDraggedCell),
-    (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
-    (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
-    (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
+    SYMBOLS,
+    getSafeSymbol,
+    hasPossibleMoves,
+    () => wireUpCellEvents(
+      gameBoard,
+      BOARD_SIZE,
+      (e) => handleDragStart(e, gameState, setDraggedCell),
+      (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
+      (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
+      (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
+    )
   );
 }
 
@@ -214,7 +202,8 @@ async function trySwap(sourceCell, targetCell) {
 /**
  * Handles Play Game button click.
  */
-function handlePlayClick() {
+
+function startGame() {
   // Always reset lives and level
   gameState.lives = INITIAL_LIVES;
   gameState.level = 1;
@@ -237,6 +226,10 @@ function handlePlayClick() {
 
   // Start the first level
   startLevel(1);
+}
+
+function handlePlayClick() {
+  startGame();
 }
 
 /**

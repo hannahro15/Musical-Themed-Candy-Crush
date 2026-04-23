@@ -25,30 +25,49 @@ export function handleTouchStart(event, gameState, setTouchStartCell, setTouchSt
   setTouchStartY(touch.clientY);
 }
 
-export async function handleTouchEnd(event, gameState, touchStartCell, touchStartX, touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap) {
-  if (gameState.isResolving || !touchStartCell) return;
-  const touch = event.changedTouches[0];
-  const deltaX = touch.clientX - touchStartX;
-  const deltaY = touch.clientY - touchStartY;
-  const sourceCell = touchStartCell;
-  setTouchStartCell(null);
-  const MIN_SWIPE_DISTANCE = 20;
-  if (Math.abs(deltaX) < MIN_SWIPE_DISTANCE && Math.abs(deltaY) < MIN_SWIPE_DISTANCE) return;
-  const allCells = [...gameBoard.children];
-  const sourceIndex = allCells.indexOf(sourceCell);
-  if (sourceIndex === -1) return;
-  const column = sourceIndex % BOARD_SIZE;
-  const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
-  let indexOffset;
-  if (isHorizontalSwipe) {
-    const swipeRight = deltaX > 0 && column < BOARD_SIZE - 1;
-    const swipeLeft = deltaX < 0 && column > 0;
-    indexOffset = swipeRight ? 1 : swipeLeft ? -1 : 0;
-  } else {
-    indexOffset = deltaY > 0 ? BOARD_SIZE : -BOARD_SIZE;
-  }
-  const targetIndex = sourceIndex + indexOffset;
-  if (indexOffset !== 0 && targetIndex >= 0 && targetIndex < allCells.length) {
-    await trySwap(sourceCell, allCells[targetIndex]);
-  }
+export async function handleTouchEnd(
+    event,
+    gameState,
+    touchStartCell,
+    touchStartX,
+    touchStartY,
+    setTouchStartCell,
+    BOARD_SIZE,
+    gameBoard,
+    trySwap
+) {
+    if (gameState.isResolving || !touchStartCell) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    setTouchStartCell(null);
+
+    const MIN_SWIPE_DISTANCE = 20;
+    if (Math.abs(deltaX) < MIN_SWIPE_DISTANCE && Math.abs(deltaY) < MIN_SWIPE_DISTANCE) return;
+
+    const allCells = Array.from(gameBoard.children);
+    const sourceIndex = allCells.indexOf(touchStartCell);
+    if (sourceIndex === -1) return;
+
+    let targetIndex = -1;
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe
+        if (deltaX > 0 && sourceIndex % BOARD_SIZE < BOARD_SIZE - 1) {
+            targetIndex = sourceIndex + 1;
+        } else if (deltaX < 0 && sourceIndex % BOARD_SIZE > 0) {
+            targetIndex = sourceIndex - 1;
+        }
+    } else {
+        // Vertical swipe
+        if (deltaY > 0 && sourceIndex + BOARD_SIZE < allCells.length) {
+            targetIndex = sourceIndex + BOARD_SIZE;
+        } else if (deltaY < 0 && sourceIndex - BOARD_SIZE >= 0) {
+            targetIndex = sourceIndex - BOARD_SIZE;
+        }
+    }
+
+    if (targetIndex !== -1) {
+        await trySwap(touchStartCell, allCells[targetIndex]);
+    }
 }

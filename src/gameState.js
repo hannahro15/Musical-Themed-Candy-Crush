@@ -11,6 +11,10 @@ export let gameState = {
   timerInterval: null,
   timerActive: false,
   lives: INITIAL_LIVES,
+  draggedCell: null,
+  touchStartCell: null,
+  touchStartX: null,
+  touchStartY: null,
 };
 
 export function resetGameState(config) {

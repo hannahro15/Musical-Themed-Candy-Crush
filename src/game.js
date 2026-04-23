@@ -4,11 +4,20 @@ export function swapCellContents(cellA, cellB) {
 }
 
 export function areAdjacent(cellA, cellB, gameBoard, BOARD_SIZE) {
-  const allCells = [...gameBoard.children];
-  const [indexA, indexB] = [allCells.indexOf(cellA), allCells.indexOf(cellB)];
-  const indexDiff = Math.abs(indexA - indexB);
-  const sameRow = Math.floor(indexA / BOARD_SIZE) === Math.floor(indexB / BOARD_SIZE);
-  return indexDiff === BOARD_SIZE || (indexDiff === 1 && sameRow);
+    const cells = Array.from(gameBoard.children);
+    const indexA = cells.indexOf(cellA);
+    const indexB = cells.indexOf(cellB);
+
+    if (indexA === -1 || indexB === -1) return false;
+
+    const rowA = Math.floor(indexA / BOARD_SIZE);
+    const rowB = Math.floor(indexB / BOARD_SIZE);
+
+    // Adjacent if directly above/below or left/right in the same row
+    return (
+        Math.abs(indexA - indexB) === BOARD_SIZE ||
+        (rowA === rowB && Math.abs(indexA - indexB) === 1)
+    );
 }
 
 export function getRandomSymbol(SYMBOLS) {

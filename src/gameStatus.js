@@ -12,17 +12,21 @@ export function handleLevelWin(restartContainer, nextLevelBtn, restartBtn) {
 }
 
 export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
-  gameState.levelComplete = true;
-  gameState.timerActive = false;
-  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  // Decrement lives and update display
-  if (typeof gameState.lives === 'number' && gameState.lives > 0) {
-    gameState.lives -= 1;
-    const livesDisplay = document.getElementById('livesDisplay');
-    if (livesDisplay) livesDisplay.textContent = `❤️ Lives: ${gameState.lives}`;
-  }
-  // Show the restart container and button only on lose
-  if (restartContainer) restartContainer.classList.remove('hidden');
-  if (restartBtn) restartBtn.classList.remove('hidden');
-  if (nextLevelBtn) nextLevelBtn.classList.add('hidden');
+    gameState.levelComplete = true;
+    gameState.timerActive = false;
+    if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+
+    // Decrement lives and update display
+    if (Number.isFinite(gameState.lives) && gameState.lives > 0) {
+        gameState.lives--;
+        const livesDisplay = document.getElementById('livesDisplay');
+        if (livesDisplay) {
+            livesDisplay.textContent = `❤️ Lives: ${gameState.lives}`;
+        }
+    }
+
+    // Toggle UI elements
+    restartContainer?.classList.remove('hidden');
+    restartBtn?.classList.remove('hidden');
+    nextLevelBtn?.classList.add('hidden');
 }

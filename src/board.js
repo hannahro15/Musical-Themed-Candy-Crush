@@ -152,3 +152,9 @@ export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
     }
   }
 }
+
+function swapCellContents(cellA, cellB) {
+  const temp = cellA.textContent;
+  cellA.textContent = cellB.textContent;
+  cellB.textContent = temp;
+}
