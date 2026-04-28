@@ -236,6 +236,7 @@ function setupBoardEvents() {
 ----------------------------------- */
 
 function startGame() {
+  console.log('Play Game button clicked');
   hideGameOver();
 
   resetGame();
@@ -327,7 +328,9 @@ function onLevelLose() {
 ----------------------------------- */
 
 function bindEvents() {
+
   attachEventListeners({
+    playButton,
     restartBtn,
     howToPlayBtn,
     howToPlayModal,
@@ -335,10 +338,6 @@ function bindEvents() {
     handlePlayClick: startGame,
     handleRestartLevel: restartLevel
   });
-
-  if (playButton) {
-    playButton.addEventListener('click', startGame);
-  }
 
   if (nextLevelBtn) {
     nextLevelBtn.addEventListener('click', nextLevel);
@@ -351,6 +350,7 @@ function bindEvents() {
     });
   }
 }
+
 
 /* -----------------------------------
    INIT

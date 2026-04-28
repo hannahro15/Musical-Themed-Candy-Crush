@@ -4,7 +4,8 @@ import { getLevelConfig } from './levels.js';
 import { findMatches, dropAndRefill, hasPossibleMoves } from './board.js';
 import { updateMovesDisplay, updateScoreDisplay, updateObjectiveCounters } from './ui.js';
 import { gameState } from './gameState.js';
-import { BOARD_SIZE, SYMBOLS, getSafeSymbol } from './constants.js';
+import { BOARD_SIZE, SYMBOLS } from './constants.js';
+import { getSafeSymbol } from './board.js';
 import { wireUpCellEvents } from './events.js';
 
 // These will be injected from script.js
