@@ -33,7 +33,7 @@ export function updateObjectiveCounters(objectiveCountersContainer, objectives, 
   objectives.forEach(obj => {
     const span = document.createElement('span');
     const left = state[obj.label + 'Left'] ?? obj.count;
-    span.textContent = `${obj.symbol}: ${left}`;
+    span.textContent = `${obj.symbol} = ${left}`;
     objectiveCountersContainer.appendChild(span);
   });
 }
