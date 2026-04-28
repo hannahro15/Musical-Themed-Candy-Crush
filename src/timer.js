@@ -16,9 +16,15 @@ export function startTimer(gameState, timerDisplay, handleLevelLose) {
             gameState.timerActive = false;
 
             // Only trigger lose if moves are still above 0 and level not complete
-            if (gameState.movesLeft > 0 && !gameState.levelComplete) {
+
+            if (gameState.movesLeft > 0 && !gameState.levelComplete && typeof handleLevelLose === 'function') {
                 handleLevelLose();
             }
         }
     }, 1000);
+}
+
+export function stopTimer(gameState) {
+    clearInterval(gameState.timerInterval);
+    gameState.timerInterval = null;
 }

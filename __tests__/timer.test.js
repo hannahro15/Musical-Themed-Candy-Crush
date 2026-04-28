@@ -8,56 +8,74 @@ import * as ui from '../src/ui.js';
 
 
 describe('timer', () => {
-    test('startTimer is a function', () => {
-  expect(typeof startTimer).toBe('function');
-});
-
-  test('the timer decrements every second when started', () => {
-    startTimer(gameState);
-    expect(gameState.timerInterval).not.toBeNull();
+  afterEach(() => {
+    stopTimer(gameState);
+    gameState.timerActive = true;
+    gameState.levelComplete = false;
+    gameState.movesLeft = 0;
+    gameState.timer = 0;
   });
 
-  test('handelLevelLose is called when timer reaches 0 and no moves are left', () => {
+  test('startTimer is a function', () => {
+    expect(typeof startTimer).toBe('function');
+  });
+
+  test('the timer decrements every second when started', (done) => {
+    gameState.timer = 2;
+    startTimer(gameState, undefined, () => {});
+    setTimeout(() => {
+      expect(gameState.timer).toBe(1);
+      done();
+    }, 1100);
+  });
+
+  test('handelLevelLose is called when timer reaches 0 and moves are left', (done) => {
     gameState.timer = 1;
-    gameState.movesLeft = 0;
+    gameState.movesLeft = 1;
     const handleLevelLose = jest.fn();
-    startTimer(gameState, handleLevelLose);
+    startTimer(gameState, undefined, handleLevelLose);
     setTimeout(() => {
       expect(handleLevelLose).toHaveBeenCalled();
-    }, 1100); // Wait a bit longer than 1 second to ensure the timer has decremented
+      done();
+    }, 1100);
   });
 
-  test('timer does not go below 0', () => {
+  test('timer does not go below 0', (done) => {
     gameState.timer = 1;
-    startTimer(gameState);
+    startTimer(gameState, undefined, () => {});
     setTimeout(() => {
       expect(gameState.timer).toBe(0);
-    }, 1100); // Wait a bit longer than 1 second to ensure the timer has decremented
+      done();
+    }, 1100);
   });
 
-  test('startTimer does not call handleLevelLose if moves are left when timer reaches 0', () => {
+  test('startTimer does not call handleLevelLose if moves are left when timer reaches 0', (done) => {
     gameState.timer = 1;
     gameState.movesLeft = 5;
     const handleLevelLose = jest.fn();
-    startTimer(gameState, handleLevelLose);
+    startTimer(gameState, undefined, handleLevelLose);
     setTimeout(() => {
       expect(handleLevelLose).not.toHaveBeenCalled();
-    }, 1100); // Wait a bit longer than 1 second to ensure the timer has decremented
+      done();
+    }, 1100);
   });
 
   test('stopTimer clears the timer interval', () => {
-    startTimer(gameState);
+    gameState.timer = 2;
+    startTimer(gameState, undefined, () => {});
     stopTimer(gameState);
     expect(gameState.timerInterval).toBeNull();
   });
 
-  test('updateTimerDisplay updates the timer display element', () => {
+  test('updateTimerDisplay updates the timer display element', (done) => {
     document.body.innerHTML = '<div id="timer"></div>';
     const timerDisplay = document.getElementById('timer');
-    startTimer(gameState, timerDisplay);
+    gameState.timer = 2;
+    startTimer(gameState, timerDisplay, () => {});
     setTimeout(() => {
       expect(timerDisplay.textContent).toBe(String(gameState.timer));
-    }, 1100); // Wait a bit longer than 1 second to ensure the timer has decremented
+      done();
+    }, 1100);
   });
 
   test('does not decrement timer or call updateTimerDisplay if timerActive is false', (done) => {
@@ -95,7 +113,7 @@ describe('timer', () => {
     const spy = jest.spyOn(ui, 'updateTimerDisplay');
     gameState.timer = 2;
     gameState.timerActive = true;
-    startTimer(gameState, timerDisplay);
+    startTimer(gameState, timerDisplay, () => {});
     setTimeout(() => {
       expect(spy).toHaveBeenCalledWith(timerDisplay, 1);
       spy.mockRestore();
