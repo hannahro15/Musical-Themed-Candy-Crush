@@ -11,7 +11,7 @@ describe('UI functions', () => {
 
   beforeEach(() => {
     // Set up DOM elements for testing
-    document.body.innerHTML = `
+        document.body.innerHTML = `
       <div id="score">0</div>
       <div id="level">1</div>
       <div id="timer">60</div>
@@ -99,6 +99,9 @@ describe('UI functions', () => {
       const timerDisplay = document.createElement('div');
       const livesDisplay = document.createElement('div');
       const restartContainer = document.createElement('div');
+      const heading = document.createElement('h1');
+      const menu = document.createElement('div');
+      const gameBoard = document.createElement('div');
       document.body.appendChild(movesDisplay);
       document.body.appendChild(scoreDisplay);
       document.body.appendChild(timerDisplay);
@@ -110,8 +113,7 @@ describe('UI functions', () => {
   <div id="score-moves-wrapper"></div>
   <div id="levelDisplay"></div>
 `;
-
-      showMenuPage(movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+      showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer)
 
       expect(document.getElementById('score-moves-wrapper').classList.contains('hidden')).toBe(true);
       expect(movesDisplay.classList.contains('hidden')).toBe(true);
