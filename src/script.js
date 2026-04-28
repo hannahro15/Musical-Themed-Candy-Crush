@@ -26,6 +26,8 @@ const restartContainer = document.getElementById('restartContainer');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const howToPlayModal = document.getElementById('howToPlayModal');
 const closeHowToPlay = document.getElementById('closeHowToPlay');
+const gameOverModal = document.getElementById('gameOverModal');
+const gameOverRestartBtn = document.getElementById('gameOverRestartBtn');
 
 // --- Game State ---
 // (removed local gameState definition)
@@ -92,32 +94,7 @@ function generateBoardAndWireEvents() {
  */
 
 
-async function trySwap(sourceCell, targetCell) {
-  if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
-  gameState.isResolving = true;
-
-  const matchResult = await swapAndCheckMatch(sourceCell, targetCell);
-  if (!matchResult) {
-    gameState.isResolving = false;
-    return;
-  }
-
-  const { scoreGained, matchedCounts, config } = await resolveAllMatchesAndDrop();
-  updateScoreAndObjectives(scoreGained, matchedCounts, config);
-
-  if (checkWinCondition(config)) {
-    handleLevelWin(restartContainer, nextLevelBtn, restartBtn);
-    gameState.isResolving = false;
-    return;
-  }
-
-  if (gameState.movesLeft <= 0 && !gameState.levelComplete && gameState.timer > 0) {
-    handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
-    gameState.isResolving = false;
-    return;
-  }
-  gameState.isResolving = false;
-}
+// The trySwap function is now imported from boardController.js, so it has been removed.
 
 async function swapAndCheckMatch(sourceCell, targetCell) {
   swapCellContents(sourceCell, targetCell);
@@ -247,3 +224,46 @@ document.addEventListener('DOMContentLoaded', () => {
   if (nextLevelBtn) nextLevelBtn.addEventListener('click', handleNextLevel);
   showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
 });
+
+// --- Game Over Modal Logic ---
+function showGameOverModal() {
+  if (gameOverModal) gameOverModal.classList.remove('hidden');
+}
+function hideGameOverModal() {
+  if (gameOverModal) gameOverModal.classList.add('hidden');
+}
+if (gameOverRestartBtn) {
+  gameOverRestartBtn.addEventListener('click', () => {
+    hideGameOverModal();
+    // Option 1: Go to menu page
+    showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
+    // Option 2: Uncomment below to start at level 1 directly instead of menu
+    // patchedStartGame();
+  });
+}
+
+// Patch handleLevelLose to show modal if lives are 0
+const originalHandleLevelLose = handleLevelLose;
+function patchedHandleLevelLose(...args) {
+  originalHandleLevelLose(...args);
+  if (gameState.lives === 0) {
+    showGameOverModal();
+  }
+}
+// Patch global reference
+window.handleLevelLose = patchedHandleLevelLose;
+
+// Hide modal on new game or restart
+const originalStartGame = startGame;
+function patchedStartGame(...args) {
+  hideGameOverModal();
+  originalStartGame(...args);
+}
+window.startGame = patchedStartGame;
+
+const originalHandleRestartLevel = handleRestartLevel;
+function patchedHandleRestartLevel(...args) {
+  hideGameOverModal();
+  originalHandleRestartLevel(...args);
+}
+window.handleRestartLevel = patchedHandleRestartLevel;

@@ -1,3 +1,25 @@
+/* Game Over Modal Customization */
+#gameOverModal .modal-content {
+    text-align: center;
+}
+#gameOverModal h2 {
+    margin-bottom: 12px;
+    color: #c0392b;
+}
+#gameOverRestartBtn {
+    margin-top: 18px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#gameOverRestartBtn:hover {
+    background: #a93226;
+}
 /* Modal Styles */
 .modal {
     display: flex;
