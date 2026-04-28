@@ -267,3 +267,9 @@ function patchedHandleRestartLevel(...args) {
   originalHandleRestartLevel(...args);
 }
 window.handleRestartLevel = patchedHandleRestartLevel;
+
+// After patching window.startGame, ensure playButton uses the patched version
+if (playButton) {
+  playButton.removeEventListener('click', handlePlayClick); // Remove old if present
+  playButton.addEventListener('click', () => window.startGame());
+}
