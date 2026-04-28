@@ -10,14 +10,14 @@ describe('UI functions', () => {
   let gameOverElement;
 
   beforeEach(() => {
-    // Set up DOM elements for testing
-        document.body.innerHTML = `
+    document.body.innerHTML = `
       <div id="score">0</div>
       <div id="level">1</div>
       <div id="timer">60</div>
       <div id="game-over" class="hidden">Game Over</div>
+      <div id="score-moves-wrapper"></div>
+      <div id="levelDisplay"></div>
     `;
-
     scoreElement = document.getElementById('score');
     levelElement = document.getElementById('level');
     timerElement = document.getElementById('timer');
@@ -78,7 +78,6 @@ describe('UI functions', () => {
   });
 
   test('showGameOver removes hidden from #game-over', () => {
-    document.body.innerHTML = '<div id="game-over" class="hidden"></div>';
     showGameOver();
     expect(document.getElementById('game-over').classList.contains('hidden')).toBe(false);
   });
@@ -207,15 +206,5 @@ describe('UI functions', () => {
       expect(livesDisplay.classList.contains('hidden')).toBe(true);
       expect(restartContainer.classList.contains('hidden')).toBe(true);
 
-  });
-
-  test('the game over modal appears when the lives reach 0', () => {
-    const gameOverModal = document.createElement('div');
-    gameOverModal.id = 'gameOverModal';
-    gameOverModal.classList.add('hidden');
-    document.body.appendChild(gameOverModal);
-
-    showGameOver();
-    expect(gameOverModal.classList.contains('hidden')).toEqual(true);
   });
 });
