@@ -56,4 +56,17 @@ describe('game', () => {
     expect(scoreForMatch(2)).toBe(0);
     expect(scoreForMatch(0)).toBe(0);
   });
+
+  test('swapCellContents swaps values correctly', () => {
+    const cell1 = document.createElement('div');
+    const cell2 = document.createElement('div');
+    cell1.textContent = 'X';
+    cell2.textContent = 'Y';
+
+    swapCellContents(cell1, cell2);
+
+    expect(cell1.textContent).toBe('Y');
+    expect(cell2.textContent).toBe('X');
+  });
 });
+
