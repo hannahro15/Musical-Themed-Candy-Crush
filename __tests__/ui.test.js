@@ -29,9 +29,31 @@ describe('UI functions', () => {
     expect(scoreElement.textContent).toBe('100');
   });
 
+  test('updateScore updates #score element text', () => {
+    document.body.innerHTML = '<div id="score"></div>';
+    updateScore(123);
+    expect(document.getElementById('score').textContent).toBe('123');
+  });
+
+  test('updateScore does nothing if #score element missing', () => {
+    document.body.innerHTML = '';
+    expect(() => updateScore(123)).not.toThrow();
+  });
+
   test('updateLevel updates the level element', () => {
     updateLevel(2);
     expect(levelElement.textContent).toBe('2');
+  });
+
+  test('updateLevel updates #level element text', () => {
+    document.body.innerHTML = '<div id="level"></div>';
+    updateLevel(5);
+    expect(document.getElementById('level').textContent).toBe('5');
+  });
+
+  test('updateLevel does nothing if #level element missing', () => {
+    document.body.innerHTML = '';
+    expect(() => updateLevel(5)).not.toThrow();
   });
 
   test('updateTimer updates the timer element', () => {
@@ -39,14 +61,47 @@ describe('UI functions', () => {
     expect(timerElement.textContent).toBe('45');
   });
 
+  test('updateTimer updates #timer element text', () => {
+    document.body.innerHTML = '<div id="timer"></div>';
+    updateTimer(42);
+    expect(document.getElementById('timer').textContent).toBe('42');
+  });
+
+  test('updateTimer does nothing if #timer element missing', () => {
+    document.body.innerHTML = '';
+    expect(() => updateTimer(42)).not.toThrow();
+  });
+
   test('showGameOver displays the game over element', () => {
     showGameOver();
     expect(gameOverElement.classList.contains('hidden')).toBe(false);
   });
 
+  test('showGameOver removes hidden from #game-over', () => {
+    document.body.innerHTML = '<div id="game-over" class="hidden"></div>';
+    showGameOver();
+    expect(document.getElementById('game-over').classList.contains('hidden')).toBe(false);
+  });
+
+  test('showGameOver does nothing if #game-over missing', () => {
+    document.body.innerHTML = '';
+    expect(() => showGameOver()).not.toThrow();
+  });
+
   test('hideGameOver hides the game over element', () => {
     hideGameOver();
     expect(gameOverElement.classList.contains('hidden')).toBe(true);
+  });
+
+  test('hideGameOver adds hidden to #game-over', () => {
+    document.body.innerHTML = '<div id="game-over"></div>';
+    hideGameOver();
+    expect(document.getElementById('game-over').classList.contains('hidden')).toBe(true);
+  });
+
+  test('hideGameOver does nothing if #game-over missing', () => {
+    document.body.innerHTML = '';
+    expect(() => hideGameOver()).not.toThrow();
   });
 
   test('updateObjectiveCounters renders the correct number of counters', () => {
@@ -67,6 +122,35 @@ describe('UI functions', () => {
     expect(objectiveCountersContainer.children.length).toBe(2);
     expect(objectiveCountersContainer.children[0].textContent).toBe('🔴: 2');
     expect(objectiveCountersContainer.children[1].textContent).toBe('🔵: 1');
+  });
+
+  test('updateObjectiveCounters handles null container gracefully', () => {
+    expect(() => updateObjectiveCounters(null, [{ label: 'a', symbol: 'A', count: 1 }], { aLeft: 1 })).not.toThrow();
+  });
+
+  test('updateObjectiveCounters renders correct spans and values', () => {
+    const container = document.createElement('div');
+    const objectives = [
+      { label: 'red', symbol: '🔴', count: 5 },
+      { label: 'blue', symbol: '🔵', count: 3 }
+    ];
+    const state = { redLeft: 2, blueLeft: 1 };
+    updateObjectiveCounters(container, objectives, state);
+    expect(container.children.length).toBe(2);
+    expect(container.children[0].textContent).toBe('🔴: 2');
+    expect(container.children[1].textContent).toBe('🔵: 1');
+  });
+
+  test('updateObjectiveCounters uses obj.count as fallback if state key missing', () => {
+    const container = document.createElement('div');
+    const objectives = [
+      { label: 'red', symbol: '🔴', count: 5 },
+      { label: 'blue', symbol: '🔵', count: 3 }
+    ];
+    const state = { redLeft: undefined };
+    updateObjectiveCounters(container, objectives, state);
+    expect(container.children[0].textContent).toBe('🔴: 5'); // fallback to count
+    expect(container.children[1].textContent).toBe('🔵: 3'); // fallback to count
   });
 
   test('updateLivesDisplay updates the lives display text with the correct value', () => {
@@ -122,5 +206,16 @@ describe('UI functions', () => {
       expect(document.getElementById('levelDisplay').classList.contains('hidden')).toBe(true);
       expect(livesDisplay.classList.contains('hidden')).toBe(true);
       expect(restartContainer.classList.contains('hidden')).toBe(true);
+
+  });
+
+  test('the game over modal appears when the lives reach 0', () => {
+    const gameOverModal = document.createElement('div');
+    gameOverModal.id = 'gameOverModal';
+    gameOverModal.classList.add('hidden');
+    document.body.appendChild(gameOverModal);
+
+    showGameOver();
+    expect(gameOverModal.classList.contains('hidden')).toEqual(true);
   });
 });
