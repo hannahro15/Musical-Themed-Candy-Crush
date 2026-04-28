@@ -99,66 +99,74 @@ function generateBoardAndWireEvents() {
  * @param {HTMLElement} targetCell
  */
 
+
 async function trySwap(sourceCell, targetCell) {
-  console.log('[trySwap] called with', sourceCell, targetCell);
-  if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) {
-    console.log('[trySwap] Early exit: isResolving:', gameState.isResolving, 'levelComplete:', gameState.levelComplete, 'timerActive:', gameState.timerActive);
-    return;
-  }
+  if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
   gameState.isResolving = true;
 
-  swapCellContents(sourceCell, targetCell);
-
-  // Wait a short moment so the swap is visible before clearing matches
-  await new Promise(res => setTimeout(res, 180));
-
-  // Detect matches after swap
-  let matches = findMatches(gameBoard, BOARD_SIZE);
-  console.log('[trySwap] matches after swap:', matches);
-
-  // Only swap back if neither swapped cell is in a match
-  const swappedInMatch = matches.some(group => group.includes(sourceCell) || group.includes(targetCell));
-  if (matches.length === 0 || !swappedInMatch) {
-    console.log('[trySwap] No match or swapped cells not in match, swapping back');
-    swapCellContents(sourceCell, targetCell);
+  const matchResult = await swapAndCheckMatch(sourceCell, targetCell);
+  if (!matchResult) {
     gameState.isResolving = false;
     return;
   }
 
-  // At least one match: resolve all matches
+  const { scoreGained, matchedCounts, config } = await resolveAllMatchesAndDrop();
+  updateScoreAndObjectives(scoreGained, matchedCounts, config);
+
+  if (checkWinCondition(config)) {
+    handleLevelWin(restartContainer, nextLevelBtn, restartBtn);
+    gameState.isResolving = false;
+    return;
+  }
+
+  if (gameState.movesLeft <= 0 && !gameState.levelComplete && gameState.timer > 0) {
+    handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
+    gameState.isResolving = false;
+    return;
+  }
+  gameState.isResolving = false;
+}
+
+async function swapAndCheckMatch(sourceCell, targetCell) {
+  swapCellContents(sourceCell, targetCell);
+  await wait(180);
+  let matches = findMatches(gameBoard, BOARD_SIZE);
+  const swappedInMatch = matches.some(group => group.includes(sourceCell) || group.includes(targetCell));
+  if (matches.length === 0 || !swappedInMatch) {
+    swapCellContents(sourceCell, targetCell);
+    return false;
+  }
+  // Decrement movesLeft and update display for a valid swap
+  gameState.movesLeft = Math.max(0, gameState.movesLeft - 1);
+  updateMovesDisplay(movesDisplay, gameState.movesLeft);
+  return true;
+}
+
+async function resolveAllMatchesAndDrop() {
+  let matches = findMatches(gameBoard, BOARD_SIZE);
   let scoreGained = 0;
-  // Dynamically count matches for all objectives
   const config = getLevelConfig(gameState.level);
   const matchedCounts = {};
   config.objectives.forEach(obj => { matchedCounts[obj.label] = 0; });
 
-  // Decrement movesLeft and update display for a valid swap
-  gameState.movesLeft = Math.max(0, gameState.movesLeft - 1);
-  updateMovesDisplay(movesDisplay, gameState.movesLeft);
-
   while (matches.length > 0) {
-    // Animate matched cells
     for (const group of matches) {
       scoreGained += scoreForMatch(group.length);
       for (const cell of group) {
         cell.classList.add('matched');
-        // Count matches for all objectives
         config.objectives.forEach(obj => {
           if (cell.textContent === obj.symbol) matchedCounts[obj.label]++;
         });
       }
     }
-    await new Promise(res => setTimeout(res, 250)); // Animation delay
-    // Remove matched cells
+    await wait(250); // Animation delay
     for (const group of matches) {
       for (const cell of group) {
         cell.textContent = '';
         cell.classList.remove('matched');
       }
     }
-    // Drop cells down and refill
     dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-    // Ensure new cells are interactive
     wireUpCellEvents(
       gameBoard,
       BOARD_SIZE,
@@ -168,10 +176,9 @@ async function trySwap(sourceCell, targetCell) {
       (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
     );
     matches = findMatches(gameBoard, BOARD_SIZE);
-    // After resolving matches, check for possible moves
     if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
       // Import reshuffleBoard dynamically to avoid circular dependency
-      import('./board.js').then(({ reshuffleBoard }) => {
+      await import('./board.js').then(({ reshuffleBoard }) => {
         reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, () => wireUpCellEvents(
           gameBoard,
           BOARD_SIZE,
@@ -184,38 +191,31 @@ async function trySwap(sourceCell, targetCell) {
       break;
     }
   }
+  return { scoreGained, matchedCounts, config };
+}
 
-  // Update score and display
+function updateScoreAndObjectives(scoreGained, matchedCounts, config) {
   gameState.score += scoreGained;
   updateScoreDisplay(scoreDisplay, gameState.score);
-
-  // Decrease counters for all objectives
-  let allObjectivesComplete = true;
   config.objectives.forEach(obj => {
     const key = obj.label + 'Left';
     if (typeof gameState[key] !== 'number') gameState[key] = obj.count;
     if (matchedCounts[obj.label] > 0) {
       gameState[key] = Math.max(0, gameState[key] - matchedCounts[obj.label]);
     }
-    if (gameState[key] > 0) allObjectivesComplete = false;
   });
   updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
-  // Check for win condition after counters update
-  if (allObjectivesComplete) {
-    handleLevelWin(restartContainer, nextLevelBtn, restartBtn);
-    gameState.isResolving = false;
-    return;
-  }
+}
 
-  if (gameState.movesLeft <= 0 && !gameState.levelComplete) {
-    // Only trigger lose if timer is still above 0
-    if (gameState.timer > 0) {
-      handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
-      gameState.isResolving = false;
-      return;
-    }
-  }
-  gameState.isResolving = false;
+function checkWinCondition(config) {
+  return config.objectives.every(obj => {
+    const key = obj.label + 'Left';
+    return gameState[key] === 0;
+  });
+}
+
+function wait(ms) {
+  return new Promise(res => setTimeout(res, ms));
 }
 
 
