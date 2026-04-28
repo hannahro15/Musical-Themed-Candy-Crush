@@ -1,10 +1,9 @@
-
-
 import { getLevelConfig } from './levels.js';
 import { showMenuPage, updateObjectiveCounters, updateMovesDisplay, updateScoreDisplay, updateLivesDisplay } from './ui.js';
 import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
 import { swapCellContents, scoreForMatch, areAdjacent } from './game.js';
+import { trySwap, setBoardControllerDeps } from './boardController.js';
 import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
 import { handleLevelWin, handleLevelLose } from './gameStatus.js';
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
@@ -42,18 +41,15 @@ const closeHowToPlay = document.getElementById('closeHowToPlay');
 function startLevel(levelNum) {
   const config = getLevelConfig(levelNum);
   if (!config) {
-    // No more levels, show menu or win screen
     showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer);
     return;
   }
-  // Reset game state for new level
   gameState.level = levelNum;
   gameState.levelComplete = false;
   gameState.movesLeft = config.moves;
   gameState.score = 0;
   gameState.timer = config.timer;
   gameState.timerActive = true;
-  // Reset all objective counters
   Object.keys(gameState).forEach(key => {
     if (key.endsWith('Left') && key !== 'movesLeft') delete gameState[key];
   });
@@ -62,20 +58,16 @@ function startLevel(levelNum) {
       gameState[obj.label + 'Left'] = obj.count;
     });
   }
-  // Update UI
   document.getElementById('levelDisplay').textContent = `LEVEL ${levelNum}`;
   updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
   updateScoreDisplay(scoreDisplay, gameState.score);
   updateLivesDisplay(livesDisplay, gameState.lives);
-  // Generate board and wire up cell events
   generateBoardAndWireEvents();
-  // Start timer
   startTimer(gameState, timerDisplay, () => handleLevelLose(restartContainer, restartBtn, nextLevelBtn));
 }
 
 function generateBoardAndWireEvents() {
-  // Use the robust board.js logic for board generation
   generateGameBoard(
     gameBoard,
     BOARD_SIZE,
@@ -139,58 +131,9 @@ async function swapAndCheckMatch(sourceCell, targetCell) {
   // Decrement movesLeft and update display for a valid swap
   gameState.movesLeft = Math.max(0, gameState.movesLeft - 1);
   updateMovesDisplay(movesDisplay, gameState.movesLeft);
-  return true;
-}
 
-async function resolveAllMatchesAndDrop() {
-  let matches = findMatches(gameBoard, BOARD_SIZE);
-  let scoreGained = 0;
-  const config = getLevelConfig(gameState.level);
-  const matchedCounts = {};
-  config.objectives.forEach(obj => { matchedCounts[obj.label] = 0; });
 
-  while (matches.length > 0) {
-    for (const group of matches) {
-      scoreGained += scoreForMatch(group.length);
-      for (const cell of group) {
-        cell.classList.add('matched');
-        config.objectives.forEach(obj => {
-          if (cell.textContent === obj.symbol) matchedCounts[obj.label]++;
-        });
-      }
-    }
-    await wait(250); // Animation delay
-    for (const group of matches) {
-      for (const cell of group) {
-        cell.textContent = '';
-        cell.classList.remove('matched');
-      }
-    }
-    dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-    wireUpCellEvents(
-      gameBoard,
-      BOARD_SIZE,
-      (e) => handleDragStart(e, gameState, setDraggedCell),
-      (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
-      (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
-      (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
-    );
-    matches = findMatches(gameBoard, BOARD_SIZE);
-    if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
-      // Import reshuffleBoard dynamically to avoid circular dependency
-      await import('./board.js').then(({ reshuffleBoard }) => {
-        reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, () => wireUpCellEvents(
-          gameBoard,
-          BOARD_SIZE,
-          (e) => handleDragStart(e, gameState, setDraggedCell),
-          (e) => handleDrop(e, gameState, gameState.draggedCell, setDraggedCell, (a, b) => areAdjacent(a, b, gameBoard, BOARD_SIZE), trySwap),
-          (e) => handleTouchStart(e, gameState, setTouchStartCell, setTouchStartX, setTouchStartY, gameBoard),
-          (e) => handleTouchEnd(e, gameState, gameState.touchStartCell, gameState.touchStartX, gameState.touchStartY, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap)
-        ));
-      });
-      break;
-    }
-  }
+  // Code related to reshuffling and event wiring has been moved to boardController.js
   return { scoreGained, matchedCounts, config };
 }
 
@@ -278,6 +221,18 @@ function handleNextLevel() {
   if (restartBtn) restartBtn.classList.add('hidden');
   startLevel(gameState.level + 1);
 }
+
+
+
+// Inject dependencies for boardController
+setBoardControllerDeps({
+  gameBoard,
+  movesDisplay,
+  scoreDisplay,
+  restartContainer,
+  nextLevelBtn,
+  restartBtn
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   attachEventListeners({
