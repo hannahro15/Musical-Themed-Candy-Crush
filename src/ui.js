@@ -10,7 +10,7 @@ export function showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDispla
   timerDisplay.classList.add('hidden');
   document.getElementById('levelDisplay').classList.add('hidden');
   livesDisplay.classList.add('hidden');
-  restartContainer.classList.add('hidden');
+  if (restartContainer) restartContainer.classList.add('hidden');
 }
 
 export function updateLivesDisplay(livesDisplay, lives) {
