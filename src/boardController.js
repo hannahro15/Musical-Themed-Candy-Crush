@@ -35,12 +35,11 @@ export async function trySwap(sourceCell, targetCell) {
   updateScoreAndObjectives(scoreGained, matchedCounts, config);
 
   if (checkWinCondition(config)) {
-    // Show next level modal immediately when objectives are complete
-    gameState.levelComplete = true;
-    setTimeout(() => {
-      const nextLevelModal = document.getElementById('nextLevelModal');
-      if (nextLevelModal) nextLevelModal.classList.remove('hidden');
-    }, 250);
+    // Use handleLevelWin to show modal and update state
+    await wait(250); // Animation delay for match clear
+    import('./gameStatus.js').then(({ handleLevelWin }) => {
+      handleLevelWin();
+    });
     gameState.isResolving = false;
     return;
   }
