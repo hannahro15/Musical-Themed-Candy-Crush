@@ -35,7 +35,12 @@ export async function trySwap(sourceCell, targetCell) {
   updateScoreAndObjectives(scoreGained, matchedCounts, config);
 
   if (checkWinCondition(config)) {
-    // handleLevelWin should be called from script.js after trySwap resolves
+    // Show next level modal immediately when objectives are complete
+    gameState.levelComplete = true;
+    setTimeout(() => {
+      const nextLevelModal = document.getElementById('nextLevelModal');
+      if (nextLevelModal) nextLevelModal.classList.remove('hidden');
+    }, 250);
     gameState.isResolving = false;
     return;
   }
