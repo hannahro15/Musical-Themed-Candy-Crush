@@ -75,6 +75,9 @@ const levelDisplay = document.getElementById('levelDisplay');
 const scoreMovesWrapper = document.getElementById('score-moves-wrapper');
 const objectiveCounters = document.getElementById('objective-counters');
 
+// Add missing restartContainer reference for menu/game UI state
+const restartContainer = document.getElementById('restartLevelModal');
+
 const restartLevelModal = document.getElementById('restartLevelModal');
 const confirmRestartBtn = document.getElementById('confirmRestartBtn');
 const cancelRestartBtn = document.getElementById('cancelRestartBtn');
@@ -106,11 +109,15 @@ function showMenu() {
 }
 
 function showGameUI() {
+  console.log('[showGameUI] called');
   hideElement(heading);
   hideElement(menu);
 
-  showElement(gameBoardContainer);
-  showElement(gameBoard);
+  // Always show both the container and the board
+  gameBoardContainer.classList.remove('hidden');
+  gameBoard.classList.remove('hidden');
+  console.log('[showGameUI] gameBoardContainer.hidden:', gameBoardContainer.classList.contains('hidden'));
+  console.log('[showGameUI] gameBoard.hidden:', gameBoard.classList.contains('hidden'));
   showElement(scoreMovesWrapper);
   showElement(levelDisplay);
   showElement(movesDisplay);
@@ -120,7 +127,6 @@ function showGameUI() {
   showElement(objectiveCounters);
 
   hideElement(restartLevelModal);
-  hideElement(nextLevelBtn);
 }
 
 function showGameOver() {
@@ -164,6 +170,7 @@ function loadObjectives(config) {
 ----------------------------------- */
 
 function generateBoard() {
+  console.log('[generateBoard] called');
   generateGameBoard(
     gameBoard,
     BOARD_SIZE,
@@ -172,6 +179,7 @@ function generateBoard() {
     hasPossibleMoves,
     setupBoardEvents
   );
+  console.log('[generateBoard] cell count:', gameBoard.children.length);
 }
 
 function setupBoardEvents() {
@@ -325,6 +333,13 @@ function onLevelWin() {
 ----------------------------------- */
 
 function bindEvents() {
+  // Play Game button event
+  if (playButton) {
+    playButton.addEventListener('click', function () {
+      startGame();
+    });
+  }
+
   // Restart modal events
   const restartTrigger = document.getElementById('restartBtn');
   if (restartTrigger) {
