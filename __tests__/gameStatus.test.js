@@ -12,21 +12,21 @@ describe('gameStatus', () => {
     gameState.lives = 3; // Assuming INITIAL_LIVES is 3
   });
 
-  test('handleLevelWin updates gameState and UI elements correctly', () => {
-    const restartContainer = document.createElement('div');
-    const nextLevelBtn = document.createElement('button');
-    const restartBtn = document.createElement('button');
-    restartContainer.classList.add('hidden');
-    nextLevelBtn.classList.add('hidden');
-    restartBtn.classList.remove('hidden');
+  test('handleLevelWin updates gameState and shows next level modal', () => {
+    // Simulate the next level modal in the DOM
+    const nextLevelModal = document.createElement('div');
+    nextLevelModal.id = 'nextLevelModal';
+    nextLevelModal.classList.add('modal', 'hidden');
+    document.body.appendChild(nextLevelModal);
 
-    handleLevelWin(restartContainer, nextLevelBtn, restartBtn);
+    handleLevelWin();
 
     expect(gameState.levelComplete).toBe(true);
     expect(gameState.timerActive).toBe(false);
-    expect(restartContainer.classList.contains('hidden')).toBe(false);
-    expect(nextLevelBtn.classList.contains('hidden')).toBe(false);
-    expect(restartBtn.classList.contains('hidden')).toBe(true);
+    expect(nextLevelModal.classList.contains('hidden')).toBe(false);
+
+    // Clean up
+    document.body.removeChild(nextLevelModal);
   });
 
   test('handleLevelLose updates gameState and UI elements correctly', () => {
