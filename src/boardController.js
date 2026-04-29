@@ -7,7 +7,7 @@ import { gameState } from './gameState.js';
 import { BOARD_SIZE, SYMBOLS } from './constants.js';
 import { getSafeSymbol } from './board.js';
 import { wireUpCellEvents } from './events.js';
-import { boardEventHandlers } from './script.js';
+import { boardEventHandlers } from './boardEventHandlers.js';
 
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, restartContainer, nextLevelBtn, restartBtn;
