@@ -21,41 +21,53 @@ describe('timer', () => {
   });
 
   test('the timer decrements every second when started', (done) => {
+    document.body.innerHTML = '<div id="timer"></div>';
+    const timerDisplay = document.getElementById('timer');
     gameState.timer = 2;
-    startTimer(gameState, undefined, () => {});
+    startTimer(gameState, timerDisplay, () => {});
     setTimeout(() => {
       expect(gameState.timer).toBe(1);
+      expect(timerDisplay.textContent).toBe('Time: 1s');
       done();
     }, 1100);
   });
 
   test('handelLevelLose is called when timer reaches 0 and moves are left', (done) => {
+    document.body.innerHTML = '<div id="timer"></div>';
+    const timerDisplay = document.getElementById('timer');
     gameState.timer = 1;
     gameState.movesLeft = 1;
     const handleLevelLose = jest.fn();
-    startTimer(gameState, undefined, handleLevelLose);
+    startTimer(gameState, timerDisplay, handleLevelLose);
     setTimeout(() => {
       expect(handleLevelLose).toHaveBeenCalled();
+      expect(timerDisplay.textContent).toBe('Time: 0s');
       done();
     }, 1100);
   });
 
   test('timer does not go below 0', (done) => {
+    document.body.innerHTML = '<div id="timer"></div>';
+    const timerDisplay = document.getElementById('timer');
     gameState.timer = 1;
-    startTimer(gameState, undefined, () => {});
+    startTimer(gameState, timerDisplay, () => {});
     setTimeout(() => {
       expect(gameState.timer).toBe(0);
+      expect(timerDisplay.textContent).toBe('Time: 0s');
       done();
     }, 1100);
   });
 
-  test('startTimer does not call handleLevelLose if moves are left when timer reaches 0', (done) => {
+  test('startTimer does not call handleLevelLose if no moves are left when timer reaches 0', (done) => {
+    document.body.innerHTML = '<div id="timer"></div>';
+    const timerDisplay = document.getElementById('timer');
     gameState.timer = 1;
-    gameState.movesLeft = 5;
+    gameState.movesLeft = 0;
     const handleLevelLose = jest.fn();
-    startTimer(gameState, undefined, handleLevelLose);
+    startTimer(gameState, timerDisplay, handleLevelLose);
     setTimeout(() => {
       expect(handleLevelLose).not.toHaveBeenCalled();
+      expect(timerDisplay.textContent).toBe('Time: 0s');
       done();
     }, 1100);
   });
@@ -73,7 +85,7 @@ describe('timer', () => {
     gameState.timer = 2;
     startTimer(gameState, timerDisplay, () => {});
     setTimeout(() => {
-      expect(timerDisplay.textContent).toBe(String(gameState.timer));
+      expect(timerDisplay.textContent).toBe('Time: 1s');
       done();
     }, 1100);
   });
