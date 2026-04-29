@@ -7,6 +7,7 @@ import { gameState } from './gameState.js';
 import { BOARD_SIZE, SYMBOLS } from './constants.js';
 import { getSafeSymbol } from './board.js';
 import { wireUpCellEvents } from './events.js';
+import { boardEventHandlers } from './script.js';
 
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, restartContainer, nextLevelBtn, restartBtn;
@@ -90,12 +91,10 @@ async function resolveAllMatchesAndDrop() {
     wireUpCellEvents(
       gameBoard,
       BOARD_SIZE,
-      // These event handlers should be injected or imported as needed
-      // For now, leave as placeholders
-      () => {},
-      () => {},
-      () => {},
-      () => {}
+      boardEventHandlers.onDragStart,
+      boardEventHandlers.onDrop,
+      boardEventHandlers.onTouchStart,
+      boardEventHandlers.onTouchEnd
     );
     matches = findMatches(gameBoard, BOARD_SIZE);
     if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
@@ -103,10 +102,10 @@ async function resolveAllMatchesAndDrop() {
         reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, () => wireUpCellEvents(
           gameBoard,
           BOARD_SIZE,
-          () => {},
-          () => {},
-          () => {},
-          () => {}
+          boardEventHandlers.onDragStart,
+          boardEventHandlers.onDrop,
+          boardEventHandlers.onTouchStart,
+          boardEventHandlers.onTouchEnd
         ));
       });
       break;
