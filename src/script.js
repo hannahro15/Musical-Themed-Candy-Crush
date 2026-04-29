@@ -73,8 +73,10 @@ const levelDisplay = document.getElementById('levelDisplay');
 const scoreMovesWrapper = document.getElementById('score-moves-wrapper');
 const objectiveCounters = document.getElementById('objective-counters');
 
-const restartBtn = document.getElementById('restartBtn');
-const restartContainer = document.getElementById('restartContainer');
+const restartLevelModal = document.getElementById('restartLevelModal');
+const confirmRestartBtn = document.getElementById('confirmRestartBtn');
+const cancelRestartBtn = document.getElementById('cancelRestartBtn');
+const closeRestartModal = document.getElementById('closeRestartModal');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 
 const howToPlayModal = document.getElementById('howToPlayModal');
@@ -122,8 +124,7 @@ function showGameUI() {
   showElement(livesDisplay);
   showElement(objectiveCounters);
 
-  hideElement(restartContainer);
-  hideElement(restartBtn);
+  hideElement(restartLevelModal);
   hideElement(nextLevelBtn);
 }
 
@@ -299,6 +300,7 @@ function restartLevel() {
   }
 
   startLevel(gameState.level);
+  hideElement(restartLevelModal);
 }
 
 function nextLevel() {
@@ -328,16 +330,38 @@ function onLevelLose() {
 ----------------------------------- */
 
 function bindEvents() {
+  // Open restart modal when restart is requested (show button somewhere in UI if needed)
+  const restartTrigger = document.getElementById('restartBtn');
+  if (restartTrigger) {
+    restartTrigger.addEventListener('click', function () {
+      showElement(restartLevelModal);
+    });
+  }
 
-  attachEventListeners({
-    playButton,
-    restartBtn,
-    howToPlayBtn,
-    howToPlayModal,
-    closeHowToPlay,
-    handlePlayClick: startGame,
-    handleRestartLevel: restartLevel
-  });
+  if (confirmRestartBtn) {
+    confirmRestartBtn.addEventListener('click', restartLevel);
+  }
+  if (cancelRestartBtn) {
+    cancelRestartBtn.addEventListener('click', function () {
+      hideElement(restartLevelModal);
+    });
+  }
+  if (closeRestartModal) {
+    closeRestartModal.addEventListener('click', function () {
+      hideElement(restartLevelModal);
+    });
+  }
+
+  if (howToPlayBtn) {
+    howToPlayBtn.addEventListener('click', function () {
+      showElement(howToPlayModal);
+    });
+  }
+  if (closeHowToPlay) {
+    closeHowToPlay.addEventListener('click', function () {
+      hideElement(howToPlayModal);
+    });
+  }
 
   if (nextLevelBtn) {
     nextLevelBtn.addEventListener('click', nextLevel);
@@ -361,9 +385,8 @@ function init() {
     gameBoard,
     movesDisplay,
     scoreDisplay,
-    restartContainer,
-    nextLevelBtn,
-    restartBtn
+    // restartContainer and restartBtn removed for modal version
+    nextLevelBtn
   });
 
   bindEvents();

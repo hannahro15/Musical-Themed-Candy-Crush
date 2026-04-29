@@ -28,10 +28,17 @@
                 </div>
             </div>
             <div id="gameBoard"></div>
-            <div id="restartContainer" class="hidden" style="text-align:center; margin-top: 16px;">
-                <button id="restartBtn">Restart Level</button>
-                <button id="nextLevelBtn" class="hidden">Next Level</button>
+            <!-- Restart Level Modal -->
+            <div id="restartLevelModal" class="modal hidden">
+                <div class="modal-content" style="text-align:center;">
+                    <span id="closeRestartModal" class="close">&times;</span>
+                    <h2>Restart Level?</h2>
+                    <p>Are you sure you want to restart this level?</p>
+                    <button id="confirmRestartBtn">Yes, Restart</button>
+                    <button id="cancelRestartBtn">Cancel</button>
+                </div>
             </div>
+            <button id="nextLevelBtn" class="hidden">Next Level</button>
         </div>
         <!-- Game Over Modal -->
         <div id="gameOverModal" class="modal hidden">
