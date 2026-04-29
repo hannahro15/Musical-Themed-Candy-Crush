@@ -47,10 +47,12 @@ import {
 
 import { startTimer } from './timer.js';
 
+
 import {
   attachEventListeners,
   wireUpCellEvents
 } from './events.js';
+import { showElement, hideElement } from './utils.js';
 
 /* -----------------------------------
    DOM ELEMENTS
@@ -88,17 +90,7 @@ const closeHowToPlay = document.getElementById('closeHowToPlay');
 const gameOverModal = document.getElementById('gameOverModal');
 const gameOverRestartBtn = document.getElementById('gameOverRestartBtn');
 
-/* -----------------------------------
-   UI HELPERS
------------------------------------ */
 
-function showElement(element) {
-  if (element) element.classList.remove('hidden');
-}
-
-function hideElement(element) {
-  if (element) element.classList.add('hidden');
-}
 
 function showMenu() {
   showMenuPage(
