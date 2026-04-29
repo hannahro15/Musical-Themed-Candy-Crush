@@ -229,7 +229,7 @@ function startLevel(levelNumber) {
   startTimer(
     gameState,
     timerDisplay,
-    onLevelLose
+    () => handleLevelLose(restartContainer, restartBtn, nextLevelBtn)
   );
 }
 
