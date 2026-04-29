@@ -359,8 +359,10 @@ function init() {
   setBoardControllerDeps({
     gameBoard,
     movesDisplay,
-    scoreDisplay
-    // restartContainer, restartBtn, nextLevelBtn removed for modal version
+    scoreDisplay,
+    restartContainer,
+    restartBtn: document.getElementById('confirmRestartBtn'),
+    nextLevelBtn: document.getElementById('confirmNextLevelBtn')
   });
 
   bindEvents();
