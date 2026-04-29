@@ -36,7 +36,7 @@ import {
   setTouchStartY
 } from './gameState.js';
 
-import { handleLevelLose } from './gameStatus.js';
+import { handleLevelLose, handleLevelWin } from './gameStatus.js';
 
 import {
   handleDragStart,
@@ -77,7 +77,10 @@ const restartLevelModal = document.getElementById('restartLevelModal');
 const confirmRestartBtn = document.getElementById('confirmRestartBtn');
 const cancelRestartBtn = document.getElementById('cancelRestartBtn');
 const closeRestartModal = document.getElementById('closeRestartModal');
-const nextLevelBtn = document.getElementById('nextLevelBtn');
+const nextLevelModal = document.getElementById('nextLevelModal');
+const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');
+const cancelNextLevelBtn = document.getElementById('cancelNextLevelBtn');
+const closeNextLevelModal = document.getElementById('closeNextLevelModal');
 
 const howToPlayModal = document.getElementById('howToPlayModal');
 const closeHowToPlay = document.getElementById('closeHowToPlay');
@@ -304,12 +307,10 @@ function restartLevel() {
 }
 
 function nextLevel() {
-  hideElement(restartContainer);
-  hideElement(restartBtn);
-  hideElement(nextLevelBtn);
-
   startLevel(gameState.level + 1);
+  hideElement(nextLevelModal);
 }
+
 
 function onLevelLose() {
   handleLevelLose(
@@ -317,12 +318,14 @@ function onLevelLose() {
     restartBtn,
     nextLevelBtn
   );
-
   updateLivesDisplay(livesDisplay, gameState.lives);
-
   if (gameState.lives <= 0) {
     showGameOver();
   }
+}
+
+function onLevelWin() {
+  handleLevelWin();
 }
 
 /* -----------------------------------
@@ -330,14 +333,13 @@ function onLevelLose() {
 ----------------------------------- */
 
 function bindEvents() {
-  // Open restart modal when restart is requested (show button somewhere in UI if needed)
+  // Restart modal events
   const restartTrigger = document.getElementById('restartBtn');
   if (restartTrigger) {
     restartTrigger.addEventListener('click', function () {
       showElement(restartLevelModal);
     });
   }
-
   if (confirmRestartBtn) {
     confirmRestartBtn.addEventListener('click', restartLevel);
   }
@@ -352,6 +354,21 @@ function bindEvents() {
     });
   }
 
+  // Next level modal events
+  if (confirmNextLevelBtn) {
+    confirmNextLevelBtn.addEventListener('click', nextLevel);
+  }
+  if (cancelNextLevelBtn) {
+    cancelNextLevelBtn.addEventListener('click', function () {
+      hideElement(nextLevelModal);
+    });
+  }
+  if (closeNextLevelModal) {
+    closeNextLevelModal.addEventListener('click', function () {
+      hideElement(nextLevelModal);
+    });
+  }
+
   if (howToPlayBtn) {
     howToPlayBtn.addEventListener('click', function () {
       showElement(howToPlayModal);
@@ -361,10 +378,6 @@ function bindEvents() {
     closeHowToPlay.addEventListener('click', function () {
       hideElement(howToPlayModal);
     });
-  }
-
-  if (nextLevelBtn) {
-    nextLevelBtn.addEventListener('click', nextLevel);
   }
 
   if (gameOverRestartBtn) {
@@ -384,9 +397,8 @@ function init() {
   setBoardControllerDeps({
     gameBoard,
     movesDisplay,
-    scoreDisplay,
-    // restartContainer and restartBtn removed for modal version
-    nextLevelBtn
+    scoreDisplay
+    // restartContainer, restartBtn, nextLevelBtn removed for modal version
   });
 
   bindEvents();

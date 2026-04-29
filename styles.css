@@ -1,3 +1,41 @@
+/* Next Level Modal Customization */
+#nextLevelModal .modal-content {
+    text-align: center;
+}
+#nextLevelModal h2 {
+    margin-bottom: 12px;
+    color: #27ae60;
+}
+#confirmNextLevelBtn {
+    margin-top: 18px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#confirmNextLevelBtn:hover {
+    background: #1e8449;
+}
+#cancelNextLevelBtn {
+    margin-left: 16px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #aaa;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#cancelNextLevelBtn:hover {
+    background: #888;
+}
+/* Hide old next level button if present */
+#nextLevelBtn { display: none !important; }
 /* Restart Level Modal Customization */
 #restartLevelModal .modal-content {
     text-align: center;

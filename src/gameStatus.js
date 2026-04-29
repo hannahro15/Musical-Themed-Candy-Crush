@@ -2,13 +2,13 @@
 import { gameState } from './gameState.js';
 
 
-export function handleLevelWin(restartContainer, nextLevelBtn, restartBtn) {
-  gameState.levelComplete = true;
-  gameState.timerActive = false;
-  if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-  if (restartContainer) restartContainer.classList.remove('hidden');
-  if (nextLevelBtn) nextLevelBtn.classList.remove('hidden');
-  if (restartBtn) restartBtn.classList.add('hidden'); // Hide restart button on win
+export function handleLevelWin() {
+    gameState.levelComplete = true;
+    gameState.timerActive = false;
+    if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+    // Show next level modal
+    const nextLevelModal = document.getElementById('nextLevelModal');
+    if (nextLevelModal) nextLevelModal.classList.remove('hidden');
 }
 
 export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
