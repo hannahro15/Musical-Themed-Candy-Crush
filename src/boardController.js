@@ -45,7 +45,10 @@ export async function trySwap(sourceCell, targetCell) {
   }
 
   if (gameState.movesLeft <= 0 && !gameState.levelComplete && gameState.timer > 0) {
-    // handleLevelLose should be called from script.js after trySwap resolves
+    // Show lose modal immediately if out of moves and not a win
+    await import('./gameStatus.js').then(({ handleLevelLose }) => {
+      handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
+    });
     gameState.isResolving = false;
     return;
   }
