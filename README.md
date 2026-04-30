@@ -87,6 +87,7 @@ Musical-Themed-Candy-Crush/
 
 This modular structure makes it easy to maintain, test, and extend the game. Each file is responsible for a specific aspect of the game logic or UI.
 
+
 ## Running Unit Tests
 
 1. Install dependencies (if not already):
@@ -98,6 +99,22 @@ This modular structure makes it easy to maintain, test, and extend the game. Eac
    npx jest
    ```
 3. Add your test cases in the `__tests__` folder for each module.
+
+## Test Coverage
+
+This project uses [Jest](https://jestjs.io/) for unit and component testing. Test coverage is automatically generated after running the test suite.
+
+- To generate a coverage report, run:
+  ```bash
+  npx jest --coverage
+  ```
+- The HTML coverage report can be found at:
+  ```
+  coverage/lcov-report/index.html
+  ```
+- Open this file in your browser to view detailed coverage by file and line.
+
+Aim for high coverage, but focus on meaningful tests for game logic, UI, and edge cases. See the coverage report for areas needing more tests.
 
 # Getting Started
 
