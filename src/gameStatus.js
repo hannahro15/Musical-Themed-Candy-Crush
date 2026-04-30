@@ -6,9 +6,11 @@ export function handleLevelWin() {
     gameState.levelComplete = true;
     gameState.timerActive = false;
     if (gameState.timerInterval) clearInterval(gameState.timerInterval);
-    // Show next level modal
+    // Show next level modal and ensure Next Level button is visible
     const nextLevelModal = document.getElementById('nextLevelModal');
+    const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');
     if (nextLevelModal) nextLevelModal.classList.remove('hidden');
+    if (confirmNextLevelBtn) confirmNextLevelBtn.classList.remove('hidden');
 }
 
 export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
