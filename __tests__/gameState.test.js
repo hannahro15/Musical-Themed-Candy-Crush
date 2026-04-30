@@ -118,4 +118,17 @@ describe('gameState', () => {
     expect(gameState.blueLeft).toBeUndefined();
     expect(gameState.greenLeft).toBe(8);
   });
+
+  test ('restetGameState when config.objectives is missing or not an array', () => {
+    const config = {
+      moves: 10,
+      timer: 20,
+    };
+    resetGameState(config);
+    expect(gameState.movesLeft).toBe(10);
+    expect(gameState.score).toBe(0);
+    expect(gameState.levelComplete).toBe(false);
+    expect(gameState.timer).toBe(20);
+    expect(gameState.timerActive).toBe(true);
+  });
 });
