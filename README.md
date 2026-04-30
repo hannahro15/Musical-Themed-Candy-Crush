@@ -3,17 +3,37 @@
 
 ![Game Screenshot](images/game-screenshot.png)
 
-A musical twist on the classic match-3 game!
-Match musical instrument symbols to complete level objectives!
+A musical twist on the classic match-3 game! Match musical instrument symbols to complete level objectives.
 
-**Note:** This is a solo project. Much of the game logic and code was generated with the help of AI (GitHub Copilot), especially the core mechanics and modular structure. The project was originally started by following a YouTube tutorial for a basic match-3 game, then heavily customised and extended with AI assistance.
+**Play it here:** https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 
-**AI & Manual Testing:**
-While AI was used to accelerate development and modularisation, manual human testing remains essential for catching subtle bugs, ensuring a great user experience, and validating real-world usability. Feedback from human testers are welcome and encouraged!
+---
 
-Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
+## Table of Contents
+1. [Getting Started](#getting-started)
+2. [How to Play](#how-to-play)
+3. [Features](#features)
+4. [Technologies Used](#technologies-used)
+5. [Project Structure](#project-structure)
+6. [Running Unit Tests](#running-unit-tests)
+7. [Test Coverage](#test-coverage)
+8. [Known Issues](#known-issues)
+9. [Roadmap](#roadmap)
+10. [Credits](#credits)
 
-# How to Play
+---
+
+## Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/hannahro15/Musical-Themed-Candy-Crush.git
+   ```
+2. Open `index.html` in your web browser
+
+---
+
+## How to Play
 
 1. Click **Play Game** to start Level 1.  
    - When you start a new game from the menu, your lives are reset to 5.
@@ -24,13 +44,13 @@ Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 6. When all lives are lost, you are returned to the menu and can restart with 5 lives.
 7. The Play button always starts Level 1 and resets all counters and lives.
 
- Drag or swipe adjacent tiles to create matches
-
+Drag or swipe adjacent tiles to create matches:
 - Match **3** tiles → 10 points
 - Match **4** tiles → 20 points
 - Match **5** tiles → 40 points
 - Match at least 6 tiles - 60 points
 
+---
 
 ## Features
 
@@ -42,12 +62,16 @@ Play it here: https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 - Modular JavaScript codebase for easy maintenance and extension
 - Flexible level logic (easy to add new levels/objectives)
 
-# Technologies Used
+---
+
+## Technologies Used
 
 - HTML5
 - CSS3
 - JavaScript (modular ES modules)
 - [GitHub Copilot](https://github.com/features/copilot) for AI-assisted development
+
+---
 
 ## Project Structure
 
@@ -87,6 +111,7 @@ Musical-Themed-Candy-Crush/
 
 This modular structure makes it easy to maintain, test, and extend the game. Each file is responsible for a specific aspect of the game logic or UI.
 
+---
 
 ## Running Unit Tests
 
@@ -99,6 +124,8 @@ This modular structure makes it easy to maintain, test, and extend the game. Eac
    npx jest
    ```
 3. Add your test cases in the `__tests__` folder for each module.
+
+---
 
 ## Test Coverage
 
@@ -116,33 +143,18 @@ This project uses [Jest](https://jestjs.io/) for unit and component testing. Tes
 
 Aim for high coverage, but focus on meaningful tests for game logic, UI, and edge cases. See the coverage report for areas needing more tests.
 
-# Getting Started
+---
 
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/hannahro15/Musical-Themed-Candy-Crush.git
-   ```
-
-2. Open `index.html` in your web browser
-
-
-# Credits
-
-
-Developed by Hannah Olbrich (solo project).
-Emoji icons from [Unicode](https://unicode.org/emoji/).
-AI-assisted development with GitHub Copilot.
-
-
-# Known Issues
+## Known Issues
 
 - No E2E (end-to-end) tests yet; user flows are not fully automated.
 - Accessibility features (keyboard navigation, ARIA labels, color contrast) have not yet been started.
 - SEO improvements (meta tags, alt text, semantic HTML) have not yet been started.
 - UI/UX could be further polished for mobile and desktop.
 
-# Roadmap
+---
+
+## Roadmap
 
 - Add Cypress E2E tests for main user journeys and regression testing.
 - Improve accessibility: keyboard navigation, ARIA labels, color contrast.
@@ -151,5 +163,13 @@ AI-assisted development with GitHub Copilot.
 - Add more unit tests for uncovered logic, edge cases, and complex interactions (see coverage report for details).
 - Increase integration test coverage for module interactions.
 - Gather user feedback and iterate on gameplay and usability.
+
+---
+
+## Credits
+
+Developed by Hannah Olbrich (solo project).
+Emoji icons from [Unicode](https://unicode.org/emoji/).
+AI-assisted development with GitHub Copilot.
 
 
