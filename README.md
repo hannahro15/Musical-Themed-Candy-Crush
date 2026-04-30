@@ -1,9 +1,12 @@
 
+
 # Musical-Themed Candy Crush
 
 ![Game Screenshot](images/game-screenshot.png)
 
 A musical twist on the classic match-3 game! Match musical instrument symbols to complete level objectives.
+
+**Solo Project:** This game was designed, developed, and tested entirely by Hannah Olbrich as a personal project. It is not open source and does not accept external contributions.
 
 **Play it here:** https://hannahro15.github.io/Musical-Themed-Candy-Crush/
 
@@ -166,9 +169,10 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 
 ---
 
+
 ## Credits
 
-Developed by Hannah Olbrich (solo project).
+Created and maintained by Hannah Olbrich (solo project).
 Emoji icons from [Unicode](https://unicode.org/emoji/).
 AI-assisted development with GitHub Copilot.
 
