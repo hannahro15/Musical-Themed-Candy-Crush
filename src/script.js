@@ -81,11 +81,16 @@ const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');
 const cancelNextLevelBtn = document.getElementById('cancelNextLevelBtn');
 const closeNextLevelModal = document.getElementById('closeNextLevelModal');
 
+
 const howToPlayModal = document.getElementById('howToPlayModal');
 const closeHowToPlay = document.getElementById('closeHowToPlay');
 
 const gameOverModal = document.getElementById('gameOverModal');
 const gameOverRestartBtn = document.getElementById('gameOverRestartBtn');
+
+// Congratulations modal
+const congratsModal = document.getElementById('congratsModal');
+const congratsRestartBtn = document.getElementById('congratsRestartBtn');
 
 
 
@@ -260,7 +265,16 @@ function restartLevel() {
   hideElement(restartLevelModal);
 }
 
+
+import { LEVELS } from './levels.js';
+
 function nextLevel() {
+  if (gameState.level >= LEVELS.length) {
+    // Show congratulations modal if last level completed
+    showElement(congratsModal);
+    hideElement(nextLevelModal);
+    return;
+  }
   startLevel(gameState.level + 1);
   hideElement(nextLevelModal);
 }
@@ -344,6 +358,12 @@ function bindEvents() {
   if (gameOverRestartBtn) {
     gameOverRestartBtn.addEventListener('click', function () {
       hideGameOver();
+      showMenu();
+    });
+  }
+  if (congratsRestartBtn) {
+    congratsRestartBtn.addEventListener('click', function () {
+      hideElement(congratsModal);
       showMenu();
     });
   }
