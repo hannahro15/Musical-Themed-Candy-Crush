@@ -72,7 +72,6 @@ const objectiveCounters = document.getElementById('objective-counters');
 
 // Add missing restartContainer reference for menu/game UI state
 const restartContainer = document.getElementById('restartLevelModal');
-
 const restartLevelModal = document.getElementById('restartLevelModal');
 const confirmRestartBtn = document.getElementById('confirmRestartBtn');
 const cancelRestartBtn = document.getElementById('cancelRestartBtn');
@@ -229,7 +228,7 @@ function startLevel(levelNumber) {
   startTimer(
     gameState,
     timerDisplay,
-    () => handleLevelLose(restartContainer, restartBtn, nextLevelBtn)
+    () => handleLevelLose(restartContainer, confirmRestartBtn, confirmNextLevelBtn)
   );
 }
 
@@ -270,8 +269,8 @@ function nextLevel() {
 function onLevelLose() {
   handleLevelLose(
     restartContainer,
-    restartBtn,
-    nextLevelBtn
+    confirmRestartBtn,
+    confirmNextLevelBtn
   );
   updateLivesDisplay(livesDisplay, gameState.lives);
   if (gameState.lives <= 0) {
@@ -361,8 +360,8 @@ function init() {
     movesDisplay,
     scoreDisplay,
     restartContainer,
-    restartBtn: document.getElementById('confirmRestartBtn'),
-    nextLevelBtn: document.getElementById('confirmNextLevelBtn')
+    restartBtn: confirmRestartBtn,
+    nextLevelBtn: confirmNextLevelBtn
   });
 
   bindEvents();
