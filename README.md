@@ -129,8 +129,27 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 
 # Credits
 
+
 Developed by Hannah Olbrich (solo project).
 Emoji icons from [Unicode](https://unicode.org/emoji/).
 AI-assisted development with GitHub Copilot.
+
+
+# Known Issues
+
+- No E2E (end-to-end) tests yet; user flows are not fully automated.
+- Accessibility features (keyboard navigation, ARIA labels, color contrast) have not yet been started.
+- SEO improvements (meta tags, alt text, semantic HTML) have not yet been started.
+- UI/UX could be further polished for mobile and desktop.
+
+# Roadmap
+
+- Add Cypress E2E tests for main user journeys and regression testing.
+- Improve accessibility: keyboard navigation, ARIA labels, color contrast.
+- Enhance UI/UX: animations, transitions, and responsive design.
+- Complete SEO improvements for better discoverability.
+- Add more unit tests for uncovered logic, edge cases, and complex interactions (see coverage report for details).
+- Increase integration test coverage for module interactions.
+- Gather user feedback and iterate on gameplay and usability.
 
 
