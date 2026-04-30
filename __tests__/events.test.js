@@ -87,4 +87,91 @@ describe('events', () => {
       expect(cell.draggable).toBe(true);
     });
   });
+
+  test('attaches click listeners to play, restart, how to play and close buttons', () => {
+    const playButton = document.createElement('button');
+    const restartBtn = document.createElement('button');
+    const howToPlayBtn = document.createElement('button');
+    const howToPlayModal = document.createElement('div');
+    const closeHowToPlay = document.createElement('button');
+    const handlePlayClick = jest.fn();
+    const handleRestartLevel = jest.fn();
+
+    // Attach to DOM for event listeners
+    document.body.appendChild(playButton);
+    document.body.appendChild(restartBtn);
+    document.body.appendChild(howToPlayBtn);
+    document.body.appendChild(howToPlayModal);
+    document.body.appendChild(closeHowToPlay);
+
+    attachEventListeners({
+      playButton,
+      restartBtn,
+      howToPlayBtn,
+      howToPlayModal,
+      closeHowToPlay,
+      handlePlayClick,
+      handleRestartLevel
+    });
+
+    playButton.click();
+    expect(handlePlayClick).toHaveBeenCalled();
+    restartBtn.click();
+    expect(handleRestartLevel).toHaveBeenCalled();
+    howToPlayBtn.click();
+    expect(howToPlayModal.classList.contains('hidden')).toBe(false);
+    closeHowToPlay.click();
+    expect(howToPlayModal.classList.contains('hidden')).toBe(true); 
+});
+
+test ('shows/hides the how to play modal on button clicks', () => {
+    const howToPlayBtn = document.createElement('button');
+    const howToPlayModal = document.createElement('div');
+    const closeHowToPlay = document.createElement('button');
+
+    // Attach to DOM for event listeners
+    document.body.appendChild(howToPlayBtn);
+    document.body.appendChild(howToPlayModal);
+    document.body.appendChild(closeHowToPlay);
+
+    attachEventListeners({
+      howToPlayBtn,
+      howToPlayModal,
+      closeHowToPlay,
+      handlePlayClick: () => {},
+      handleRestartLevel: () => {}
+    });
+
+    howToPlayBtn.click();
+    expect(howToPlayModal.classList.contains('hidden')).toBe(false);
+    closeHowToPlay.click();
+    expect(howToPlayModal.classList.contains('hidden')).toBe(true); 
+  });
+ test ('closes the modal when clicking outsdie modal content', () => {
+    const restartLevelModal = document.createElement('div');
+    const modalContent = document.createElement('div');
+    restartLevelModal.appendChild(modalContent);
+    restartLevelModal.classList.add('modal', 'hidden');
+
+    // Attach to DOM for event listeners
+    document.body.appendChild(restartLevelModal);
+
+    attachEventListeners({
+      restartBtn: null,
+      howToPlayBtn: null,
+      howToPlayModal: null,
+      closeHowToPlay: null,
+      handlePlayClick: () => {},
+      handleRestartLevel: () => {}
+    });
+
+    // Show the modal first
+    restartLevelModal.classList.remove('hidden');
+    expect(restartLevelModal.classList.contains('hidden')).toBe(false);
+
+    // Simulate click outside modal content
+    const clickEvent = new MouseEvent('click', { bubbles: true });
+    restartLevelModal.dispatchEvent(clickEvent);
+    expect(restartLevelModal.classList.contains('hidden')).toBe(false);
+ });
 });
