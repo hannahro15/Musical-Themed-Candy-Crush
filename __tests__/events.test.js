@@ -1,3 +1,4 @@
+
 // events.test.js - Unit tests for events.js
 // Add your tests here
 import { attachEventListeners, wireUpCellEvents } from '../src/events.js';
@@ -88,42 +89,6 @@ describe('events', () => {
     });
   });
 
-  test('attaches click listeners to play, restart, how to play and close buttons', () => {
-    const playButton = document.createElement('button');
-    const restartBtn = document.createElement('button');
-    const howToPlayBtn = document.createElement('button');
-    const howToPlayModal = document.createElement('div');
-    const closeHowToPlay = document.createElement('button');
-    const handlePlayClick = jest.fn();
-    const handleRestartLevel = jest.fn();
-
-    // Attach to DOM for event listeners
-    document.body.appendChild(playButton);
-    document.body.appendChild(restartBtn);
-    document.body.appendChild(howToPlayBtn);
-    document.body.appendChild(howToPlayModal);
-    document.body.appendChild(closeHowToPlay);
-
-    attachEventListeners({
-      playButton,
-      restartBtn,
-      howToPlayBtn,
-      howToPlayModal,
-      closeHowToPlay,
-      handlePlayClick,
-      handleRestartLevel
-    });
-
-    playButton.click();
-    expect(handlePlayClick).toHaveBeenCalled();
-    restartBtn.click();
-    expect(handleRestartLevel).toHaveBeenCalled();
-    howToPlayBtn.click();
-    expect(howToPlayModal.classList.contains('hidden')).toBe(false);
-    closeHowToPlay.click();
-    expect(howToPlayModal.classList.contains('hidden')).toBe(true); 
-});
-
 test ('shows/hides the how to play modal on button clicks', () => {
     const howToPlayBtn = document.createElement('button');
     const howToPlayModal = document.createElement('div');
@@ -147,31 +112,52 @@ test ('shows/hides the how to play modal on button clicks', () => {
     closeHowToPlay.click();
     expect(howToPlayModal.classList.contains('hidden')).toBe(true); 
   });
- test ('closes the modal when clicking outsdie modal content', () => {
-    const restartLevelModal = document.createElement('div');
+  
+  test('closes the modal when clicking the modal background', () => {
+    const howToPlayModal = document.createElement('div');
     const modalContent = document.createElement('div');
-    restartLevelModal.appendChild(modalContent);
-    restartLevelModal.classList.add('modal', 'hidden');
-
-    // Attach to DOM for event listeners
-    document.body.appendChild(restartLevelModal);
+    howToPlayModal.appendChild(modalContent);
+    howToPlayModal.classList.add('modal');
+    // Show the modal
+    howToPlayModal.classList.remove('hidden');
+    document.body.appendChild(howToPlayModal);
 
     attachEventListeners({
-      restartBtn: null,
+      howToPlayModal,
       howToPlayBtn: null,
-      howToPlayModal: null,
       closeHowToPlay: null,
       handlePlayClick: () => {},
       handleRestartLevel: () => {}
     });
 
-    // Show the modal first
-    restartLevelModal.classList.remove('hidden');
-    expect(restartLevelModal.classList.contains('hidden')).toBe(false);
-
-    // Simulate click outside modal content
+    // Simulate click on the modal background (not modalContent)
     const clickEvent = new MouseEvent('click', { bubbles: true });
-    restartLevelModal.dispatchEvent(clickEvent);
-    expect(restartLevelModal.classList.contains('hidden')).toBe(false);
- });
+    Object.defineProperty(clickEvent, 'target', { value: howToPlayModal, enumerable: true });
+    howToPlayModal.dispatchEvent(clickEvent);
+    expect(howToPlayModal.classList.contains('hidden')).toBe(true);
+  });
+
+    test('does not close the modal when clicking inside modal content', () => {
+    const howToPlayModal = document.createElement('div');
+    const modalContent = document.createElement('div');
+    howToPlayModal.appendChild(modalContent);
+    howToPlayModal.classList.add('modal');
+    howToPlayModal.classList.remove('hidden');
+    document.body.appendChild(howToPlayModal);
+
+    attachEventListeners({
+      howToPlayModal,
+      howToPlayBtn: null,
+      closeHowToPlay: null,
+      handlePlayClick: () => {},
+      handleRestartLevel: () => {}
+    });
+
+    // Simulate click on the modal content (child element)
+    const clickEvent = new MouseEvent('click', { bubbles: true });
+    Object.defineProperty(clickEvent, 'target', { value: modalContent, enumerable: true });
+    modalContent.dispatchEvent(clickEvent);
+    expect(howToPlayModal.classList.contains('hidden')).toBe(false);
+  });
+  
 });

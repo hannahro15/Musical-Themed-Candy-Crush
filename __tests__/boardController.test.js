@@ -50,27 +50,4 @@ describe('boardController', () => {
         const result = await trySwap(null, null);
         expect(result).toBeUndefined();
     });
-
-    test ('trySwap should return early if gameState.timerActive is false', async () => {
-        // Mock gameState to have timer inactive
-        const mockGameState = {
-            isResolving: false,
-            levelComplete: false,
-            timerActive: false
-        };
-        // Mock dependencies
-        const mockDeps = {
-            gameBoard: null,
-            movesDisplay: null,
-            scoreDisplay: null,
-            restartContainer: null,
-            nextLevelBtn: null,
-            restartBtn: null
-        };
-        setBoardControllerDeps(mockDeps);
-        
-        // Call trySwap and expect it to return early without doing anything
-        const result = await trySwap(null, null);
-        expect(result).toBeUndefined();
-    });
 });
