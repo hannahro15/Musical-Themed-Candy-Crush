@@ -4,17 +4,18 @@
 import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from '../src/interaction.js';
 import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from '../src/gameState.js';
 
-describe('interaction', () => {
-  beforeEach(() => {
-    // Reset gameState and related variables before each test
-    gameState.isResolving = false;
-    setDraggedCell(null);
-    setTouchStartCell(null);
-    setTouchStartX(null);
-    setTouchStartY(null);
-  });
 
-  test('handleDragStart sets dragged cell when not resolving', () => {
+beforeEach(() => {
+  // Reset gameState and related variables before each test
+  gameState.isResolving = false;
+  setDraggedCell(null);
+  setTouchStartCell(null);
+  setTouchStartX(null);
+  setTouchStartY(null);
+});
+
+describe('handleDragStart', () => {
+  test('sets dragged cell when not resolving', () => {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     const event = { target: cell, preventDefault: jest.fn() };
@@ -24,7 +25,7 @@ describe('interaction', () => {
     expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
-  test('handleDragStart prevents default when resolving', () => {
+  test('prevents default when resolving', () => {
     gameState.isResolving = true;
     const cell = document.createElement('div');
     cell.classList.add('cell');
@@ -35,7 +36,18 @@ describe('interaction', () => {
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
-  test('handleDrop tries swap when cells are adjacent', async () => {
+  test('does nothing when not a cell', () => {
+    const nonCell = document.createElement('div');
+    const event = { target: nonCell, preventDefault: jest.fn() };
+
+    handleDragStart(event, gameState, setDraggedCell);
+    expect(gameState.draggedCell).toBeNull();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+});
+
+describe('handleDrop', () => {
+  test('tries swap when cells are adjacent', async () => {
     const draggedCell = document.createElement('div');
     draggedCell.classList.add('cell');
     const targetCell = document.createElement('div');
@@ -52,7 +64,7 @@ describe('interaction', () => {
     expect(gameState.draggedCell).toBeNull();
   });
 
-  test('handleDrop does not try swap when cells are not adjacent', async () => {
+  test('does not try swap when cells are not adjacent', async () => {
     const draggedCell = document.createElement('div');
     draggedCell.classList.add('cell');
     const targetCell = document.createElement('div');
@@ -69,29 +81,7 @@ describe('interaction', () => {
     expect(gameState.draggedCell).toBeNull();
   });
 
-  test ('handleTouchStart sets touch start cell and coordinates', () => {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    const touch = { clientX: 100, clientY: 200 };
-    const event = { touches: [touch] };
-    document.elementFromPoint = jest.fn().mockReturnValue(cell);
-
-    handleTouchStart(event, gameState, setTouchStartCell, setTouchStartX, setTouchStartY);
-    expect(gameState.touchStartCell).toBe(cell);
-    expect(gameState.touchStartX).toBe(100);
-    expect(gameState.touchStartY).toBe(200);
-  });
-
-  test('handleDragStart does nothing when not a cell', () => {
-    const nonCell = document.createElement('div');
-    const event = { target: nonCell, preventDefault: jest.fn() };
-
-    handleDragStart(event, gameState, setDraggedCell);
-    expect(gameState.draggedCell).toBeNull();
-    expect(event.preventDefault).not.toHaveBeenCalled();
-  });
-
-  test('handleDrop does nothing when not a cell', async () => {
+  test('does nothing when not a cell', async () => {
     const draggedCell = document.createElement('div');
     draggedCell.classList.add('cell');
     const nonCell = document.createElement('div');
@@ -107,7 +97,7 @@ describe('interaction', () => {
     expect(gameState.draggedCell).toBeNull();
   });
 
-  test('handleDrop does not call trySwap if cells are not adjacent', async () => {
+  test('does not call trySwap if cells are not adjacent', async () => {
     const draggedCell = document.createElement('div');
     draggedCell.classList.add('cell');
     const targetCell = document.createElement('div');
@@ -124,7 +114,51 @@ describe('interaction', () => {
     expect(gameState.draggedCell).toBeNull();
   });
 
-  test ('handleTouchStart does nothing when not a cell or a cell is not found', () => {
+  test('Nothing happens if draggedCell is null', async () => {
+    const event = { target: document.createElement('div'), preventDefault: jest.fn() };
+    setDraggedCell(null);
+
+    const areAdjacent = jest.fn();
+    const trySwap = jest.fn();
+
+    await handleDrop(event, gameState, null, setDraggedCell, areAdjacent, trySwap);
+    expect(areAdjacent).not.toHaveBeenCalled();
+    expect(trySwap).not.toHaveBeenCalled();
+  });
+
+  test('nothing happens if gameState.isResolvingis true', async () => {     
+    const draggedCell = document.createElement('div');
+    draggedCell.classList.add('cell');
+    const targetCell = document.createElement('div');
+    targetCell.classList.add('cell');
+    const event = { target: targetCell, preventDefault: jest.fn() };
+    setDraggedCell(draggedCell);
+    gameState.isResolving = true;
+
+    const areAdjacent = jest.fn();
+    const trySwap = jest.fn();
+
+    await handleDrop(event, gameState, draggedCell, setDraggedCell, areAdjacent, trySwap);
+    expect(areAdjacent).not.toHaveBeenCalled();
+    expect(trySwap).not.toHaveBeenCalled();
+  });
+});
+
+describe('handleTouchStart', () => {
+  test('sets touch start cell and coordinates', () => {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    const touch = { clientX: 100, clientY: 200 };
+    const event = { touches: [touch] };
+    document.elementFromPoint = jest.fn().mockReturnValue(cell);
+
+    handleTouchStart(event, gameState, setTouchStartCell, setTouchStartX, setTouchStartY);
+    expect(gameState.touchStartCell).toBe(cell);
+    expect(gameState.touchStartX).toBe(100);
+    expect(gameState.touchStartY).toBe(200);
+  });
+
+  test('does nothing when not a cell or a cell is not found', () => {
     const touch = { clientX: 100, clientY: 200 };
     const event = { touches: [touch] };
     document.elementFromPoint = jest.fn().mockReturnValue(null);
@@ -135,7 +169,21 @@ describe('interaction', () => {
     expect(gameState.touchStartY).toBeNull();
   });
 
-  test ('handleTouchEnd does nothing if swipe is too short or indices are invalid', () => {
+  test('nothing happens if gameState.isResolving is true', () => {
+    gameState.isResolving = true;
+    const touch = { clientX: 100, clientY: 200 };
+    const event = { touches: [touch] };
+    document.elementFromPoint = jest.fn().mockReturnValue(null);
+
+    handleTouchStart(event, gameState, setTouchStartCell, setTouchStartX, setTouchStartY);
+    expect(gameState.touchStartCell).toBeNull();
+    expect(gameState.touchStartX).toBeNull();
+    expect(gameState.touchStartY).toBeNull();
+  });
+});
+
+describe('handleTouchEnd', () => {
+  test('does nothing if swipe is too short or indices are invalid', () => {
     const touchStartCell = document.createElement('div');
     touchStartCell.classList.add('cell');
     const touch = { clientX: 100, clientY: 200 };
