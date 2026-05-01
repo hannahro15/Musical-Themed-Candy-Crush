@@ -14,7 +14,6 @@ export function handleLevelWin() {
 }
 
 export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
-    console.log('[handleLevelLose] called', { restartContainer, restartBtn, nextLevelBtn });
     gameState.levelComplete = true;
     gameState.timerActive = false;
     if (gameState.timerInterval) clearInterval(gameState.timerInterval);
@@ -31,20 +30,11 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
     // Toggle UI elements
     if (restartContainer) {
         restartContainer.classList.remove('hidden');
-        console.log('[handleLevelLose] restartContainer .hidden removed:', !restartContainer.classList.contains('hidden'));
-    } else {
-        console.warn('[handleLevelLose] restartContainer is null/undefined');
     }
     if (restartBtn) {
         restartBtn.classList.remove('hidden');
-        console.log('[handleLevelLose] restartBtn .hidden removed:', !restartBtn.classList.contains('hidden'));
-    } else {
-        console.warn('[handleLevelLose] restartBtn is null/undefined');
     }
     if (nextLevelBtn) {
         nextLevelBtn.classList.add('hidden');
-        console.log('[handleLevelLose] nextLevelBtn .hidden added:', nextLevelBtn.classList.contains('hidden'));
-    } else {
-        console.warn('[handleLevelLose] nextLevelBtn is null/undefined');
     }
 }
