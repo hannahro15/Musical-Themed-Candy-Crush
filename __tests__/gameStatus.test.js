@@ -129,4 +129,66 @@ describe('gameStatus', () => {
     // Call handleLevelWin and ensure no errors are thrown
     expect(() => handleLevelWin()).not.toThrow();
   });
+
+  test('final level win shows congratulations modal and not next level modal', () => {
+    gameState.level = LEVELS.length; // Set to final level
+
+    const congratsModal = document.createElement('div');
+    congratsModal.id = 'congratsModal';
+    congratsModal.classList.add('modal', 'hidden');
+    document.body.appendChild(congratsModal);
+
+    const nextLevelModal = document.createElement('div');
+    nextLevelModal.id = 'nextLevelModal';
+    nextLevelModal.classList.add('modal', 'hidden');
+    document.body.appendChild(nextLevelModal);
+
+    handleLevelWin();
+
+    expect(congratsModal.classList.contains('hidden')).toBe(false);
+    expect(nextLevelModal.classList.contains('hidden')).toBe(true);
+
+    // Clean up
+    document.body.removeChild(congratsModal);
+    document.body.removeChild(nextLevelModal);  
+  });
+  
+  test('non-final level shows next level modal and not congratulations modal', () => {
+    gameState.level = 1; // Set to non-final level
+
+    const congratsModal = document.createElement('div');
+    congratsModal.id = 'congratsModal';
+    congratsModal.classList.add('modal', 'hidden');
+    document.body.appendChild(congratsModal);
+
+    const nextLevelModal = document.createElement('div');
+    nextLevelModal.id = 'nextLevelModal';
+    nextLevelModal.classList.add('modal', 'hidden');
+    document.body.appendChild(nextLevelModal);
+
+    handleLevelWin();
+
+    expect(congratsModal.classList.contains('hidden')).toBe(true);
+    expect(nextLevelModal.classList.contains('hidden')).toBe(false);
+
+    // Clean up
+    document.body.removeChild(congratsModal);
+    document.body.removeChild(nextLevelModal);
+  });
+
+  test('confirm next level button stays hidden for final level path', () => {
+    gameState.level = LEVELS.length; // Set to final level
+
+    const confirmNextLevelBtn = document.createElement('button');
+    confirmNextLevelBtn.id = 'confirmNextLevelBtn';
+    confirmNextLevelBtn.classList.add('hidden');
+    document.body.appendChild(confirmNextLevelBtn);
+
+    handleLevelWin();
+
+    expect(confirmNextLevelBtn.classList.contains('hidden')).toBe(true);
+
+    // Clean up
+    document.body.removeChild(confirmNextLevelBtn); 
+  });
 });
