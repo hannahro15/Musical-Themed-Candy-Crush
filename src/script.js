@@ -72,7 +72,8 @@ const gameOverRestartBtn = document.getElementById('gameOverRestartBtn');
 
 // Congratulations modal
 const congratsModal = document.getElementById('congratsModal');
-const congratsRestartBtn = document.getElementById('congratsRestartBtn');
+const congratsPlayAgainBtn = document.getElementById('congratsPlayAgainBtn');
+const congratsHomeBtn = document.getElementById('congratsHomeBtn');
 
 
 
@@ -342,8 +343,14 @@ function bindEvents() {
       showMenu();
     });
   }
-  if (congratsRestartBtn) {
-    congratsRestartBtn.addEventListener('click', function () {
+  if (congratsPlayAgainBtn) {
+    congratsPlayAgainBtn.addEventListener('click', function () {
+      hideElement(congratsModal);
+      startGame();
+    });
+  }
+  if (congratsHomeBtn) {
+    congratsHomeBtn.addEventListener('click', function () {
       hideElement(congratsModal);
       showMenu();
     });

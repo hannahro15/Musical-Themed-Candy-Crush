@@ -1,11 +1,20 @@
 // gameStatus.js - Handles win/lose logic for the game
 import { gameState } from './gameState.js';
+import { LEVELS } from './levels.js';
 
 
 export function handleLevelWin() {
     gameState.levelComplete = true;
     gameState.timerActive = false;
     if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+    const isFinalLevel = gameState.level >= LEVELS.length;
+
+    if (isFinalLevel) {
+        const congratsModal = document.getElementById('congratsModal');
+        if (congratsModal) congratsModal.classList.remove('hidden');
+        return;
+    }
+
     // Show next level modal and ensure Next Level button is visible
     const nextLevelModal = document.getElementById('nextLevelModal');
     const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');

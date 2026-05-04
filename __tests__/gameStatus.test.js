@@ -2,6 +2,7 @@
 // Add your tests here
 import { gameState } from '../src/gameState.js';
 import { handleLevelWin, handleLevelLose } from '../src/gameStatus.js';
+import { LEVELS } from '../src/levels.js';
 
 describe('gameStatus', () => {
   beforeEach(() => {
@@ -10,6 +11,8 @@ describe('gameStatus', () => {
     gameState.timerActive = false;
     gameState.timerInterval = null;
     gameState.lives = 3; // Assuming INITIAL_LIVES is 3
+    gameState.level = 1;
+    document.body.innerHTML = '';
   });
 
   test('handleLevelWin updates gameState and shows next level modal', () => {
@@ -27,6 +30,27 @@ describe('gameStatus', () => {
 
     // Clean up
     document.body.removeChild(nextLevelModal);
+  });
+
+  test('handleLevelWin shows congratulations modal on the final level', () => {
+    gameState.level = LEVELS.length;
+
+    const congratsModal = document.createElement('div');
+    congratsModal.id = 'congratsModal';
+    congratsModal.classList.add('modal', 'hidden');
+    document.body.appendChild(congratsModal);
+
+    const nextLevelModal = document.createElement('div');
+    nextLevelModal.id = 'nextLevelModal';
+    nextLevelModal.classList.add('modal', 'hidden');
+    document.body.appendChild(nextLevelModal);
+
+    handleLevelWin();
+
+    expect(gameState.levelComplete).toBe(true);
+    expect(gameState.timerActive).toBe(false);
+    expect(congratsModal.classList.contains('hidden')).toBe(false);
+    expect(nextLevelModal.classList.contains('hidden')).toBe(true);
   });
 
   test('handleLevelLose updates gameState and UI elements correctly', () => {
