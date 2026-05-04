@@ -21,32 +21,12 @@ import {
   INITIAL_LIVES
 } from './constants.js';
 
-import { areAdjacent } from './game.js';
-
-import {
-  trySwap,
-  setBoardControllerDeps
-} from './boardController.js';
-
-import {
-  gameState,
-  setDraggedCell,
-  setTouchStartCell,
-  setTouchStartX,
-  setTouchStartY
-} from './gameState.js';
-
+import { setBoardControllerDeps } from './boardController.js';
+import { gameState } from './gameState.js';
 import { handleLevelLose, handleLevelWin } from './gameStatus.js';
-
 import { setGameBoardRef, boardEventHandlers } from './boardEventHandlers.js';
-
 import { startTimer } from './timer.js';
-
-
-import {
-  attachEventListeners,
-  wireUpCellEvents
-} from './events.js';
+import { wireUpCellEvents } from './events.js';
 import { showElement, hideElement } from './utils.js';
 
 /* -----------------------------------
@@ -112,7 +92,6 @@ function showMenu() {
 }
 
 function showGameUI() {
-  console.log('[showGameUI] called');
   container?.classList.add('game-active');
   hideElement(heading);
   hideElement(subtitle);
@@ -121,8 +100,6 @@ function showGameUI() {
   // Always show both the container and the board
   gameBoardContainer.classList.remove('hidden');
   gameBoard.classList.remove('hidden');
-  console.log('[showGameUI] gameBoardContainer.hidden:', gameBoardContainer.classList.contains('hidden'));
-  console.log('[showGameUI] gameBoard.hidden:', gameBoard.classList.contains('hidden'));
   showElement(scoreMovesWrapper);
   showElement(levelDisplay);
   showElement(movesDisplay);
@@ -175,7 +152,6 @@ function loadObjectives(config) {
 ----------------------------------- */
 
 function generateBoard() {
-  console.log('[generateBoard] called');
   setGameBoardRef(gameBoard);
   generateGameBoard(
     gameBoard,
@@ -185,7 +161,6 @@ function generateBoard() {
     hasPossibleMoves,
     setupBoardEvents
   );
-  console.log('[generateBoard] cell count:', gameBoard.children.length);
 }
 
 
