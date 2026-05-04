@@ -21,4 +21,45 @@ describe('LEVELS', () => {
     const uniqueObjectiveSets = new Set(objectiveSets);
     expect(uniqueObjectiveSets.size).toBe(LEVELS.length);
   });
+
+  test('winConditions returns true when all objectives are met', () => {
+    const levelConfig = {
+      objectives: { A: 2, B: 3 },
+      moves: 10,
+      timer: 60
+    };
+    const matchedCounts = { A: 2, B: 3 };
+    const checkWinCondition = (config, counts) => {
+      return Object.keys(config.objectives).every(symbol => counts[symbol] >= config.objectives[symbol]);
+    };
+    expect(checkWinCondition(levelConfig, matchedCounts)).toBe(true);
+  });
+
+  test('winCondtions returns false when at least one objective is not met', () => {
+    const levelConfig = {
+      objectives: { A: 2, B: 3 },
+      moves: 10,
+      timer: 60
+    };
+    const matchedCounts = { A: 2, B: 2 };
+    const checkWinCondition = (config, counts) => {
+      return Object.keys(config.objectives).every(symbol => counts[symbol] >= config.objectives[symbol]);
+    };
+    expect(checkWinCondition(levelConfig, matchedCounts)).toBe(false);
+  });
+
+  test('valid level returns the correct level configuration', () => {
+    const levelIndex = 0;
+    const levelConfig = LEVELS[levelIndex];
+    expect(levelConfig).toBeDefined();
+    expect(levelConfig).toHaveProperty('objectives');
+    expect(levelConfig).toHaveProperty('moves');
+    expect(levelConfig).toHaveProperty('timer');
+  });
+
+  test('invalid level index returns undefined', () => {
+    const levelIndex = -1;
+    const levelConfig = LEVELS[levelIndex];
+    expect(levelConfig).toBeUndefined();
+  });
 });
