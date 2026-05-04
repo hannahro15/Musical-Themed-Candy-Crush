@@ -1,10 +1,10 @@
 
 
-# Musical-Themed Candy Crush
+# Musical Match Saga
 
 ![Game Screenshot](images/game-screenshot.png)
 
-A musical twist on the classic match-3 game! Match musical instrument symbols to complete level objectives.
+A musical twist on the classic match-3 formula. Swap and match musical symbols, complete level objectives, and progress through timed challenges with limited moves and lives.
 
 **Solo Project:** This game was designed, developed, and tested entirely by Hannah Olbrich as a personal project. It is not open source and does not accept external contributions.
 
@@ -18,7 +18,7 @@ A musical twist on the classic match-3 game! Match musical instrument symbols to
 3. [Features](#features)
 4. [Technologies Used](#technologies-used)
 5. [Project Structure](#project-structure)
-6. [Running Unit Tests](#running-unit-tests)
+6. [Running Tests](#running-tests)
 7. [Test Coverage](#test-coverage)
 8. [Known Issues](#known-issues)
 9. [Roadmap](#roadmap)
@@ -32,7 +32,7 @@ A musical twist on the classic match-3 game! Match musical instrument symbols to
    ```bash
    git clone https://github.com/hannahro15/Musical-Themed-Candy-Crush.git
    ```
-2. Open `index.html` in your web browser
+2. Open `index.html` in your web browser.
 
 ---
 
@@ -41,8 +41,12 @@ A musical twist on the classic match-3 game! Match musical instrument symbols to
 1. Click **Play Game** to start Level 1.  
    - When you start a new game from the menu, your lives are reset to 5.
 2. Match 3 or more of the same musical symbols by swapping adjacent tiles.
-3. Complete the level objectives within the move and time limits.
-4. The info bar above the game board (showing level, lives, moves, score, timer, and counters) is always visible during play.
+3. Complete the current level objectives before you run out of moves or time.
+4. Track your progress using the in-game HUD, which shows:
+   - current level
+   - remaining lives
+   - objective counters
+   - moves, score, and timer
 5. If you run out of moves or time, you lose a life.
 6. When all lives are lost, you are returned to the menu and can restart with 5 lives.
 7. The Play button always starts Level 1 and resets all counters and lives.
@@ -58,12 +62,14 @@ Drag or swipe adjacent tiles to create matches:
 ## Features
 
 - Musical-themed match-3 gameplay
-- 5-lives system with automatic reset
+- Five-life system with automatic reset when starting a new game
+- Level progression with different objectives
 - Move and timer limits
-- Touch and mouse controls
-- Responsive info bar above the board
-- Modular JavaScript codebase for easy maintenance and extension
-- Flexible level logic (easy to add new levels/objectives)
+- Mouse and touch/swipe controls
+- Responsive home screen and game HUD
+- Modal flows for restart, next level, game over, and congratulations
+- Modular JavaScript codebase for easier maintenance and extension
+- Jest-based unit and component test coverage across core modules
 
 ---
 
@@ -83,6 +89,8 @@ Musical-Themed-Candy-Crush/
 │
 ├── src/
 │   ├── board.js
+│   ├── boardController.js
+│   ├── boardEventHandlers.js
 │   ├── constants.js
 │   ├── events.js
 │   ├── game.js
@@ -90,17 +98,18 @@ Musical-Themed-Candy-Crush/
 │   ├── gameStatus.js
 │   ├── interaction.js
 │   ├── levels.js
-│   ├── timer.js
+│   ├── boardController.test.js
+│   ├── boardEventHandler.test.js
 │   ├── ui.js
 │   └── script.js
 │
 ├── __tests__/
 │   ├── board.test.js
-│   ├── constants.test.js
 │   ├── events.test.js
 │   ├── game.test.js
-│   ├── gameState.test.js
+│   └── utils.test.js
 │   ├── gameStatus.test.js
+├── jest.config.js
 │   ├── interaction.test.js
 │   ├── levels.test.js
 │   ├── timer.test.js
@@ -111,23 +120,26 @@ Musical-Themed-Candy-Crush/
 ├── README.md
 └── ...
 ```
-
+## Running Tests
 This modular structure makes it easy to maintain, test, and extend the game. Each file is responsible for a specific aspect of the game logic or UI.
 
 ---
-
+   npm install
 ## Running Unit Tests
 
 1. Install dependencies (if not already):
    ```bash
    npm install --save-dev jest
+3. Run coverage:
+   ```bash
+   npx jest --coverage
    ```
 2. Run all tests:
    ```bash
    npx jest
    ```
 3. Add your test cases in the `__tests__` folder for each module.
-
+This project uses [Jest](https://jestjs.io/) with `babel-jest` and the `jsdom` environment for unit and component testing.
 ---
 
 ## Test Coverage
@@ -150,22 +162,19 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 
 ## Known Issues
 
-- No E2E (end-to-end) tests yet; user flows are not fully automated.
-- Accessibility features (keyboard navigation, ARIA labels, color contrast) have not yet been started.
-- SEO improvements (meta tags, alt text, semantic HTML) have not yet been started.
-- UI/UX could be further polished for mobile and desktop.
+- Accessibility can still be improved further, especially keyboard support and ARIA labelling.
+- The UI is responsive, but further polish and real-device testing would still improve the mobile experience.
+- App packaging for Android / Play Store deployment has not yet been completed.
 
 ---
 
 ## Roadmap
 
-- Add Cypress E2E tests for main user journeys and regression testing.
-- Improve accessibility: keyboard navigation, ARIA labels, color contrast.
-- Enhance UI/UX: animations, transitions, and responsive design.
-- Complete SEO improvements for better discoverability.
-- Add more unit tests for uncovered logic, edge cases, and complex interactions (see coverage report for details).
-- Increase integration test coverage for module interactions.
-- Gather user feedback and iterate on gameplay and usability.
+- Improve accessibility: ARIA labels, and contrast checks.
+- Continue polishing the UI with improved animation, transitions, and mobile tuning.
+- Package the game for mobile using a wrapper such as Capacitor.
+- Prepare Play Store assets such as icons, screenshots, and store copy.
+- Gather user feedback and iterate on gameplay, feel, and usability.
 
 ---
 
