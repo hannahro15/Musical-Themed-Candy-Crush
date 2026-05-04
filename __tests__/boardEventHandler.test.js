@@ -31,4 +31,24 @@ describe('boardEventHandlers', () => {
     boardEventHandlers.onDragStart(event);
     expect(gameState.draggedCell).toBe(cell);
   });
+
+  test('onDragStart sets dragged cell when interaction is allowed', () => {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    const event = { target: cell, preventDefault: jest.fn() };
+
+    boardEventHandlers.onDragStart(event);
+    expect(gameState.draggedCell).toBe(cell);
+  });
+
+  test('ondragStart does nothing if gameState.isResolving is true', () => {
+    gameState.isResolving = true;
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    const event = { target: cell, preventDefault: jest.fn() };
+
+    boardEventHandlers.onDragStart(event);
+    expect(gameState.draggedCell).toBeNull();
+    expect(event.preventDefault).toHaveBeenCalled();
+  });
 });
