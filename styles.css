@@ -33,7 +33,7 @@ button {
 
 /* --- MENU/HOME STYLES --- */
 .container {
-        padding: 30px;
+    padding: 24px;
         border: solid 2px black;
         min-height: 300px;
         width: 90vw;
@@ -47,19 +47,35 @@ button {
 }
 
 h1 {
-    font-size: 2em;
-    margin: 0;
-    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    text-align: center;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
     margin: 0 auto;
-    padding-bottom: 10px; 
+    padding-bottom: 10px;
+    line-height: 1.1;
+}
+
+.title-note {
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+.title-text {
+    display: inline-block;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 1.2em;
 }
 
 .subtitle {
-    font-size: 1.2em;
+    font-size: 1rem;
     color: #555;
     margin: 0 auto;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 #playBtn, #howToPlayBtn {
@@ -71,7 +87,8 @@ h1 {
     display: block;
     font-size: 16px;
     padding: 15px 35px;
-    width: 70%;
+    width: 100%;
+    max-width: 280px;
     border-radius: 8px;
     margin: 0 auto;
 }
@@ -261,12 +278,12 @@ h1 {
 .moves-score-timer-row {
     width: 100%;
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: center;
-    gap: 24px;
+    gap: 10px;
     margin-bottom: 18px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 .top-bar-custom {
     width: 100%;
@@ -307,15 +324,16 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.13em;
+    font-size: 1.05em;
     font-weight: 600;
-    min-width: 90px;
+    min-width: 0;
+    width: 100%;
     border-radius: 18px;
     margin-bottom: 0;
     text-align: center;
     border: 2px solid #e0e0f7;
     background: linear-gradient(90deg, #f3f3fa 80%, #e6eaff 100%);
-    padding: 8px 12px;
+    padding: 10px 0;
     box-sizing: border-box;
     transition: font-size 0.2s, padding 0.2s;
 }
@@ -327,78 +345,103 @@ h1 {
 }
 #movesDisplay, #scoreDisplay, #timerDisplay {
     text-align: center;
-    font-size: 1.2em;
+    font-size: 1.05em;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     background-color: #6c6c96;
     border-radius: 14px;
     color: black;
-    padding: 6px 10px;
-    min-width: 80px;
+    padding: 10px 0;
+    min-width: 0;
+    width: 100%;
     box-sizing: border-box;
     transition: font-size 0.2s, padding 0.2s;
 }
 .symbol-counters-row {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 22px;
+    gap: 10px;
     background: linear-gradient(90deg, #e6eaff 80%, #cfd8ff 100%);
     border: 2px solid #b6b6e6;
     border-radius: 16px;
-    padding: 10px 28px;
+    padding: 10px 8px;
     min-width: 0;
     box-shadow: 0 2px 8px rgba(60,60,120,0.07);
     margin-bottom: 18px;
 }
 
+.symbol-counters-row span {
+    font-size: 1.15em;
+    font-weight: 600;
+    background: #f3f3fa;
+    border-radius: 10px;
+    padding: 6px 14px;
+    margin-bottom: 2px;
+    min-width: 80px;
+    box-shadow: 0 1px 4px rgba(60,60,120,0.07);
+    display: block;
+    text-align: center;
+}
+
 /* --- RESPONSIVE --- */
-@media (max-width: 600px) {
-    .moves-score-timer-row {
-        flex-direction: column;
-        gap: 10px;
-        align-items: stretch;
+@media (min-width: 500px) {
+    .container {
+        padding: 30px;
     }
-    .moves-horizontal, .score-horizontal, .timer-horizontal {
-        font-size: 1.05em;
-        min-width: 0;
-        width: 100%;
-        padding: 10px 0;
-        margin-bottom: 0;
+
+    h1 {
+        font-size: 2em;
+        gap: 0.35rem;
     }
-    #movesDisplay, #scoreDisplay, #timerDisplay {
-        font-size: 1.05em;
-        min-width: 0;
-        width: 100%;
-        padding: 10px 0;
-        margin-bottom: 0;
+
+    .title-note {
+        font-size: 0.9em;
     }
-    .symbol-counters-row {
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px 8px;
-        align-items: center;
-        justify-content: center;
+
+    .subtitle {
+        font-size: 1.2em;
+        margin-bottom: 20px;
     }
-    .symbol-counters-row span {
-        font-size: 1.15em;
-        font-weight: 600;
-        background: #f3f3fa;
-        border-radius: 10px;
-        padding: 6px 14px;
-        margin-bottom: 2px;
-        min-width: 80px;
-        box-shadow: 0 1px 4px rgba(60,60,120,0.07);
-        display: block;
-        text-align: center;
+
+    #playBtn, #howToPlayBtn {
+        width: 70%;
+        max-width: none;
     }
 }
 
-@media (min-width: 500px) {
-    h1 {
-        font-size: 2em;
+@media (min-width: 600px) {
+    .moves-score-timer-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
     }
+
+    .moves-horizontal, .score-horizontal, .timer-horizontal {
+        font-size: 1.13em;
+        min-width: 90px;
+        width: auto;
+        padding: 8px 12px;
+    }
+
+    #movesDisplay, #scoreDisplay, #timerDisplay {
+        font-size: 1.2em;
+        min-width: 80px;
+        width: auto;
+        padding: 6px 10px;
+        margin-bottom: 10px;
+    }
+
+    .symbol-counters-row {
+        flex-direction: row;
+        gap: 22px;
+        padding: 10px 28px;
+    }
+}
+
+@media (min-width: 768px) {
     #playBtn, #howToPlayBtn {
         width: 40%;
     }

@@ -1,6 +1,7 @@
 // UI helper functions
-export function showMenuPage(heading, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer) {
+export function showMenuPage(heading, subtitle, menu, gameBoard, movesDisplay, scoreDisplay, timerDisplay, livesDisplay, restartContainer) {
   heading.classList.remove('hidden');
+  if (subtitle) subtitle.classList.remove('hidden');
   menu.classList.remove('hidden');
   document.getElementById('game-board-container').classList.add('hidden');
   gameBoard.classList.add('hidden');

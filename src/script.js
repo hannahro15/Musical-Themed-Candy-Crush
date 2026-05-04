@@ -56,6 +56,7 @@ import { showElement, hideElement } from './utils.js';
 const playButton = document.getElementById('playBtn');
 const howToPlayBtn = document.getElementById('howToPlayBtn');
 const heading = document.querySelector('h1');
+const subtitle = document.querySelector('.subtitle');
 const menu = document.querySelector('.menu');
 
 const gameBoard = document.getElementById('gameBoard');
@@ -97,6 +98,7 @@ const congratsRestartBtn = document.getElementById('congratsRestartBtn');
 function showMenu() {
   showMenuPage(
     heading,
+    subtitle,
     menu,
     gameBoard,
     movesDisplay,
@@ -110,6 +112,7 @@ function showMenu() {
 function showGameUI() {
   console.log('[showGameUI] called');
   hideElement(heading);
+  hideElement(subtitle);
   hideElement(menu);
 
   // Always show both the container and the board
