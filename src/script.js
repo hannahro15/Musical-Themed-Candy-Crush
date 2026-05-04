@@ -55,6 +55,7 @@ import { showElement, hideElement } from './utils.js';
 
 const playButton = document.getElementById('playBtn');
 const howToPlayBtn = document.getElementById('howToPlayBtn');
+const container = document.querySelector('.container');
 const heading = document.querySelector('h1');
 const subtitle = document.querySelector('.subtitle');
 const menu = document.querySelector('.menu');
@@ -96,6 +97,7 @@ const congratsRestartBtn = document.getElementById('congratsRestartBtn');
 
 
 function showMenu() {
+  container?.classList.remove('game-active');
   showMenuPage(
     heading,
     subtitle,
@@ -111,6 +113,7 @@ function showMenu() {
 
 function showGameUI() {
   console.log('[showGameUI] called');
+  container?.classList.add('game-active');
   hideElement(heading);
   hideElement(subtitle);
   hideElement(menu);
