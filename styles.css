@@ -100,6 +100,7 @@ h1 {
 /* --- GAME BOARD & MODALS --- */
 #game-board-container {
     text-align: center;
+    background-color: slateblue;
 }
 #gameBoard {
     display: flex;
@@ -280,6 +281,12 @@ h1 {
 }
 
 /* --- TOP BAR --- */
+#score-moves-wrapper {
+    width: 100%;
+    padding: 10px 8px 12px;
+    box-sizing: border-box;
+}
+
 .top-bar-custom {
     width: 100%;
     display: flex;
@@ -294,13 +301,21 @@ h1 {
     text-align: left;
     font-size: 1.45em;
     font-weight: 700;
-    color: #333;
-    border: 2px solid #b6b6e6;
     padding: 6px 24px;
     border-radius: 16px;
     letter-spacing: 0.6px;
     margin: 0;
+    color: white;
     margin-right: auto;
+}
+
+#livesDisplay,
+#livesCount {
+    color: white;
+}
+
+#livesDisplay {
+    padding: 6px 10px;
 }
 
 /* --- INFO BAR & COUNTERS --- */
@@ -343,7 +358,7 @@ h1 {
     text-align: center;
     border: 2px solid #e0e0f7;
     background: linear-gradient(90deg, #f3f3fa 80%, #e6eaff 100%);
-    padding: 8px 6px;
+    padding: 9px 8px;
     box-sizing: border-box;
     transition: font-size 0.2s, padding 0.2s;
 }
@@ -361,7 +376,7 @@ h1 {
     background-color: #6c6c96;
     border-radius: 14px;
     color: black;
-    padding: 8px 6px;
+    padding: 9px 8px;
     min-width: 0;
     width: auto;
     flex: 1 1 0;
@@ -378,7 +393,7 @@ h1 {
     border: 1px solid #c8cff5;
     box-shadow: 0 2px 10px rgba(60,60,120,0.08);
     border-radius: 18px;
-    padding: 8px 12px;
+    padding: 10px 12px;
     min-width: 0;
     margin-bottom: 18px;
     flex-wrap: nowrap;
@@ -406,6 +421,10 @@ h1 {
 @media (min-width: 500px) {
     .container {
         padding: 30px;
+    }
+
+    #score-moves-wrapper {
+        padding: 12px 10px 14px;
     }
 
     h1 {
@@ -455,7 +474,7 @@ h1 {
     #objective-counters {
         flex-direction: row;
         gap: 16px;
-        padding: 10px 20px;
+        padding: 12px 20px;
         flex-wrap: wrap;
     }
 
