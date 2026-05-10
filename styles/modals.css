@@ -1,0 +1,110 @@
+/* --- MODAL CUSTOMIZATION --- */
+#nextLevelModal .modal-content {
+    text-align: center;
+}
+
+#nextLevelModal h2 {
+    margin-bottom: 12px;
+    color: #27ae60;
+}
+
+#confirmNextLevelBtn {
+    margin-top: 18px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#confirmNextLevelBtn:hover {
+    background: #1e8449;
+}
+
+#cancelNextLevelBtn {
+    margin-left: 16px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #aaa;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#cancelNextLevelBtn:hover {
+    background: #888;
+}
+
+#nextLevelBtn { display: none !important; }
+
+#restartLevelModal .modal-content {
+    text-align: center;
+}
+
+#restartLevelModal h2 {
+    margin-bottom: 12px;
+    color: #2980b9;
+}
+
+#confirmRestartBtn {
+    margin-top: 18px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#confirmRestartBtn:hover {
+    background: #1c5a8a;
+}
+
+#cancelRestartBtn {
+    margin-left: 16px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #aaa;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#cancelRestartBtn:hover {
+    background: #888;
+}
+#restartContainer { display: none !important; }
+
+#gameOverModal .modal-content {
+    text-align: center;
+}
+
+#gameOverModal h2 {
+    margin-bottom: 12px;
+    color: #c0392b;
+}
+
+#gameOverRestartBtn {
+    margin-top: 18px;
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#gameOverRestartBtn:hover {
+    background: #a93226;
+}
