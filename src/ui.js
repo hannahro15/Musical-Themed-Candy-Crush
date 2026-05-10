@@ -36,11 +36,9 @@ export function updateTotalScoreDisplay(totalScoreDisplay, totalScore) {
 }
 
 export function updateHighScoreDisplay(highScoreDisplay, highScore) {
-  if (highScoreDisplay && highScore > 0) {
-    highScoreDisplay.textContent = `High Score: ${highScore}`;
+  if (highScoreDisplay) {
+    highScoreDisplay.textContent = `Best Score: ${highScore}`;
     highScoreDisplay.classList.remove('hidden');
-  } else if (highScoreDisplay) {
-    highScoreDisplay.classList.add('hidden');
   }
 }
 

@@ -49,12 +49,8 @@ export function showMenu() {
   updateHighScoreDisplay(dom.highScoreDisplay, highScore);
   
   if (dom.highestLevelDisplay) {
-    if (highestLevel > 0) {
-      dom.highestLevelDisplay.textContent = `Highest Level: ${highestLevel}`;
-      showElement(dom.highestLevelDisplay);
-    } else {
-      hideElement(dom.highestLevelDisplay);
-    }
+    dom.highestLevelDisplay.textContent = `Highest Level: ${highestLevel}`;
+    showElement(dom.highestLevelDisplay);
   }
   
   // Show/hide continue button, restart button, and play button based on saved progress
