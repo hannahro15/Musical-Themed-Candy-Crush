@@ -1,8 +1,9 @@
-/* --- GAME BOARD & MODALS --- */
+/* --- GAME BOARD & CELLS --- */
 #game-board-container {
     text-align: center;
     background-color: slateblue;
 }
+
 #gameBoard {
     display: flex;
     flex-wrap: wrap;
@@ -32,7 +33,6 @@
     margin: 0;
     border-radius: 6px;
     background-color: #ececf3;
-
 }
 
 .cell.selected {
@@ -45,148 +45,6 @@
     background-color: #8fd3a8;
     transform: scale(1.15);
     transition: transform 0.2s, background-color 0.2s;
-}
-
-
-
-/* --- MODALS --- */
-.modal {
-    display: flex;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-    align-items: center;
-    justify-content: center;
-}
-.modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 32px 24px 24px 24px;
-    border: 2px solid #888;
-    border-radius: 16px;
-    width: 90vw;
-    max-width: 400px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-    position: relative;
-    text-align: left;
-}
-.close {
-    color: #aaa;
-    position: absolute;
-    top: 12px;
-    right: 18px;
-    font-size: 32px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.close:hover,
-.close:focus {
-    color: #333;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* --- MODAL CUSTOMIZATION --- */
-#nextLevelModal .modal-content {
-    text-align: center;
-}
-#nextLevelModal h2 {
-    margin-bottom: 12px;
-    color: #27ae60;
-}
-#confirmNextLevelBtn {
-    margin-top: 18px;
-    padding: 10px 28px;
-    font-size: 1.1rem;
-    background: #27ae60;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#confirmNextLevelBtn:hover {
-    background: #1e8449;
-}
-#cancelNextLevelBtn {
-    margin-left: 16px;
-    padding: 10px 28px;
-    font-size: 1.1rem;
-    background: #aaa;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#cancelNextLevelBtn:hover {
-    background: #888;
-}
-#nextLevelBtn { display: none !important; }
-
-#restartLevelModal .modal-content {
-    text-align: center;
-}
-#restartLevelModal h2 {
-    margin-bottom: 12px;
-    color: #2980b9;
-}
-#confirmRestartBtn {
-    margin-top: 18px;
-    padding: 10px 28px;
-    font-size: 1.1rem;
-    background: #2980b9;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#confirmRestartBtn:hover {
-    background: #1c5a8a;
-}
-#cancelRestartBtn {
-    margin-left: 16px;
-    padding: 10px 28px;
-    font-size: 1.1rem;
-    background: #aaa;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#cancelRestartBtn:hover {
-    background: #888;
-}
-#restartContainer { display: none !important; }
-
-#gameOverModal .modal-content {
-    text-align: center;
-}
-#gameOverModal h2 {
-    margin-bottom: 12px;
-    color: #c0392b;
-}
-#gameOverRestartBtn {
-    margin-top: 18px;
-    padding: 10px 28px;
-    font-size: 1.1rem;
-    background: #c0392b;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#gameOverRestartBtn:hover {
-    background: #a93226;
 }
 
 /* --- TOP BAR --- */
@@ -227,8 +85,7 @@
     padding: 6px 10px;
 }
 
-/* --- INFO BAR & COUNTERS --- */
-
+/* --- INFO BAR: MOVES, SCORE & TIMER --- */
 .moves-score-timer-row {
     width: 100%;
     display: flex;
@@ -274,6 +131,8 @@
     box-sizing: border-box;
     transition: font-size 0.2s, padding 0.2s;
 }
+
+/* --- OBJECTIVE COUNTERS --- */
 #objective-counters {
     display: flex;
     flex-direction: row;
@@ -308,6 +167,9 @@
     white-space: nowrap;
 }
 
+/* --- RESPONSIVE STYLES --- */
+
+/* Mobile: Full-screen game layout */
 @media (max-width: 767px) {
     body {
         align-items: stretch;
@@ -335,6 +197,7 @@
     }
 }
 
+/* Tablet and Desktop: Enhanced spacing and sizing */
 @media (min-width: 600px) {
     .moves-score-timer-row {
         align-items: center;
@@ -374,8 +237,3 @@
         flex: 0 1 auto;
     }
 }
-
-
-
-
-
