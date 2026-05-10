@@ -44,7 +44,8 @@ export const closeHowToPlay = document.getElementById('closeHowToPlay');
 
 // Game over modal
 export const gameOverModal = document.getElementById('gameOverModal');
-export const gameOverRestartBtn = document.getElementById('gameOverRestartBtn');
+export const gameOverPlayAgainBtn = document.getElementById('gameOverPlayAgainBtn');
+export const gameOverHomeBtn = document.getElementById('gameOverHomeBtn');
 
 // Congratulations modal
 export const congratsModal = document.getElementById('congratsModal');

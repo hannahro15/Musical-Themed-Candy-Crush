@@ -194,16 +194,6 @@ function renderLevel(config) {
 
 export function restartLevel() {
   hideGameOver();
-
-  if (gameState.lives <= 0) {
-    // Game over - save high score if it's a new record
-    saveHighScore(gameState.totalScore);
-    resetGame();
-    updateLivesDisplay(dom.livesDisplay, gameState.lives);
-    showMenu();
-    return;
-  }
-
   startLevel(gameState.level);
   hideElement(dom.restartLevelModal);
 }

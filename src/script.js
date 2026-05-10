@@ -71,8 +71,14 @@ function bindEvents() {
   }
 
   // Game over modal events
-  if (dom.gameOverRestartBtn) {
-    dom.gameOverRestartBtn.addEventListener('click', () => {
+  if (dom.gameOverPlayAgainBtn) {
+    dom.gameOverPlayAgainBtn.addEventListener('click', () => {
+      hideGameOver();
+      startGame();
+    });
+  }
+  if (dom.gameOverHomeBtn) {
+    dom.gameOverHomeBtn.addEventListener('click', () => {
       hideGameOver();
       showMenu();
     });
