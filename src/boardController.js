@@ -37,7 +37,7 @@ export async function trySwap(sourceCell, targetCell) {
   if (checkWinCondition(config)) {
     // Use handleLevelWin to show modal and update state
     await wait(250); // Animation delay for match clear
-    import('./gameStatus.js').then(({ handleLevelWin }) => {
+    import('./levelOutcomes.js').then(({ handleLevelWin }) => {
       handleLevelWin();
     });
     gameState.isResolving = false;
@@ -46,7 +46,7 @@ export async function trySwap(sourceCell, targetCell) {
 
   if (gameState.movesLeft <= 0 && !gameState.levelComplete && gameState.timer > 0) {
     // Show lose modal immediately if out of moves and not a win
-    await import('./gameStatus.js').then(({ handleLevelLose }) => {
+    await import('./levelOutcomes.js').then(({ handleLevelLose }) => {
       // Always use confirmRestartBtn and confirmNextLevelBtn
       const restartLevelModal = document.getElementById('restartLevelModal');
       const confirmRestartBtn = document.getElementById('confirmRestartBtn');

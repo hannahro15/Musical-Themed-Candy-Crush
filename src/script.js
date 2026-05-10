@@ -23,7 +23,7 @@ import {
 
 import { setBoardControllerDeps } from './boardController.js';
 import { gameState } from './gameState.js';
-import { handleLevelLose, handleLevelWin } from './gameStatus.js';
+import { handleLevelLose, handleLevelWin } from './levelOutcomes.js';
 import { setGameBoardRef, boardEventHandlers } from './boardEventHandlers.js';
 import { startTimer } from './timer.js';
 import { wireUpCellEvents } from './events.js';

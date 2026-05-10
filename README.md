@@ -95,7 +95,7 @@ Musical-Themed-Candy-Crush/
 │   ├── events.js
 │   ├── game.js
 │   ├── gameState.js
-│   ├── gameStatus.js
+│   ├── levelOutcomes.js
 │   ├── interaction.js
 │   ├── levels.js
 │   ├── boardController.test.js
@@ -108,7 +108,7 @@ Musical-Themed-Candy-Crush/
 │   ├── events.test.js
 │   ├── game.test.js
 │   └── utils.test.js
-│   ├── gameStatus.test.js
+│   ├── levelOutcomes.test.js
 ├── jest.config.js
 │   ├── interaction.test.js
 │   ├── levels.test.js
