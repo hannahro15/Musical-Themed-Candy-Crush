@@ -8,6 +8,7 @@ import { BOARD_SIZE, SYMBOLS } from './constants.js';
 import { getSafeSymbol } from './board.js';
 import { wireUpCellEvents } from './events.js';
 import { boardEventHandlers } from './boardEventHandlers.js';
+import { autoSaveProgress } from './gameController.js';
 
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay, restartContainer, nextLevelBtn, restartBtn;
@@ -34,6 +35,9 @@ export async function trySwap(sourceCell, targetCell) {
 
   const { scoreGained, matchedCounts, config } = await resolveAllMatchesAndDrop();
   updateScoreAndObjectives(scoreGained, matchedCounts, config);
+
+  // Auto-save progress after each move
+  autoSaveProgress();
 
   if (checkWinCondition(config)) {
     // Use handleLevelWin to show modal and update state

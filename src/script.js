@@ -9,8 +9,10 @@ import {
   showGameOver,
   hideGameOver,
   startGame,
+  continueGame,
   restartLevel,
-  nextLevel
+  nextLevel,
+  goHome
 } from './gameController.js';
 
 /* -----------------------------------
@@ -21,6 +23,16 @@ function bindEvents() {
   // Play Game button event
   if (dom.playButton) {
     dom.playButton.addEventListener('click', startGame);
+  }
+
+  // Continue Game button event
+  if (dom.continueButton) {
+    dom.continueButton.addEventListener('click', continueGame);
+  }
+
+  // Home button event (during gameplay)
+  if (dom.homeBtn) {
+    dom.homeBtn.addEventListener('click', goHome);
   }
 
   // Restart modal events

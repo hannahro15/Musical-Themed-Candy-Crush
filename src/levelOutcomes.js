@@ -1,7 +1,7 @@
 // levelOutcomes.js - Handles win/lose outcomes for levels
 import { gameState } from './gameState.js';
 import { LEVELS } from './levels.js';
-import { saveHighScore } from './storage.js';
+import { saveHighScore, clearGameProgress } from './storage.js';
 
 
 export function handleLevelWin() {
@@ -39,8 +39,9 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
 
     // If out of lives, show game over modal instead of restart modal
     if (gameState.lives <= 0) {
-        // Save high score if it's a new record
+        // Save high score if it's a new record and clear saved progress
         saveHighScore(gameState.totalScore);
+        clearGameProgress();
         const gameOverModal = document.getElementById('gameOverModal');
         if (gameOverModal) {
             gameOverModal.classList.remove('hidden');

@@ -61,6 +61,19 @@ h1 {
     box-shadow: 0 2px 8px rgba(108, 92, 231, 0.1);
 }
 
+#highestLevelDisplay {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #5c6ce7;
+    text-align: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #f8f3fa 0%, #ffe6ea 100%);
+    border: 2px solid #d0d0f0;
+    border-radius: 20px;
+    margin: 10px auto;
+    box-shadow: 0 2px 8px rgba(92, 108, 231, 0.1);
+}
+
 #playBtn, #howToPlayBtn {
     background-color: slateblue;
     border: none;

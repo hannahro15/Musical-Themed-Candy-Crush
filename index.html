@@ -21,8 +21,10 @@
         </h1>
         <em class="subtitle">Start your musical match-three adventure!</em>
         <div id="highScoreDisplay" class="high-score hidden">High Score: 0</div>
+        <div id="highestLevelDisplay" class="highest-level hidden">Highest Level: 0</div>
         <div class="menu">
             <button id="playBtn">Play Game</button>
+            <button id="continueBtn" class="hidden">Continue Game</button>
             <button id="howToPlayBtn">How to Play</button>
         </div>
         <div id="game-board-container" class="hidden">
@@ -38,6 +40,7 @@
                     <div id="timerDisplay" class="hidden timer-horizontal">Time: 0s</div>
                 </div>
                 <div id="totalScoreDisplay" class="hidden total-score">Total: 0</div>
+                <button id="homeBtn" class="hidden home-btn">🏠 Home</button>
                 </div>
             </div>
             <div id="gameBoard"></div>
@@ -76,7 +79,9 @@
         <div id="congratsModal" class="modal hidden">
             <div class="modal-content" style="text-align:center;">
                 <h2>Congratulations!</h2>
-                <p>You have completed all levels of Musical Match Saga!<br>Would you like to play again or go back to the home screen?</p>
+                <p>You have completed all levels of Musical Match Saga!</p>
+                <p id="congratsFinalScore" style="font-size: 1.3em; font-weight: 600; color: #6c5ce7; margin: 15px 0;">Total Score: 0</p>
+                <p>Would you like to play again or go back to the home screen?</p>
                 <button id="congratsPlayAgainBtn">Play Again</button>
                 <button id="congratsHomeBtn">Home</button>
             </div>

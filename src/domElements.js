@@ -2,7 +2,9 @@
 
 // Menu elements
 export const playButton = document.getElementById('playBtn');
+export const continueButton = document.getElementById('continueBtn');
 export const howToPlayBtn = document.getElementById('howToPlayBtn');
+export const homeBtn = document.getElementById('homeBtn');
 export const container = document.querySelector('.container');
 export const heading = document.querySelector('h1');
 export const subtitle = document.querySelector('.subtitle');
@@ -20,6 +22,7 @@ export const livesDisplay = document.getElementById('livesDisplay');
 export const levelDisplay = document.getElementById('levelDisplay');
 export const totalScoreDisplay = document.getElementById('totalScoreDisplay');
 export const highScoreDisplay = document.getElementById('highScoreDisplay');
+export const highestLevelDisplay = document.getElementById('highestLevelDisplay');
 
 export const scoreMovesWrapper = document.getElementById('score-moves-wrapper');
 export const objectiveCounters = document.getElementById('objective-counters');
@@ -49,5 +52,6 @@ export const gameOverHomeBtn = document.getElementById('gameOverHomeBtn');
 
 // Congratulations modal
 export const congratsModal = document.getElementById('congratsModal');
+export const congratsFinalScore = document.getElementById('congratsFinalScore');
 export const congratsPlayAgainBtn = document.getElementById('congratsPlayAgainBtn');
 export const congratsHomeBtn = document.getElementById('congratsHomeBtn');
