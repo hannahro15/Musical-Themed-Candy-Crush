@@ -54,7 +54,12 @@ export function updateObjectiveCounters(objectiveCountersContainer, objectives, 
 }
 
 export function updateTimerDisplay(timerDisplay, timer) {
+  if (!timerDisplay) return;
+
   timerDisplay.textContent = `Time: ${timer}s`;
+  if (timerDisplay.classList) {
+    timerDisplay.classList.toggle('low-time', timer <= 10 && timer > 0);
+  }
 }
 
 // Add these UI functions for testing and export them
