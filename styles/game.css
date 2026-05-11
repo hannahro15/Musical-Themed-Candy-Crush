@@ -22,7 +22,7 @@
 }
 
 .cell {
-    width: calc((100% - 7px) / 8);
+    width: calc((100% - 6px) / 7);
     display: flex;
     aspect-ratio: 1;
     justify-content: center;
@@ -61,6 +61,11 @@
     pointer-events: none;
     z-index: 5;
     animation: scorePopupFloat 0.7s ease-out forwards;
+}
+
+.combo-popup {
+    background: rgba(245, 158, 11, 0.96);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
 }
 
 @keyframes scorePopupFloat {
