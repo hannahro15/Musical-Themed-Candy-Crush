@@ -207,4 +207,16 @@ describe('UI functions', () => {
       expect(restartContainer.classList.contains('hidden')).toBe(true);
 
   });
+
+  test('timer warning class is toggled correctly based on timer value', () => {
+    const timerDisplay = document.createElement('div');
+    updateTimerDisplay(timerDisplay, 15);
+    expect(timerDisplay.classList.contains('low-time')).toBe(false);
+    updateTimerDisplay(timerDisplay, 10);
+    expect(timerDisplay.classList.contains('low-time')).toBe(true);
+    updateTimerDisplay(timerDisplay, 5);
+    expect(timerDisplay.classList.contains('low-time')).toBe(true);
+    updateTimerDisplay(timerDisplay, 0);
+    expect(timerDisplay.classList.contains('low-time')).toBe(false); // No warning at 0
+  });
 });

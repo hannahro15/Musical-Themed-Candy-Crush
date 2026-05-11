@@ -1,4 +1,12 @@
-import { trySwap, setBoardControllerDeps } from '../src/boardController.js';
+import {
+    trySwap,
+    setBoardControllerDeps,
+    getComboLevel,
+    getComboBonus,
+    updateScoreAndObjectives,
+    checkWinCondition,
+    showScorePopup
+} from '../src/boardController.js';
 import { gameState } from '../src/gameState.js';
 
 describe('boardController', () => {

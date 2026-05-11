@@ -212,3 +212,11 @@ function showScorePopup(points, cells, type = 'score', comboLevel = 1) {
     popup.remove();
   }, 700);
 }
+
+export {
+  getComboLevel,
+  getComboBonus,
+  updateScoreAndObjectives,
+  checkWinCondition,
+  showScorePopup
+};
