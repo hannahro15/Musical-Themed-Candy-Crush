@@ -44,6 +44,47 @@
     cursor: pointer;
 }
 
+#howToPlayModal .modal-content {
+    max-width: 560px;
+    border: 2px solid #cfc4ff;
+    background: linear-gradient(180deg, #ffffff 0%, #f7f4ff 100%);
+}
+
+#howToPlayModal h2 {
+    text-align: center;
+    color: #6c5ce7;
+    margin-bottom: 12px;
+}
+
+.how-to-play-intro {
+    text-align: center;
+    color: #4b4b63;
+    line-height: 1.6;
+    margin: 0 16px 22px;
+}
+
+.how-to-play-list {
+    margin: 0;
+    padding: 0 8px 0 28px;
+    color: #35354d;
+    line-height: 1.7;
+}
+
+.how-to-play-list li {
+    margin-bottom: 12px;
+}
+
+.how-to-play-list strong {
+    color: #5849c7;
+}
+
+.how-to-play-footer {
+    text-align: center;
+    font-weight: 600;
+    color: #5a53a2;
+    margin: 20px 0 0;
+}
+
 /* --- MODAL CUSTOMIZATION --- */
 #nextLevelModal .modal-content {
     text-align: center;

@@ -1,8 +1,13 @@
 // Board and match logic
 import { swapCellContents } from './game.js';
 
+function getBoardCells(gameBoard) {
+  const cells = Array.from(gameBoard.querySelectorAll('.cell'));
+  return cells.length > 0 ? cells : Array.from(gameBoard.children);
+}
+
 export function getCellGrid(gameBoard, BOARD_SIZE) {
-  const allCells = Array.from(gameBoard.children);
+  const allCells = getBoardCells(gameBoard);
   const grid = [];
   for (let row = 0; row < BOARD_SIZE; row++) {
     grid.push(allCells.slice(row * BOARD_SIZE, (row + 1) * BOARD_SIZE));
@@ -75,7 +80,7 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol,
 }
 
 export function hasPossibleMoves(gameBoard, BOARD_SIZE) {
-    const allCells = Array.from(gameBoard.children);
+  const allCells = getBoardCells(gameBoard);
 
     function trySwapAndCheck(idx1, idx2) {
         swapCellContents(allCells[idx1], allCells[idx2]);
@@ -94,7 +99,7 @@ export function hasPossibleMoves(gameBoard, BOARD_SIZE) {
 }
 
 export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
-  let allCells = Array.from(gameBoard.children);
+  let allCells = getBoardCells(gameBoard);
   let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
   let attempts = 0;
   do {
@@ -118,7 +123,7 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, ha
 
 export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   const grid = [];
-  const allCells = Array.from(gameBoard.children);
+  const allCells = getBoardCells(gameBoard);
   for (let row = 0; row < BOARD_SIZE; row++) {
     grid[row] = [];
     for (let col = 0; col < BOARD_SIZE; col++) {

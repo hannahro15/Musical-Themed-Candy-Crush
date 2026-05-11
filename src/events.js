@@ -2,14 +2,14 @@
 import { areAdjacent } from './game.js';
 
 export function wireUpCellEvents(gameBoard, boardSize, onDragStart, onDrop, onTouchStart, onTouchEnd) {
-  const cells = Array.from(gameBoard.children);
+  const cells = Array.from(gameBoard.querySelectorAll('.cell'));
   cells.forEach(cell => {
     const newCell = cell.cloneNode(true);
     newCell.draggable = true;
     cell.replaceWith(newCell);
   });
 
-  Array.from(gameBoard.children).forEach(cell => {
+  Array.from(gameBoard.querySelectorAll('.cell')).forEach(cell => {
     cell.draggable = true;
     cell.addEventListener('dragstart', onDragStart);
     cell.addEventListener('dragover', e => e.preventDefault());

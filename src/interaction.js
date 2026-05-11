@@ -80,7 +80,7 @@ export async function handleTouchEnd(
     const deltaY = touch.clientY - touchStartY;
     setTouchStartCell(null);
 
-    const allCells = Array.from(gameBoard.children);
+    const allCells = Array.from(gameBoard.querySelectorAll('.cell'));
     const sourceIndex = allCells.indexOf(touchStartCell);
     if (sourceIndex === -1) return;
 
