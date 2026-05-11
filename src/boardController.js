@@ -89,16 +89,21 @@ async function resolveAllMatchesAndDrop() {
 
   while (matches.length > 0) {
     chainCount++;
+    let waveScore = 0;
     for (const group of matches) {
       const matchScore = scoreForMatch(group.length);
       scoreGained += matchScore;
-      showScorePopup(matchScore, group);
+      waveScore += matchScore;
       for (const cell of group) {
         cell.classList.add('matched');
         config.objectives.forEach(obj => {
           if (cell.textContent === obj.symbol) matchedCounts[obj.label]++;
         });
       }
+    }
+
+    if (waveScore > 0) {
+      showScorePopup(waveScore, matches.flat());
     }
 
     const comboLevel = getComboLevel(matches, chainCount);
