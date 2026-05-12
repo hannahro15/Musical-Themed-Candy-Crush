@@ -3,6 +3,7 @@
 import { gameState } from '../src/gameState.js';
 import { handleLevelWin, handleLevelLose } from '../src/levelOutcomes.js';
 import { LEVELS } from '../src/levels.js';
+import { getHighScore, getHighestLevel, loadGameProgress } from '../src/storage.js';
 
 describe('levelOutcomes', () => {
   beforeEach(() => {
@@ -12,7 +13,10 @@ describe('levelOutcomes', () => {
     gameState.timerInterval = null;
     gameState.lives = 3; // Assuming INITIAL_LIVES is 3
     gameState.level = 1;
+    gameState.score = 0;
+    gameState.totalScore = 0;
     document.body.innerHTML = '';
+    localStorage.clear();
   });
 
   test('handleLevelWin updates gameState and shows next level modal', () => {
@@ -34,16 +38,26 @@ describe('levelOutcomes', () => {
 
   test('handleLevelWin shows congratulations modal on the final level', () => {
     gameState.level = LEVELS.length;
+    gameState.score = 125;
+    gameState.totalScore = 400;
 
     const congratsModal = document.createElement('div');
     congratsModal.id = 'congratsModal';
     congratsModal.classList.add('modal', 'hidden');
     document.body.appendChild(congratsModal);
 
+    const congratsFinalScore = document.createElement('div');
+    congratsFinalScore.id = 'congratsFinalScore';
+    document.body.appendChild(congratsFinalScore);
+
     const nextLevelModal = document.createElement('div');
     nextLevelModal.id = 'nextLevelModal';
     nextLevelModal.classList.add('modal', 'hidden');
     document.body.appendChild(nextLevelModal);
+
+    localStorage.setItem('musicalMatchSaga', JSON.stringify({
+      savedProgress: { level: LEVELS.length, score: 400 }
+    }));
 
     handleLevelWin();
 
@@ -51,6 +65,12 @@ describe('levelOutcomes', () => {
     expect(gameState.timerActive).toBe(false);
     expect(congratsModal.classList.contains('hidden')).toBe(false);
     expect(nextLevelModal.classList.contains('hidden')).toBe(true);
+    expect(gameState.totalScore).toBe(525);
+    expect(gameState.score).toBe(0);
+    expect(congratsFinalScore.textContent).toBe('Total Score: 525');
+    expect(getHighScore()).toBe(525);
+    expect(getHighestLevel()).toBe(LEVELS.length);
+    expect(loadGameProgress()).toBeNull();
   });
 
   test('handleLevelLose updates gameState and UI elements correctly', () => {
@@ -84,6 +104,8 @@ describe('levelOutcomes', () => {
   
   test("lives do not go below 0 if gamrState.lives is already 0", () => {
     gameState.lives = 0; // Set lives to 0 before calling handleLevelLose
+    gameState.score = 75;
+    gameState.totalScore = 200;
 
     const restartContainer = document.createElement('div');
     const restartBtn = document.createElement('button');
@@ -92,9 +114,23 @@ describe('levelOutcomes', () => {
     restartBtn.classList.add('hidden');
     nextLevelBtn.classList.remove('hidden');
 
+    const gameOverModal = document.createElement('div');
+    gameOverModal.id = 'gameOverModal';
+    gameOverModal.classList.add('hidden');
+    document.body.appendChild(gameOverModal);
+
+    const gameOverFinalScore = document.createElement('div');
+    gameOverFinalScore.id = 'gameOverFinalScore';
+    document.body.appendChild(gameOverFinalScore);
+
     handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
 
     expect(gameState.lives).toBe(0); // Lives should not go below 0
+    expect(gameState.totalScore).toBe(275);
+    expect(gameState.score).toBe(0);
+    expect(gameOverModal.classList.contains('hidden')).toBe(false);
+    expect(gameOverFinalScore.textContent).toBe('Total Score: 275');
+    expect(getHighScore()).toBe(275);
   });
 
   test('livesDisplay is updated if present in the DOM when handleLevelLose is called', () => {
