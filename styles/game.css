@@ -86,31 +86,41 @@
 /* --- TOP BAR --- */
 #score-moves-wrapper {
     width: 100%;
-    padding: 12px 10px 8px;
+    padding: 14px 10px 14px;
     box-sizing: border-box;
     background-color: slateblue;
 }
 
 .top-bar-custom {
     width: 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     gap: 12px;
+    box-sizing: border-box;
 }
+
+.top-bar-custom > * {
+    min-width: 0;
+}
+
 .level-center {
     flex: 0 1 auto;
     text-align: left;
-    font-size: 1.45em;
+    font-size: 1.15rem;
     font-weight: 700;
-    padding: 6px 24px;
-    border-radius: 16px;
+    padding: 10px 16px;
+    border-radius: 14px;
     letter-spacing: 0.6px;
     margin: 0;
     color: white;
     margin-right: auto;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 #livesDisplay,
@@ -119,7 +129,17 @@
 }
 
 #livesDisplay {
-    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    font-size: 0.98rem;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 #totalScoreDisplay {
@@ -131,50 +151,52 @@
     background: linear-gradient(135deg, #f3f3fa 0%, #e6eaff 100%);
     border: 2px solid #d0d0f0;
     border-radius: 16px;
-    margin: 10px auto 8px;
+    margin: 14px auto 10px;
     max-width: 200px;
     box-shadow: 0 2px 6px rgba(108, 92, 231, 0.1);
 }
 
 .home-btn {
-    background-color: #667eea;
-    border: 2px solid #5568d3;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     color: white;
-    padding: 8px 18px;
+    padding: 8px 14px;
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    margin: 8px auto;
+    margin: 0;
     display: block;
     width: fit-content;
-    min-width: 120px;
+    min-width: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 10px rgba(30, 30, 80, 0.12);
 }
 
 .home-btn:hover {
-    background-color: #5568d3;
+    background: rgba(255, 255, 255, 0.14);
     transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 14px rgba(30, 30, 80, 0.18);
 }
 
 .home-btn:active {
     transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 6px rgba(30, 30, 80, 0.14);
 }
 
 /* --- INFO BAR: MOVES, SCORE & TIMER --- */
 .moves-score-timer-row {
     width: 100%;
+    max-width: 100%;
     display: flex;
-    flex-direction: row;
-    align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 18px;
-    flex-wrap: nowrap;
+    box-sizing: border-box;
+}
+
+.moves-score-timer-row > * {
+    min-width: 0;
 }
 
 .moves-horizontal, .score-horizontal, .timer-horizontal {
@@ -183,33 +205,24 @@
     justify-content: center;
     font-size: 0.95em;
     font-weight: 600;
-    min-width: 0;
-    width: auto;
     flex: 1 1 0;
     border-radius: 18px;
-    margin-bottom: 0;
-    text-align: center;
     border: 2px solid #e0e0f7;
     background: linear-gradient(90deg, #f3f3fa 80%, #e6eaff 100%);
-    padding: 9px 8px;
+    padding: 6px 8px;
     box-sizing: border-box;
-    transition: font-size 0.2s, padding 0.2s;
 }
 
 #movesDisplay, #scoreDisplay, #timerDisplay {
     text-align: center;
     font-size: 0.95em;
     font-weight: bold;
-    margin-bottom: 0;
     background-color: #6c6c96;
     border-radius: 14px;
     color: black;
-    padding: 9px 8px;
-    min-width: 0;
-    width: auto;
+    padding: 6px 8px;
     flex: 1 1 0;
     box-sizing: border-box;
-    transition: font-size 0.2s, padding 0.2s;
 }
 
 #timerDisplay.low-time {
@@ -241,11 +254,13 @@
     border-radius: 18px;
     padding: 10px 12px;
     min-width: 0;
-    margin-bottom: 18px;
-    flex-wrap: nowrap;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
     width: fit-content;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+    box-sizing: border-box;
 }
 
 #objective-counters span {
@@ -272,7 +287,7 @@
     }
 
     .container.game-active {
-        width: 100;
+        width: 100%;
         max-width: none;
         min-height: 100dvh;
         border-radius: 0;
@@ -288,8 +303,62 @@
     }
 
     #score-moves-wrapper {
-        padding-left: 0;
-        padding-right: 0;
+        padding-left: 12px;
+        padding-right: 12px;
+        overflow-x: hidden;
+    }
+
+    .top-bar-custom,
+    .moves-score-timer-row {
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+
+    .top-bar-custom {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .level-center {
+        flex: 1 1 100%;
+        text-align: center;
+        margin-right: 0;
+        padding: 8px 12px;
+    }
+
+    #livesDisplay {
+        padding: 8px 12px;
+    }
+
+    .home-btn {
+        min-width: 0;
+        margin: 0;
+        padding: 8px 12px;
+    }
+
+    .moves-score-timer-row {
+        flex-wrap: wrap;
+    }
+
+    .moves-horizontal, .score-horizontal, .timer-horizontal {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+    }
+
+    #objective-counters {
+        margin-left: auto;
+        margin-right: auto;
+        width: fit-content;
+        max-width: calc(100% - 12px);
+        justify-content: center;
+        padding: 9px 8px;
+        margin-bottom: 18px;
+        gap: 4px;
+    }
+
+    #objective-counters span {
+        white-space: normal;
     }
 }
 
