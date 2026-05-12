@@ -96,4 +96,24 @@ describe('storage.js', () => {
     const storedData = JSON.parse(localStorage.getItem('musicalMatchSaga'));
     expect(storedData.savedProgress).toEqual(savedProgress);
   });
+
+  test ('clearStorage clears savedProgress and objectives', () => {
+    const savedProgress = {
+      level: 4,
+      score: 600,
+      lives: 1,
+      objectives: {
+        collectRedLeft: 0,
+        collectBlueLeft: 2
+      }
+    };
+    localStorage.setItem('musicalMatchSaga', JSON.stringify({ savedProgress }));
+    localStorage.clear();
+    const storedData = JSON.parse(localStorage.getItem('musicalMatchSaga'));
+    expect(storedData).toBeNull();
+  });
+
+  test('clearStorage does not throw error if localStorage is already empty', () => {
+    expect(() => localStorage.clear()).not.toThrow();
+  });
 });
