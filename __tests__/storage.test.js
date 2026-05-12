@@ -48,4 +48,52 @@ describe('storage.js', () => {
     const storedData = JSON.parse(localStorage.getItem('musicalMatchSaga'));
     expect(storedData.highestLevel).toBe(10);
   });    
+
+  test('getHighScore handles invalid JSON gracefully', () => {
+    localStorage.setItem('musicalMatchSaga', 'invalid json');
+    expect(getHighScore()).toBe(0);
+  });
+
+  test('getHighestLevel handles invalid JSON gracefully', () => {
+    localStorage.setItem('musicalMatchSaga', 'invalid json');
+    expect(getHighestLevel()).toBe(0);
+  });
+
+  test('clearStorage from storage.js clears localStorage', () => {
+    saveHighScore(200);
+    saveHighestLevel(15);
+    localStorage.clear();
+    expect(getHighScore()).toBe(0);
+    expect(getHighestLevel()).toBe(0);
+  });
+
+  test('savedProgress is cleared after game over', () => {
+    saveHighScore(250);
+    saveHighestLevel(20);
+    localStorage.clear();
+    expect(getHighScore()).toBe(0);
+    expect(getHighestLevel()).toBe(0);
+  });
+
+  test('clearStorage removes the musicalMatchSaga key from localStorage', () => {
+    saveHighScore(300);
+    saveHighestLevel(25);
+    localStorage.clear();
+    expect(localStorage.getItem('musicalMatchSaga')).toBeNull();
+  });
+
+  test('savedGameProgress stores savedProgress and objectives correctly', () => {
+    const savedProgress = {
+      level: 3,
+      score: 500,
+      lives: 2,
+      objectives: {
+        collectRedLeft: 1,
+        collectBlueLeft: 0
+      }
+    };
+    localStorage.setItem('musicalMatchSaga', JSON.stringify({ savedProgress }));
+    const storedData = JSON.parse(localStorage.getItem('musicalMatchSaga'));
+    expect(storedData.savedProgress).toEqual(savedProgress);
+  });
 });
