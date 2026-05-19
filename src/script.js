@@ -16,6 +16,7 @@ import {
   restartGameFromBeginning
 } from './gameController.js';
 
+
 /* -----------------------------------
    EVENT BINDING
 ----------------------------------- */
@@ -41,7 +42,50 @@ function bindEvents() {
 
   // Home button event (during gameplay)
   if (dom.homeBtn) {
-    dom.homeBtn.addEventListener('click', goHome);
+    dom.homeBtn.addEventListener('click', (e) => {
+      // Only show confirm modal if in game (board is visible)
+      if (!dom.gameBoardContainer.classList.contains('hidden')) {
+        const modal = document.getElementById('confirmHomeModal');
+        modal.classList.remove('hidden');
+        // Focus the close button for accessibility
+        const closeBtn = document.getElementById('closeConfirmHomeModal');
+        if (closeBtn) closeBtn.focus();
+
+        function cleanup() {
+          modal.classList.add('hidden');
+          confirmBtn.removeEventListener('click', handleConfirm);
+          cancelBtn.removeEventListener('click', handleCancel);
+          closeBtn.removeEventListener('click', handleClose);
+          closeBtn.removeEventListener('keydown', handleCloseKey);
+        }
+
+        function handleConfirm() {
+          cleanup();
+          if (typeof saveGameProgress === 'function') saveGameProgress();
+          goHome();
+        }
+        function handleCancel() {
+          cleanup();
+        }
+        function handleClose() {
+          cleanup();
+        }
+        function handleCloseKey(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleClose();
+          }
+        }
+
+        const confirmBtn = document.getElementById('confirmHomeBtn');
+        const cancelBtn = document.getElementById('cancelHomeBtn');
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+        closeBtn.addEventListener('click', handleClose);
+        closeBtn.addEventListener('keydown', handleCloseKey);
+      } else {
+        goHome();
+      }
+    });
   }
 
   // Restart Game button event

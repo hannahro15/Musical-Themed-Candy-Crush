@@ -86,6 +86,43 @@
 }
 
 /* --- MODAL CUSTOMIZATION --- */
+#confirmHomeModal .modal-content {
+    text-align: center;
+}
+
+#confirmHomeBtn {
+    margin: 20px 8px 8px 8px;
+    padding: 12px 32px;
+    font-size: 1.1rem;
+    background: #6c5ce7;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    min-width: 120px;
+}
+#confirmHomeBtn:hover {
+    background: #5849c7;
+    transform: translateY(-2px);
+}
+
+#cancelHomeBtn {
+    margin: 20px 8px 8px 8px;
+    padding: 12px 32px;
+    font-size: 1.1rem;
+    background: #95a5a6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    min-width: 120px;
+}
+#cancelHomeBtn:hover {
+    background: #7f8c8d;
+    transform: translateY(-2px);
+}
 #nextLevelModal .modal-content {
     text-align: center;
 }
