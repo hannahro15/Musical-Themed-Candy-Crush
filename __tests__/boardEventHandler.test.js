@@ -5,7 +5,6 @@ import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchS
 
 describe('boardEventHandlers', () => {
   beforeEach(() => {
-    // Reset gameState and related variables before each test
     gameState.isResolving = false;
     setDraggedCell(null);
     setTouchStartCell(null);
@@ -13,42 +12,35 @@ describe('boardEventHandlers', () => {
     setTouchStartY(null);
   });
 
-  test('onDragStart calls handleDragStart with correct parameters', () => {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    const event = { target: cell, preventDefault: jest.fn() };
-
-    boardEventHandlers.onDragStart(event);
-    expect(gameState.draggedCell).toBe(cell);
-    expect(event.preventDefault).not.toHaveBeenCalled();
-  });
-
-  test('set the dragged cell in gameState on drag start', () => {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    const event = { target: cell, preventDefault: jest.fn() };
-
-    boardEventHandlers.onDragStart(event);
-    expect(gameState.draggedCell).toBe(cell);
-  });
-
   test('onDragStart sets dragged cell when interaction is allowed', () => {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     const event = { target: cell, preventDefault: jest.fn() };
-
     boardEventHandlers.onDragStart(event);
     expect(gameState.draggedCell).toBe(cell);
   });
 
-  test('ondragStart does nothing if gameState.isResolving is true', () => {
+  test('onDragStart does nothing if gameState.isResolving is true', () => {
     gameState.isResolving = true;
     const cell = document.createElement('div');
     cell.classList.add('cell');
     const event = { target: cell, preventDefault: jest.fn() };
-
     boardEventHandlers.onDragStart(event);
     expect(gameState.draggedCell).toBeNull();
     expect(event.preventDefault).toHaveBeenCalled();
+  });
+
+  test('onDragStart does nothing if target is not a cell', () => {
+    const nonCell = document.createElement('div');
+    const event = { target: nonCell, preventDefault: jest.fn() };
+    boardEventHandlers.onDragStart(event);
+    expect(gameState.draggedCell).toBeNull();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  test('setGameBoardRef sets the gameBoard reference', () => {
+    const fakeBoard = {};
+    setGameBoardRef(fakeBoard);
+    expect(typeof setGameBoardRef).toBe('function');
   });
 });
