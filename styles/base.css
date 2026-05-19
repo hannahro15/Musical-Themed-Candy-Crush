@@ -53,18 +53,22 @@ a:focus {
 }
 
 /* Hide scrollbars on mobile for body and main containers */
+
 @media (max-width: 767px) {
-  body,
-  .container,
-  #game-board-container {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none;    /* Firefox */
-    overflow: hidden;
-  }
-  body::-webkit-scrollbar,
-  .container::-webkit-scrollbar,
-  #game-board-container::-webkit-scrollbar {
-    display: none;
-  }
+    body,
+    .container,
+    #game-board-container {
+        min-height: 100dvh;
+        height: 100dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none;    /* Firefox */
+    }
+    body::-webkit-scrollbar,
+    .container::-webkit-scrollbar,
+    #game-board-container::-webkit-scrollbar {
+        display: none;
+    }
 }
 
