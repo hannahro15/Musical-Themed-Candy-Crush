@@ -317,6 +317,9 @@ function restoreBoardState(boardState, config) {
       cell.dataset.row = i;
       cell.dataset.col = j;
       cell.draggable = true;
+      cell.tabIndex = 0;
+      cell.setAttribute('role', 'button');
+      cell.setAttribute('aria-label', `Game tile: ${symbol}, row ${i + 1}, column ${j + 1}`);
       dom.gameBoard.appendChild(cell);
     });
   });

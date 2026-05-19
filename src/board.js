@@ -66,6 +66,9 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol,
         cell.className = 'cell';
         cell.textContent = symbol;
         cell.draggable = true;
+        cell.tabIndex = 0;
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('aria-label', `Game tile: ${symbol}, row ${row + 1}, column ${col + 1}`);
         gameBoard.appendChild(cell);
       }
     }

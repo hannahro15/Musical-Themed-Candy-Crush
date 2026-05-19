@@ -1,3 +1,9 @@
+.cell:focus {
+    outline: 2px solid #6c5ce7;
+    outline-offset: 2px;
+    z-index: 2;
+    box-shadow: 0 0 0 3px #ede7fa;
+}
 /* --- GAME BOARD & CELLS --- */
 #game-board-container {
     text-align: center;
