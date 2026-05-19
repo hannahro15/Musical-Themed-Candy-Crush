@@ -1,3 +1,4 @@
+
 // boardController.js - Handles board swapping and match resolution logic
 import { swapCellContents, scoreForMatch, areAdjacent } from './game.js';
 import { getLevelConfig } from './levels.js';
@@ -13,6 +14,10 @@ import { autoSaveProgress } from './gameController.js';
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay, restartContainer, nextLevelBtn, restartBtn;
 
+/**
+ * Injects DOM and UI dependencies for the board controller.
+ * @param {Object} deps
+ */
 export function setBoardControllerDeps(deps) {
   gameBoard = deps.gameBoard;
   movesDisplay = deps.movesDisplay;
@@ -23,6 +28,12 @@ export function setBoardControllerDeps(deps) {
   restartBtn = deps.restartBtn;
 }
 
+
+/**
+ * Attempts to swap two cells and resolve matches if valid.
+ * @param {HTMLElement} sourceCell
+ * @param {HTMLElement} targetCell
+ */
 export async function trySwap(sourceCell, targetCell) {
   if (gameState.isResolving || gameState.levelComplete || !gameState.timerActive) return;
   gameState.isResolving = true;
@@ -64,6 +75,13 @@ export async function trySwap(sourceCell, targetCell) {
   gameState.isResolving = false;
 }
 
+
+/**
+ * Swaps two cells, checks for a match, and reverts if no match.
+ * @param {HTMLElement} sourceCell
+ * @param {HTMLElement} targetCell
+ * @returns {Promise<boolean>} True if swap results in a match
+ */
 async function swapAndCheckMatch(sourceCell, targetCell) {
   swapCellContents(sourceCell, targetCell);
   await wait(180);
@@ -79,6 +97,11 @@ async function swapAndCheckMatch(sourceCell, targetCell) {
   return true;
 }
 
+
+/**
+ * Resolves all matches and drops, handling combos and reshuffles.
+ * @returns {Promise<{scoreGained: number, matchedCounts: Object, config: Object}>}
+ */
 async function resolveAllMatchesAndDrop() {
   let matches = findMatches(gameBoard, BOARD_SIZE);
   let scoreGained = 0;
@@ -147,6 +170,13 @@ async function resolveAllMatchesAndDrop() {
   return { scoreGained, matchedCounts, config };
 }
 
+
+/**
+ * Updates the score, total score, and objectives after matches.
+ * @param {number} scoreGained
+ * @param {Object} matchedCounts
+ * @param {Object} config
+ */
 function updateScoreAndObjectives(scoreGained, matchedCounts, config) {
   gameState.score += scoreGained;
   gameState.totalScore += scoreGained;
@@ -162,6 +192,12 @@ function updateScoreAndObjectives(scoreGained, matchedCounts, config) {
   updateObjectiveCounters(document.getElementById('objective-counters'), config.objectives, gameState);
 }
 
+
+/**
+ * Checks if all objectives are complete for the current level.
+ * @param {Object} config
+ * @returns {boolean}
+ */
 function checkWinCondition(config) {
   return config.objectives.every(obj => {
     const key = obj.label + 'Left';
@@ -169,28 +205,53 @@ function checkWinCondition(config) {
   });
 }
 
+
+/**
+ * Waits for a specified number of milliseconds.
+ * @param {number} ms
+ * @returns {Promise<void>}
+ */
 function wait(ms) {
   return new Promise(res => setTimeout(res, ms));
 }
 
+
+/**
+ * Returns the combo level for a match chain.
+ * @param {HTMLElement[][]} matches
+ * @param {number} chainCount
+ * @returns {number}
+ */
 function getComboLevel(matches, chainCount) {
   return Math.max(matches.length, chainCount);
 }
 
+
+/**
+ * Calculates the combo bonus for a match chain.
+ * @param {HTMLElement[][]} matches
+ * @param {number} chainCount
+ * @returns {number}
+ */
 function getComboBonus(matches, chainCount) {
   let bonus = 0;
-
   if (matches.length > 1) {
     bonus += (matches.length - 1) * 20;
   }
-
   if (chainCount > 1) {
     bonus += chainCount * 20;
   }
-
   return bonus;
 }
 
+
+/**
+ * Shows a score popup animation at the center of matched cells.
+ * @param {number} points
+ * @param {HTMLElement[]} cells
+ * @param {string} [type]
+ * @param {number} [comboLevel]
+ */
 function showScorePopup(points, cells, type = 'score', comboLevel = 1) {
   if (!gameBoard || !points || !cells?.length) return;
 

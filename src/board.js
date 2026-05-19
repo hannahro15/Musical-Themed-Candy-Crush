@@ -1,11 +1,24 @@
+
 // Board and match logic
 import { swapCellContents } from './game.js';
 
+/**
+ * Returns all cell elements from the game board.
+ * @param {HTMLElement} gameBoard
+ * @returns {HTMLElement[]}
+ */
 function getBoardCells(gameBoard) {
   const cells = Array.from(gameBoard.querySelectorAll('.cell'));
   return cells.length > 0 ? cells : Array.from(gameBoard.children);
 }
 
+
+/**
+ * Returns a 2D grid of cell elements.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @returns {HTMLElement[][]}
+ */
 export function getCellGrid(gameBoard, BOARD_SIZE) {
   const allCells = getBoardCells(gameBoard);
   const grid = [];
@@ -15,6 +28,13 @@ export function getCellGrid(gameBoard, BOARD_SIZE) {
   return grid;
 }
 
+
+/**
+ * Finds all horizontal and vertical match groups (3+ in a row) on the board.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @returns {HTMLElement[][]}
+ */
 export function findMatches(gameBoard, BOARD_SIZE) {
   const grid = getCellGrid(gameBoard, BOARD_SIZE);
   const matchedGroups = [];
@@ -44,6 +64,15 @@ export function findMatches(gameBoard, BOARD_SIZE) {
   return matchedGroups;
 }
 
+
+/**
+ * Returns a random symbol that won't create an immediate match at (row, col).
+ * @param {string[][]} grid
+ * @param {number} row
+ * @param {number} col
+ * @param {string[]} SYMBOLS
+ * @returns {string}
+ */
 export function getSafeSymbol(grid, row, col, SYMBOLS) {
   const forbiddenSymbols = new Set();
   if (col >= 2 && grid[row][col - 1] === grid[row][col - 2]) forbiddenSymbols.add(grid[row][col - 1]);
@@ -52,6 +81,16 @@ export function getSafeSymbol(grid, row, col, SYMBOLS) {
   return availableSymbols[Math.floor(Math.random() * availableSymbols.length)];
 }
 
+
+/**
+ * Generates a new game board with random symbols, ensuring at least one possible move.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @param {string[]} SYMBOLS
+ * @param {Function} getSafeSymbol
+ * @param {Function} hasPossibleMoves
+ * @param {Function} wireUpCellEvents
+ */
 export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
   let attempts = 0;
   let hasMove = false;
@@ -82,27 +121,44 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol,
   }
 }
 
+
+/**
+ * Checks if there is at least one possible move on the board.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @returns {boolean}
+ */
 export function hasPossibleMoves(gameBoard, BOARD_SIZE) {
   const allCells = getBoardCells(gameBoard);
 
-    function trySwapAndCheck(idx1, idx2) {
-        swapCellContents(allCells[idx1], allCells[idx2]);
-        const hasMatch = findMatches(gameBoard, BOARD_SIZE).length > 0;
-        swapCellContents(allCells[idx1], allCells[idx2]);
-        return hasMatch;
-    }
+  function trySwapAndCheck(idx1, idx2) {
+    swapCellContents(allCells[idx1], allCells[idx2]);
+    const hasMatch = findMatches(gameBoard, BOARD_SIZE).length > 0;
+    swapCellContents(allCells[idx1], allCells[idx2]);
+    return hasMatch;
+  }
 
-    for (let i = 0; i < allCells.length; i++) {
-        const row = Math.floor(i / BOARD_SIZE);
-        const col = i % BOARD_SIZE;
-        if (col < BOARD_SIZE - 1 && trySwapAndCheck(i, i + 1)) return true;
-        if (row < BOARD_SIZE - 1 && trySwapAndCheck(i, i + BOARD_SIZE)) return true;
-    }
-    return false;
+  for (let i = 0; i < allCells.length; i++) {
+    const row = Math.floor(i / BOARD_SIZE);
+    const col = i % BOARD_SIZE;
+    if (col < BOARD_SIZE - 1 && trySwapAndCheck(i, i + 1)) return true;
+    if (row < BOARD_SIZE - 1 && trySwapAndCheck(i, i + BOARD_SIZE)) return true;
+  }
+  return false;
 }
 
+
+/**
+ * Reshuffles the board if no moves are possible, or after matches are cleared.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @param {string[]} SYMBOLS
+ * @param {Function} getSafeSymbol
+ * @param {Function} hasPossibleMoves
+ * @param {Function} wireUpCellEvents
+ */
 export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
-  let allCells = getBoardCells(gameBoard);
+  const allCells = getBoardCells(gameBoard);
   let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
   let attempts = 0;
   do {
@@ -124,6 +180,14 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, ha
   }
 }
 
+
+/**
+ * Drops symbols down to fill empty spaces and refills the board after matches.
+ * @param {HTMLElement} gameBoard
+ * @param {number} BOARD_SIZE
+ * @param {string[]} SYMBOLS
+ * @param {Function} getSafeSymbol
+ */
 export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   const grid = [];
   const allCells = getBoardCells(gameBoard);
