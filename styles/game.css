@@ -177,7 +177,7 @@
     background: linear-gradient(135deg, #f3f3fa 0%, #e6eaff 100%);
     border: 2px solid #d0d0f0;
     border-radius: 16px;
-    margin: 14px auto 10px;
+    margin: 14px auto 4px;
     max-width: 200px;
     box-shadow: 0 2px 6px rgba(108, 92, 231, 0.1);
 }
@@ -315,6 +315,9 @@
 /* Mobile: Full-screen game layout */
 
 @media (max-width: 767px) {
+        #totalScoreDisplay {
+            margin-bottom: 2px !important;
+        }
     #totalScoreDisplay {
         margin-bottom: 0 !important;
     }
