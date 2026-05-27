@@ -46,7 +46,12 @@ describe('gameController', () => {
     dom.heading = mockEl();
     dom.subtitle = mockEl();
     dom.menu = mockEl();
-    dom.gameBoard = mockEl();
+    // Mock gameBoard with querySelectorAll for goHome/autoSaveProgress
+    dom.gameBoard = {
+      ...mockEl(),
+      querySelectorAll: jest.fn(() => []),
+      innerHTML: '',
+    };
     dom.movesDisplay = mockEl();
     dom.scoreDisplay = mockEl();
     dom.timerDisplay = mockEl();
@@ -58,6 +63,8 @@ describe('gameController', () => {
     dom.restartGameBtn = mockEl();
     dom.playButton = mockEl();
     dom.homeBtn = mockEl();
+    // Always mock gameOverModal for showGameOver
+    dom.gameOverModal = mockEl();
   });
 
   afterEach(() => {
@@ -80,5 +87,48 @@ describe('gameController', () => {
   test('sets highScoreDisplay textContent', () => {
     showMenu();
     expect(dom.highScoreDisplay).toBeDefined();
+  });
+
+  test('showGameOver displays the game over modal', () => {
+    jest.resetModules();
+    // Patch domElements module directly after resetModules
+    const domModule = require('../src/domElements.js');
+    const mockEl = () => ({ classList: { add: jest.fn(), remove: jest.fn() }, style: {} });
+    domModule.gameOverModal = mockEl();
+    const utils = require('../src/utils.js');
+    const showElementSpy = jest.spyOn(utils, 'showElement');
+    const { showGameOver } = require('../src/gameController.js');
+    showGameOver();
+    expect(showElementSpy).toHaveBeenCalledWith(domModule.gameOverModal);
+    showElementSpy.mockRestore();
+  });
+
+  test('goHome clears timer, sets timerActive false, and removes game-active class', () => {
+    jest.resetModules();
+    // Patch domElements module directly after resetModules
+    const domModule = require('../src/domElements.js');
+    const mockEl = () => ({
+      classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn(() => true),
+      },
+      style: {},
+    });
+    domModule.gameBoard = {
+      ...mockEl(),
+      querySelectorAll: jest.fn(() => []),
+      innerHTML: '',
+    };
+    domModule.container = mockEl();
+    // Set up gameState with timerInterval and timerActive
+    const gameControllerModule = require('../src/gameController.js');
+    const gameState = require('../src/gameState.js').gameState;
+    gameState.timerInterval = setInterval(() => {}, 1000);
+    gameState.timerActive = true;
+    gameControllerModule.goHome();
+    expect(gameState.timerActive).toBe(false);
+    expect(domModule.container.classList.remove).toHaveBeenCalledWith('game-active');
+    clearInterval(gameState.timerInterval); // Clean up
   });
 });
