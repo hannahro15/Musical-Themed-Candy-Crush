@@ -1,6 +1,6 @@
 // add tests for levels.js
 
-import { LEVELS } from '../src/levels.js';
+import { LEVELS, getLevelConfig } from '../src/levels.js';
 
 describe('LEVELS', () => {
 
@@ -113,5 +113,17 @@ describe('LEVELS', () => {
         expect(obj.count).toBeGreaterThan(0);
       });
     });
+  });
+
+  test('getLevelConfig returns correct config for valid level index', () => {
+    const levelNum = 1;
+    const config = getLevelConfig(levelNum);
+    expect(config).toBe(LEVELS[levelNum - 1]);
+  });
+
+  test('getLevelConfig returns undefined for invalid level index', () => {
+    const levelNum = 999;
+    const config = getLevelConfig(levelNum);
+    expect(config).toBeUndefined();
   });
 });
