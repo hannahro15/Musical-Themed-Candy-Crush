@@ -84,5 +84,23 @@ describe('game', () => {
     const symbol = getRandomSymbol(SYMBOLS);
     expect(SYMBOLS).toContain(symbol);
   });
+
+  test('areAdjacent returns false if one or both cells are not in the game board', () => {
+    const cellA = { row: 0, col: 0 };
+    const cellB = { row: 0, col: 1 };
+    const gameBoard = {
+      children: [cellA] // cellB is not in the game board
+    };
+    const BOARD_SIZE = 2;
+
+    expect(areAdjacent(cellA, cellB, gameBoard, BOARD_SIZE)).toBe(false);
+    expect(areAdjacent(cellB, cellA, gameBoard, BOARD_SIZE)).toBe(false);
+  });
+
+  test('scoreForMatch returns 0 for match sizes less than 3', () => {
+    expect(scoreForMatch(0)).toBe(0);
+    expect(scoreForMatch(1)).toBe(0);
+    expect(scoreForMatch(2)).toBe(0);
+  });
 });
 
