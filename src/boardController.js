@@ -10,6 +10,7 @@ import { getSafeSymbol } from './board.js';
 import { wireUpCellEvents } from './events.js';
 import { boardEventHandlers } from './boardEventHandlers.js';
 import { autoSaveProgress } from './gameController.js';
+import { announce } from './utils.js';
 
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay, restartContainer, nextLevelBtn, restartBtn;
@@ -134,6 +135,10 @@ async function resolveAllMatchesAndDrop() {
     if (comboBonus > 0) {
       scoreGained += comboBonus;
       showScorePopup(comboBonus, matches.flat(), 'combo', comboLevel);
+      announce(`Combo times ${comboLevel}! Plus ${comboBonus} points.`);
+    } else if (waveScore > 0) {
+      const matchCount = matches.length;
+      announce(`${matchCount} match${matchCount > 1 ? 'es' : ''} found! Plus ${waveScore} points.`);
     }
 
     await wait(80); // Reduced animation delay for faster match disappearance

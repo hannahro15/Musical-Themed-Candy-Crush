@@ -2,6 +2,7 @@
 import { gameState } from './gameState.js';
 import { LEVELS } from './levels.js';
 import { saveHighScore, saveHighestLevel, clearGameProgress } from './storage.js';
+import { announce } from './utils.js';
 
 
 export function handleLevelWin() {
@@ -25,6 +26,7 @@ export function handleLevelWin() {
             congratsFinalScore.textContent = `Total Score: ${finalScore.toLocaleString()}`;
         }
         if (congratsModal) congratsModal.classList.remove('hidden');
+        announce(`Congratulations! You completed all levels with a total score of ${finalScore.toLocaleString()}.`);
         return;
     }
 
@@ -33,6 +35,7 @@ export function handleLevelWin() {
     const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');
     if (nextLevelModal) nextLevelModal.classList.remove('hidden');
     if (confirmNextLevelBtn) confirmNextLevelBtn.classList.remove('hidden');
+    announce(`Level ${gameState.level} complete! Ready for the next challenge.`);
 }
 
 export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
@@ -67,6 +70,7 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
         if (gameOverModal) {
             gameOverModal.classList.remove('hidden');
         }
+        announce(`Game over. You've run out of lives. Total score: ${finalScore.toLocaleString()}.`);
         return;
     }
 
@@ -80,4 +84,5 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
     if (nextLevelBtn) {
         nextLevelBtn.classList.add('hidden');
     }
+    announce(`Level failed. You have ${gameState.lives} ${gameState.lives === 1 ? 'life' : 'lives'} remaining.`);
 }

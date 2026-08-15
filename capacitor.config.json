@@ -1,0 +1,10 @@
+{
+  "appId": "com.musicalmatchsaga.game",
+  "appName": "Musical Match Saga",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}

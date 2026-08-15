@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 build/
+www/
 
 # Test coverage
 coverage/

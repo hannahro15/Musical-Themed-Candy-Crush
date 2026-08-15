@@ -16,6 +16,7 @@ export let gameState = {
   touchStartCell: null,
   touchStartX: null,
   touchStartY: null,
+  selectedCell: null,
 };
 
 export function resetGameState(config) {
@@ -45,4 +46,7 @@ export function setTouchStartX(x) {
 }
 export function setTouchStartY(y) {
   gameState.touchStartY = y;
+}
+export function setSelectedCell(cell) {
+  gameState.selectedCell = cell;
 }

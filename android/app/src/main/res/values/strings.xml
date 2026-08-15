@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Musical Match Saga</string>
+    <string name="title_activity_main">Musical Match Saga</string>
+    <string name="package_name">com.musicalmatchsaga.game</string>
+    <string name="custom_url_scheme">com.musicalmatchsaga.game</string>
+</resources>
