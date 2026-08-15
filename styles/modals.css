@@ -40,7 +40,11 @@
   font-size: 32px;
   font-weight: bold;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.12s;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
 }
 
 .close:hover,
@@ -48,6 +52,16 @@
   color: #333;
   text-decoration: none;
   cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: 2px solid #6c5ce7;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.close:active {
+  transform: scale(0.9);
 }
 
 /* =========================
