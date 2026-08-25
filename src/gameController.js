@@ -23,6 +23,7 @@ import { setGameBoardRef, boardEventHandlers } from './boardEventHandlers.js';
 import { startTimer } from './timer.js';
 import { wireUpCellEvents } from './events.js';
 import { showElement, hideElement } from './utils.js';
+import { createGameCell } from './cellUtils.js';
 import * as dom from './domElements.js';
 
 /* -----------------------------------
@@ -210,6 +211,14 @@ function setupBoardEvents() {
   );
 }
 
+function getLevelLoseHandler() {
+  return () => handleLevelLose(
+    dom.restartContainer,
+    dom.confirmRestartBtn,
+    dom.confirmNextLevelBtn
+  );
+}
+
 /* -----------------------------------
    GAME FLOW
 ----------------------------------- */
@@ -271,7 +280,7 @@ export function continueGame() {
   }
   
   // Restore board state
-  restoreBoardState(savedProgress.boardState, config);
+  restoreBoardState(savedProgress.boardState);
   
   // Update UI
   renderLevel(config);
@@ -279,15 +288,11 @@ export function continueGame() {
   // Start timer if needed
   if (config.timer && savedProgress.timer > 0) {
     gameState.timerActive = true;
-    startTimer(
-      gameState,
-      dom.timerDisplay,
-      () => handleLevelLose(dom.restartContainer, dom.confirmRestartBtn, dom.confirmNextLevelBtn)
-    );
+    startTimer(gameState, dom.timerDisplay, getLevelLoseHandler());
   }
 }
 
-function restoreBoardState(boardState, config) {
+function restoreBoardState(boardState) {
   // Set game board reference
   setGameBoardRef(dom.gameBoard);
   
@@ -308,42 +313,13 @@ function restoreBoardState(boardState, config) {
   // Clear existing board
   dom.gameBoard.innerHTML = '';
   
-  // Recreate board from saved state
-  const symbolToClass = {
-    '🎻': 'cell-violin',
-    '🎹': 'cell-piano',
-    '🎺': 'cell-trumpet',
-    '🥁': 'cell-drum',
-    '🎷': 'cell-saxophone',
-    '🎵': 'cell-musicalnote'
-  };
   boardState.forEach((row, i) => {
     row.forEach((symbol, j) => {
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      // Add symbol-specific class for background
-      const symbolClass = symbolToClass[symbol];
-      if (symbolClass) cell.classList.add(symbolClass);
-      cell.textContent = symbol;
-      cell.dataset.row = i;
-      cell.dataset.col = j;
-      cell.draggable = true;
-      cell.tabIndex = 0;
-      cell.setAttribute('role', 'button');
-      cell.setAttribute('aria-label', `Game tile: ${symbol}, row ${i + 1}, column ${j + 1}`);
-      dom.gameBoard.appendChild(cell);
+      dom.gameBoard.appendChild(createGameCell(symbol, i, j));
     });
   });
   
-  // Wire up events
-  wireUpCellEvents(
-    dom.gameBoard,
-    BOARD_SIZE,
-    boardEventHandlers.onDragStart,
-    boardEventHandlers.onDrop,
-    boardEventHandlers.onTouchStart,
-    boardEventHandlers.onTouchEnd
-  );
+  setupBoardEvents();
 }
 
 export function startLevel(levelNumber) {
@@ -369,7 +345,7 @@ export function startLevel(levelNumber) {
   startTimer(
     gameState,
     dom.timerDisplay,
-    () => handleLevelLose(dom.restartContainer, dom.confirmRestartBtn, dom.confirmNextLevelBtn)
+    getLevelLoseHandler()
   );
 }
 

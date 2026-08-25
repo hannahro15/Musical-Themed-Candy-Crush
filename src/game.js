@@ -1,6 +1,12 @@
+import { setCellSymbol } from './cellUtils.js';
+
 // Core game logic functions
 export function swapCellContents(cellA, cellB) {
-  [cellA.textContent, cellB.textContent] = [cellB.textContent, cellA.textContent];
+  const symbolA = cellA.textContent;
+  const symbolB = cellB.textContent;
+
+  setCellSymbol(cellA, symbolB);
+  setCellSymbol(cellB, symbolA);
 }
 
 export function areAdjacent(cellA, cellB, gameBoard, BOARD_SIZE) {

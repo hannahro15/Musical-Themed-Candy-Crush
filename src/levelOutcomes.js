@@ -2,7 +2,7 @@
 import { gameState } from './gameState.js';
 import { LEVELS } from './levels.js';
 import { saveHighScore, saveHighestLevel, clearGameProgress } from './storage.js';
-import { announce } from './utils.js';
+import { announce, showElement, hideElement } from './utils.js';
 
 
 export function handleLevelWin() {
@@ -25,7 +25,7 @@ export function handleLevelWin() {
         if (congratsFinalScore) {
             congratsFinalScore.textContent = `Total Score: ${finalScore.toLocaleString()}`;
         }
-        if (congratsModal) congratsModal.classList.remove('hidden');
+        showElement(congratsModal);
         announce(`Congratulations! You completed all levels with a total score of ${finalScore.toLocaleString()}.`);
         return;
     }
@@ -33,8 +33,8 @@ export function handleLevelWin() {
     // Show next level modal and ensure Next Level button is visible
     const nextLevelModal = document.getElementById('nextLevelModal');
     const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');
-    if (nextLevelModal) nextLevelModal.classList.remove('hidden');
-    if (confirmNextLevelBtn) confirmNextLevelBtn.classList.remove('hidden');
+    showElement(nextLevelModal);
+    showElement(confirmNextLevelBtn);
     announce(`Level ${gameState.level} complete! Ready for the next challenge.`);
 }
 
@@ -67,22 +67,14 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
         if (gameOverFinalScore) {
             gameOverFinalScore.textContent = `Total Score: ${finalScore.toLocaleString()}`;
         }
-        if (gameOverModal) {
-            gameOverModal.classList.remove('hidden');
-        }
+        showElement(gameOverModal);
         announce(`Game over. You've run out of lives. Total score: ${finalScore.toLocaleString()}.`);
         return;
     }
 
     // Toggle UI elements for restart
-    if (restartContainer) {
-        restartContainer.classList.remove('hidden');
-    }
-    if (restartBtn) {
-        restartBtn.classList.remove('hidden');
-    }
-    if (nextLevelBtn) {
-        nextLevelBtn.classList.add('hidden');
-    }
+    showElement(restartContainer);
+    showElement(restartBtn);
+    hideElement(nextLevelBtn);
     announce(`Level failed. You have ${gameState.lives} ${gameState.lives === 1 ? 'life' : 'lives'} remaining.`);
 }

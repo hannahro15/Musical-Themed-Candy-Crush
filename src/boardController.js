@@ -11,6 +11,7 @@ import { wireUpCellEvents } from './events.js';
 import { boardEventHandlers } from './boardEventHandlers.js';
 import { autoSaveProgress } from './gameController.js';
 import { announce } from './utils.js';
+import { setCellSymbol } from './cellUtils.js';
 
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay, restartContainer, nextLevelBtn, restartBtn;
@@ -52,24 +53,13 @@ export async function trySwap(sourceCell, targetCell) {
   autoSaveProgress();
 
   if (checkWinCondition(config)) {
-    // Use handleLevelWin to show modal and update state
-    await wait(250); // Animation delay for match clear
-    import('./levelOutcomes.js').then(({ handleLevelWin }) => {
-      handleLevelWin();
-    });
+    await showLevelWin();
     gameState.isResolving = false;
     return;
   }
 
   if (gameState.movesLeft <= 0 && !gameState.levelComplete && gameState.timer > 0) {
-    // Show lose modal immediately if out of moves and not a win
-    await import('./levelOutcomes.js').then(({ handleLevelLose }) => {
-      // Always use confirmRestartBtn and confirmNextLevelBtn
-      const restartLevelModal = document.getElementById('restartLevelModal');
-      const confirmRestartBtn = document.getElementById('confirmRestartBtn');
-      const confirmNextLevelBtn = document.getElementById('confirmNextLevelBtn');
-      handleLevelLose(restartLevelModal, confirmRestartBtn, confirmNextLevelBtn);
-    });
+    await showLevelLose();
     gameState.isResolving = false;
     return;
   }
@@ -144,35 +134,47 @@ async function resolveAllMatchesAndDrop() {
     await wait(80); // Reduced animation delay for faster match disappearance
     for (const group of matches) {
       for (const cell of group) {
-        cell.textContent = '';
+        setCellSymbol(cell, '');
         cell.classList.remove('matched');
       }
     }
     dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol);
-    wireUpCellEvents(
-      gameBoard,
-      BOARD_SIZE,
-      boardEventHandlers.onDragStart,
-      boardEventHandlers.onDrop,
-      boardEventHandlers.onTouchStart,
-      boardEventHandlers.onTouchEnd
-    );
+    wireBoardEvents();
     matches = findMatches(gameBoard, BOARD_SIZE);
     if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
       await import('./board.js').then(({ reshuffleBoard }) => {
-        reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, () => wireUpCellEvents(
-          gameBoard,
-          BOARD_SIZE,
-          boardEventHandlers.onDragStart,
-          boardEventHandlers.onDrop,
-          boardEventHandlers.onTouchStart,
-          boardEventHandlers.onTouchEnd
-        ));
+        reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireBoardEvents);
       });
       break;
     }
   }
   return { scoreGained, matchedCounts, config };
+}
+
+function wireBoardEvents() {
+  wireUpCellEvents(
+    gameBoard,
+    BOARD_SIZE,
+    boardEventHandlers.onDragStart,
+    boardEventHandlers.onDrop,
+    boardEventHandlers.onTouchStart,
+    boardEventHandlers.onTouchEnd
+  );
+}
+
+async function showLevelWin() {
+  await wait(250);
+  const { handleLevelWin } = await import('./levelOutcomes.js');
+  handleLevelWin();
+}
+
+async function showLevelLose() {
+  const { handleLevelLose } = await import('./levelOutcomes.js');
+  handleLevelLose(
+    document.getElementById('restartLevelModal'),
+    document.getElementById('confirmRestartBtn'),
+    document.getElementById('confirmNextLevelBtn')
+  );
 }
 
 

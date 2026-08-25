@@ -1,6 +1,7 @@
 
 // Board and match logic
 import { swapCellContents } from './game.js';
+import { createGameCell, setCellSymbol } from './cellUtils.js';
 
 /**
  * Returns all cell elements from the game board.
@@ -101,24 +102,7 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol,
       for (let col = 0; col < BOARD_SIZE; col++) {
         const symbol = getSafeSymbol(grid, row, col, SYMBOLS);
         grid[row][col] = symbol;
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        // Add symbol-specific class for background
-        const symbolClass = {
-          '🎻': 'cell-violin',
-          '🎹': 'cell-piano',
-          '🎺': 'cell-trumpet',
-          '🥁': 'cell-drum',
-          '🎷': 'cell-saxophone',
-          '🎵': 'cell-musicalnote'
-        }[symbol];
-        if (symbolClass) cell.classList.add(symbolClass);
-        cell.textContent = symbol;
-        cell.draggable = true;
-        cell.tabIndex = 0;
-        cell.setAttribute('role', 'button');
-        cell.setAttribute('aria-label', `Game tile: ${symbol}, row ${row + 1}, column ${col + 1}`);
-        gameBoard.appendChild(cell);
+        gameBoard.appendChild(createGameCell(symbol, row, col));
       }
     }
     // Check for at least one possible move
@@ -171,27 +155,13 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, ha
   const allCells = getBoardCells(gameBoard);
   let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
   let attempts = 0;
-  const symbolToClass = {
-    '🎻': 'cell-violin',
-    '🎹': 'cell-piano',
-    '🎺': 'cell-trumpet',
-    '🥁': 'cell-drum',
-    '🎷': 'cell-saxophone',
-    '🎵': 'cell-musicalnote'
-  };
-  function updateCellClass(cell) {
-    Object.values(symbolToClass).forEach(cls => cell.classList.remove(cls));
-    const symbolClass = symbolToClass[cell.textContent];
-    if (symbolClass) cell.classList.add(symbolClass);
-  }
   do {
     for (let i = symbols.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [symbols[i], symbols[j]] = [symbols[j], symbols[i]];
     }
     allCells.forEach((cell, idx) => {
-      cell.textContent = symbols[idx] || '';
-      updateCellClass(cell);
+      setCellSymbol(cell, symbols[idx] || '');
     });
     attempts++;
     if (attempts > 20) {
@@ -215,19 +185,6 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, ha
 export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   const grid = [];
   const allCells = getBoardCells(gameBoard);
-  const symbolToClass = {
-    '🎻': 'cell-violin',
-    '🎹': 'cell-piano',
-    '🎺': 'cell-trumpet',
-    '🥁': 'cell-drum',
-    '🎷': 'cell-saxophone',
-    '🎵': 'cell-musicalnote'
-  };
-  function updateCellClass(cell) {
-    Object.values(symbolToClass).forEach(cls => cell.classList.remove(cls));
-    const symbolClass = symbolToClass[cell.textContent];
-    if (symbolClass) cell.classList.add(symbolClass);
-  }
   for (let row = 0; row < BOARD_SIZE; row++) {
     grid[row] = [];
     for (let col = 0; col < BOARD_SIZE; col++) {
@@ -240,21 +197,20 @@ export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
       if (!grid[row][col].textContent) {
         emptySpots++;
       } else if (emptySpots > 0) {
-        grid[row + emptySpots][col].textContent = grid[row][col].textContent;
-        updateCellClass(grid[row + emptySpots][col]);
-        grid[row][col].textContent = '';
-        updateCellClass(grid[row][col]);
+        setCellSymbol(grid[row + emptySpots][col], grid[row][col].textContent);
+        setCellSymbol(grid[row][col], '');
       }
     }
     for (let row = 0; row < emptySpots; row++) {
-      grid[row][col].textContent = getSafeSymbol(
-        grid.map(r => r.map(c => c.textContent)),
-        row,
-        col,
-        SYMBOLS
+      setCellSymbol(
+        grid[row][col],
+        getSafeSymbol(
+          grid.map(r => r.map(c => c.textContent)),
+          row,
+          col,
+          SYMBOLS
+        )
       );
-      updateCellClass(grid[row][col]);
     }
   }
 }
-

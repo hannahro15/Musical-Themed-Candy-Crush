@@ -5,8 +5,6 @@ import { showElement, hideElement } from './utils.js';
 import * as dom from './domElements.js';
 import {
   showMenu,
-  showGameUI,
-  showGameOver,
   hideGameOver,
   startGame,
   continueGame,
@@ -30,14 +28,6 @@ function bindEvents() {
   // Continue Game button event
   if (dom.continueButton) {
     dom.continueButton.addEventListener('click', continueGame);
-  }
-
-  // Restart Game button event
-  if (dom.restartGameButton) {
-    dom.restartGameButton.addEventListener('click', () => {
-      const { restartGame } = require('./gameController.js');
-      restartGame();
-    });
   }
 
   // Home button event (during gameplay)
