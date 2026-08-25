@@ -13,6 +13,10 @@ function buildCellAriaLabel(symbol, row, col) {
   return `Game tile: ${symbol}, row ${row + 1}, column ${col + 1}`;
 }
 
+function buildEmptyCellAriaLabel(row, col) {
+  return `Empty tile, row ${row + 1}, column ${col + 1}`;
+}
+
 export function updateCellAppearance(cell) {
   SYMBOL_CLASSES.forEach((className) => cell.classList.remove(className));
 
@@ -28,11 +32,17 @@ export function updateCellAppearance(cell) {
   const row = hasCoordinates ? Number(cell.dataset.row) : NaN;
   const col = hasCoordinates ? Number(cell.dataset.col) : NaN;
 
-  if (cell.textContent && Number.isInteger(row) && Number.isInteger(col)) {
-    cell.setAttribute('aria-label', buildCellAriaLabel(cell.textContent, row, col));
-  } else {
+  if (!Number.isInteger(row) || !Number.isInteger(col)) {
     cell.removeAttribute('aria-label');
+    return;
   }
+
+  if (cell.textContent) {
+    cell.setAttribute('aria-label', buildCellAriaLabel(cell.textContent, row, col));
+    return;
+  }
+
+  cell.setAttribute('aria-label', buildEmptyCellAriaLabel(row, col));
 }
 
 export function setCellSymbol(cell, symbol) {
