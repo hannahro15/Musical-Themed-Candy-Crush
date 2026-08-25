@@ -103,16 +103,29 @@ export function renderLeaderboard(entries) {
     return;
   }
 
-  list.innerHTML = entries
-    .map((entry, i) => {
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
-      return `<li class="leaderboard-entry">
-        <span class="leaderboard-rank">${medal}</span>
-        <span class="leaderboard-score">${entry.score.toLocaleString()}</span>
-        <span class="leaderboard-meta">Lvl ${entry.level} &bull; ${entry.date}</span>
-      </li>`;
-    })
-    .join('');
+  list.innerHTML = '';
+  entries.forEach((entry, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+    const li = document.createElement('li');
+    li.className = 'leaderboard-entry';
+
+    const rankSpan = document.createElement('span');
+    rankSpan.className = 'leaderboard-rank';
+    rankSpan.textContent = medal;
+
+    const scoreSpan = document.createElement('span');
+    scoreSpan.className = 'leaderboard-score';
+    scoreSpan.textContent = Number(entry.score).toLocaleString();
+
+    const metaSpan = document.createElement('span');
+    metaSpan.className = 'leaderboard-meta';
+    metaSpan.textContent = `Lvl ${Number(entry.level)} \u2022 ${String(entry.date)}`;
+
+    li.appendChild(rankSpan);
+    li.appendChild(scoreSpan);
+    li.appendChild(metaSpan);
+    list.appendChild(li);
+  });
 
   section.classList.remove('hidden');
 }
