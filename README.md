@@ -32,8 +32,9 @@ A musical twist on the classic match-3 formula. Swap and match musical symbols, 
 7. [Test Coverage](#test-coverage)
 
 8. [Known Issues](#known-issues)
-9. [Roadmap](#roadmap)
-10. [Credits](#credits)
+9. [Android Release & Play Store](#android-release--play-store)
+10. [Roadmap](#roadmap)
+11. [Credits](#credits)
 
 ---
 
@@ -200,7 +201,15 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 - Further accessibility testing and improvements are ongoing.
 - UI is responsive, but additional polish and real-device/mobile browser testing are planned.
 - Sound effects and music not yet implemented.
-- App packaging for Android / Play Store deployment has not yet been completed.
+- Android release setup is in progress, but Play Store testing, final assets, and console submission still need to be completed.
+
+---
+
+## Android Release & Play Store
+
+- The Android app shell is configured with Capacitor in `android/`.
+- See `android/app/build.gradle` for the current Android `versionCode` and `versionName`.
+- For the repo-specific publish workflow, see `docs/google-play-publish-checklist.md`.
 
 ---
 
@@ -222,5 +231,3 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 Created and maintained by Hannah Olbrich (solo project).
 Emoji icons from [Unicode](https://unicode.org/emoji/).
 AI-assisted development with GitHub Copilot.
-
-
