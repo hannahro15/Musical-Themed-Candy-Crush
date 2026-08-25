@@ -1,7 +1,7 @@
 // levelOutcomes.js - Handles win/lose outcomes for levels
 import { gameState } from './gameState.js';
 import { LEVELS } from './levels.js';
-import { saveHighScore, saveHighestLevel, clearGameProgress } from './storage.js';
+import { saveHighScore, saveHighestLevel, clearGameProgress, addLeaderboardEntry } from './storage.js';
 import { announce } from './utils.js';
 
 
@@ -19,6 +19,7 @@ export function handleLevelWin() {
         saveHighScore(finalScore);
         saveHighestLevel(LEVELS.length);
         clearGameProgress();
+        addLeaderboardEntry(finalScore, LEVELS.length);
 
         const congratsModal = document.getElementById('congratsModal');
         const congratsFinalScore = document.getElementById('congratsFinalScore');
@@ -61,6 +62,7 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
         // Save high score if it's a new record and clear saved progress
         saveHighScore(finalScore);
         clearGameProgress();
+        addLeaderboardEntry(finalScore, gameState.level);
 
         const gameOverModal = document.getElementById('gameOverModal');
         const gameOverFinalScore = document.getElementById('gameOverFinalScore');

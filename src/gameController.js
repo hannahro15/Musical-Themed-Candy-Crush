@@ -8,9 +8,10 @@ import {
   updateScoreDisplay,
   updateLivesDisplay,
   updateTotalScoreDisplay,
-  updateHighScoreDisplay
+  updateHighScoreDisplay,
+  renderLeaderboard
 } from './ui.js';
-import { getHighScore, saveHighScore, getHighestLevel, saveHighestLevel, loadGameProgress, clearGameProgress, saveGameProgress } from './storage.js';
+import { getHighScore, saveHighScore, getHighestLevel, saveHighestLevel, loadGameProgress, clearGameProgress, saveGameProgress, getLeaderboard } from './storage.js';
 import {
   getSafeSymbol,
   hasPossibleMoves,
@@ -52,6 +53,9 @@ export function showMenu() {
     dom.highestLevelDisplay.textContent = `Highest Level: ${highestLevel}`;
     showElement(dom.highestLevelDisplay);
   }
+
+  // Render local leaderboard
+  renderLeaderboard(getLeaderboard());
   
   // Show/hide continue button, restart button, and play button based on saved progress
   const savedProgress = loadGameProgress();

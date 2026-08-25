@@ -293,6 +293,173 @@ export const LEVELS = [
     distractors: [],
     comboChallenge: true,
     note: 'All six instruments - the grand finale!'
+  },
+
+  // Level 21: Encore - three objectives, very high counts
+  {
+    moves: 28,
+    objectives: [
+      { symbol: '🎻', label: 'violin', count: 16 },
+      { symbol: '🎹', label: 'piano', count: 14 },
+      { symbol: '🎷', label: 'saxophone', count: 12 }
+    ],
+    timer: 70,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: ['🎺', '🥁', '🎵'],
+    comboChallenge: true,
+    note: 'Encore - high counts, three objectives'
+  },
+
+  // Level 22: Speed Run - four objectives, tight timer
+  {
+    moves: 30,
+    objectives: [
+      { symbol: '🎺', label: 'trumpet', count: 12 },
+      { symbol: '🥁', label: 'drum', count: 12 },
+      { symbol: '🎵', label: 'musicalNote', count: 10 },
+      { symbol: '🎷', label: 'saxophone', count: 10 }
+    ],
+    timer: 55,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: ['🎻', '🎹'],
+    comboChallenge: true,
+    note: 'Speed run - four objectives, tight timer'
+  },
+
+  // Level 23: Precision - five objectives, limited moves
+  {
+    moves: 26,
+    objectives: [
+      { symbol: '🎻', label: 'violin', count: 10 },
+      { symbol: '🎹', label: 'piano', count: 10 },
+      { symbol: '🎺', label: 'trumpet', count: 8 },
+      { symbol: '🥁', label: 'drum', count: 8 },
+      { symbol: '🎷', label: 'saxophone', count: 6 }
+    ],
+    timer: 70,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: ['🎵'],
+    comboChallenge: true,
+    note: 'Precision - five objectives, limited moves'
+  },
+
+  // Level 24: Double Down - two objectives, very high counts
+  {
+    moves: 32,
+    objectives: [
+      { symbol: '🎵', label: 'musicalNote', count: 20 },
+      { symbol: '🥁', label: 'drum', count: 18 }
+    ],
+    timer: 65,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: ['🎻', '🎹', '🎺', '🎷'],
+    comboChallenge: true,
+    note: 'Double down - two objectives, massive counts'
+  },
+
+  // Level 25: Rush - six objectives, very tight timer
+  {
+    moves: 36,
+    objectives: [
+      { symbol: '🎻', label: 'violin', count: 10 },
+      { symbol: '🎹', label: 'piano', count: 10 },
+      { symbol: '🎺', label: 'trumpet', count: 8 },
+      { symbol: '🥁', label: 'drum', count: 8 },
+      { symbol: '🎷', label: 'saxophone', count: 8 },
+      { symbol: '🎵', label: 'musicalNote', count: 6 }
+    ],
+    timer: 50,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: [],
+    comboChallenge: true,
+    note: 'Rush - all six instruments, very tight timer'
+  },
+
+  // Level 26: Blitz - four objectives, minimal moves
+  {
+    moves: 24,
+    objectives: [
+      { symbol: '🎹', label: 'piano', count: 14 },
+      { symbol: '🎺', label: 'trumpet', count: 12 },
+      { symbol: '🎵', label: 'musicalNote', count: 12 },
+      { symbol: '🎷', label: 'saxophone', count: 10 }
+    ],
+    timer: 60,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: ['🎻', '🥁'],
+    comboChallenge: true,
+    note: 'Blitz - four objectives, minimal moves'
+  },
+
+  // Level 27: Marathon - five objectives, high counts, generous moves
+  {
+    moves: 40,
+    objectives: [
+      { symbol: '🎻', label: 'violin', count: 16 },
+      { symbol: '🎹', label: 'piano', count: 14 },
+      { symbol: '🎷', label: 'saxophone', count: 14 },
+      { symbol: '🎺', label: 'trumpet', count: 12 },
+      { symbol: '🥁', label: 'drum', count: 10 }
+    ],
+    timer: 55,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: ['🎵'],
+    comboChallenge: true,
+    note: 'Marathon - five objectives, high counts'
+  },
+
+  // Level 28: Gauntlet - six objectives, fewest moves yet
+  {
+    moves: 30,
+    objectives: [
+      { symbol: '🎻', label: 'violin', count: 10 },
+      { symbol: '🎹', label: 'piano', count: 10 },
+      { symbol: '🎺', label: 'trumpet', count: 10 },
+      { symbol: '🥁', label: 'drum', count: 10 },
+      { symbol: '🎷', label: 'saxophone', count: 10 },
+      { symbol: '🎵', label: 'musicalNote', count: 10 }
+    ],
+    timer: 55,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: [],
+    comboChallenge: true,
+    note: 'Gauntlet - balanced six instruments, tight limits'
+  },
+
+  // Level 29: Crescendo - six objectives, escalating counts
+  {
+    moves: 38,
+    objectives: [
+      { symbol: '🎵', label: 'musicalNote', count: 16 },
+      { symbol: '🎷', label: 'saxophone', count: 14 },
+      { symbol: '🎺', label: 'trumpet', count: 14 },
+      { symbol: '🥁', label: 'drum', count: 12 },
+      { symbol: '🎹', label: 'piano', count: 12 },
+      { symbol: '🎻', label: 'violin', count: 10 }
+    ],
+    timer: 50,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: [],
+    comboChallenge: true,
+    note: 'Crescendo - escalating six-instrument challenge'
+  },
+
+  // Level 30: Magnum Opus - all six, maximum counts, ultimate test
+  {
+    moves: 45,
+    objectives: [
+      { symbol: '🎻', label: 'violin', count: 18 },
+      { symbol: '🎹', label: 'piano', count: 18 },
+      { symbol: '🎺', label: 'trumpet', count: 16 },
+      { symbol: '🥁', label: 'drum', count: 14 },
+      { symbol: '🎷', label: 'saxophone', count: 14 },
+      { symbol: '🎵', label: 'musicalNote', count: 12 }
+    ],
+    timer: 45,
+    winCondition: (state) => state.objectives.every(obj => state[obj.label + 'Left'] === 0),
+    distractors: [],
+    comboChallenge: true,
+    note: 'Magnum Opus - the ultimate 30-level finale!'
   }
 ];
 

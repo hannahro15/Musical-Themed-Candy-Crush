@@ -87,3 +87,32 @@ export function hideGameOver() {
   const gameOverElement = document.getElementById('game-over');
   if (gameOverElement) gameOverElement.classList.add('hidden');
 }
+
+/**
+ * Renders leaderboard entries into the leaderboard list element.
+ * Shows the section if entries exist, hides it otherwise.
+ * @param {Array<{score: number, level: number, date: string}>} entries
+ */
+export function renderLeaderboard(entries) {
+  const section = document.getElementById('leaderboardSection');
+  const list = document.getElementById('leaderboardList');
+  if (!section || !list) return;
+
+  if (!entries || entries.length === 0) {
+    section.classList.add('hidden');
+    return;
+  }
+
+  list.innerHTML = entries
+    .map((entry, i) => {
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+      return `<li class="leaderboard-entry">
+        <span class="leaderboard-rank">${medal}</span>
+        <span class="leaderboard-score">${entry.score.toLocaleString()}</span>
+        <span class="leaderboard-meta">Lvl ${entry.level} &bull; ${entry.date}</span>
+      </li>`;
+    })
+    .join('');
+
+  section.classList.remove('hidden');
+}

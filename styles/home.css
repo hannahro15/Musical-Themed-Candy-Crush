@@ -548,3 +548,59 @@ h1 {
     overflow: hidden;
   }
 }
+/* =========================
+   LEADERBOARD
+   ========================= */
+
+.leaderboard-section {
+  margin: 12px auto 0;
+  max-width: 320px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 12px rgba(108, 92, 231, 0.15);
+}
+
+.leaderboard-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #6c5ce7;
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(108, 92, 231, 0.1);
+}
+
+.leaderboard-entry:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-rank {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.leaderboard-score {
+  flex: 1;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.leaderboard-meta {
+  font-size: 0.75rem;
+  color: #636e72;
+}
