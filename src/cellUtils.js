@@ -21,8 +21,13 @@ export function updateCellAppearance(cell) {
     cell.classList.add(symbolClass);
   }
 
-  const row = Number(cell.dataset.row);
-  const col = Number(cell.dataset.col);
+  const hasCoordinates = cell.dataset.row !== undefined
+    && cell.dataset.col !== undefined
+    && cell.dataset.row !== ''
+    && cell.dataset.col !== '';
+  const row = hasCoordinates ? Number(cell.dataset.row) : NaN;
+  const col = hasCoordinates ? Number(cell.dataset.col) : NaN;
+
   if (cell.textContent && Number.isInteger(row) && Number.isInteger(col)) {
     cell.setAttribute('aria-label', buildCellAriaLabel(cell.textContent, row, col));
   } else {

@@ -60,7 +60,7 @@ describe('gameController', () => {
     dom.highScoreDisplay = { ...mockEl(), textContent: '' };
     dom.highestLevelDisplay = { ...mockEl(), textContent: '' };
     dom.continueButton = mockEl();
-    dom.restartGameBtn = mockEl();
+    dom.restartGameButton = mockEl();
     dom.playButton = mockEl();
     dom.homeBtn = mockEl();
     // Always mock gameOverModal for showGameOver

@@ -61,8 +61,8 @@ export function showMenu() {
     if (dom.continueButton) {
       showElement(dom.continueButton);
     }
-    if (dom.restartGameBtn) {
-      showElement(dom.restartGameBtn);
+    if (dom.restartGameButton) {
+      showElement(dom.restartGameButton);
     }
     if (dom.playButton) {
       hideElement(dom.playButton);
@@ -72,8 +72,8 @@ export function showMenu() {
     if (dom.continueButton) {
       hideElement(dom.continueButton);
     }
-    if (dom.restartGameBtn) {
-      hideElement(dom.restartGameBtn);
+    if (dom.restartGameButton) {
+      hideElement(dom.restartGameButton);
     }
     if (dom.playButton) {
       showElement(dom.playButton);

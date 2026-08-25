@@ -113,7 +113,7 @@ export function loadGameProgress() {
 export function clearGameProgress() {
   try {
     const parsed = readStorageData();
-    if (Object.keys(parsed).length > 0) {
+    if ('savedProgress' in parsed) {
       delete parsed.savedProgress;
       writeStorageData(parsed);
       return true;
