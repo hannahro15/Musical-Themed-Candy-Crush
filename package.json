@@ -2,7 +2,10 @@
   "type": "module",
   "scripts": {
     "build": "node build-www.js",
-    "cap:sync": "npm run build && npx cap sync android"
+    "cap:sync": "npm run build && ./node_modules/.bin/cap sync android",
+    "test": "npx jest",
+    "test:coverage": "npx jest --coverage",
+    "android:bundle": "npm run cap:sync && cd android && ./gradlew bundleRelease"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.2",
