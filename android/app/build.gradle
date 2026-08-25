@@ -43,7 +43,10 @@ android {
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            def releaseSigningConfig = signingConfigs.findByName('release')
+            if (hasReleaseSigning && releaseSigningConfig != null) {
+                signingConfig releaseSigningConfig
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

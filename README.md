@@ -204,7 +204,7 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 ## Android Release & Play Store
 
 - The Android app shell is configured with Capacitor in `android/`.
-- Release builds use `versionCode 2` and `versionName 1.0.1` as the current starting point.
+- See `android/app/build.gradle` for the current Android `versionCode` and `versionName`.
 - For the repo-specific publish workflow, see `docs/google-play-publish-checklist.md`.
 
 ---

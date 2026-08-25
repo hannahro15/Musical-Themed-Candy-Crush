@@ -51,8 +51,8 @@ The release bundle output is expected at:
 
 Review and replace these Android assets if you want updated release branding:
 
-- launcher icons in `android/app/src/main/res/mipmap-*/`
-- round launcher icons in `android/app/src/main/res/mipmap-*/`
+- launcher icons (`ic_launcher*`) in `android/app/src/main/res/mipmap-*/`
+- round launcher icons (`ic_launcher_round*`) in `android/app/src/main/res/mipmap-*/`
 - splash assets in `android/app/src/main/res/drawable*/splash.png`
 
 Also verify the web app icons used by the packaged app:
