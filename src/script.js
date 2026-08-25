@@ -79,8 +79,8 @@ function bindEvents() {
   }
 
   // Restart Game button event
-  if (dom.restartGameBtn) {
-    dom.restartGameBtn.addEventListener('click', restartGameFromBeginning);
+  if (dom.restartGameButton) {
+    dom.restartGameButton.addEventListener('click', restartGameFromBeginning);
   }
 
   // Restart modal events

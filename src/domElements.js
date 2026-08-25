@@ -3,7 +3,8 @@
 // Menu elements
 export const playButton = document.getElementById('playBtn');
 export const continueButton = document.getElementById('continueBtn');
-export const restartGameBtn = document.getElementById('restartGameBtn');
+export const restartGameButton = document.getElementById('restartGameBtn');
+export const restartGameBtn = restartGameButton;
 export const howToPlayBtn = document.getElementById('howToPlayBtn');
 export const homeBtn = document.getElementById('homeBtn');
 export const container = document.querySelector('.container');
