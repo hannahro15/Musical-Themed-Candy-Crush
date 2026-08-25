@@ -12,6 +12,7 @@ import { boardEventHandlers } from './boardEventHandlers.js';
 import { autoSaveProgress } from './gameController.js';
 import { announce } from './utils.js';
 import { setCellSymbol } from './cellUtils.js';
+import * as dom from './domElements.js';
 
 // These will be injected from script.js
 let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay, restartContainer, nextLevelBtn, restartBtn;
@@ -171,9 +172,9 @@ async function showLevelWin() {
 async function showLevelLose() {
   const { handleLevelLose } = await import('./levelOutcomes.js');
   handleLevelLose(
-    document.getElementById('restartLevelModal'),
-    document.getElementById('confirmRestartBtn'),
-    document.getElementById('confirmNextLevelBtn')
+    dom.restartContainer,
+    dom.confirmRestartBtn,
+    dom.confirmNextLevelBtn
   );
 }
 
