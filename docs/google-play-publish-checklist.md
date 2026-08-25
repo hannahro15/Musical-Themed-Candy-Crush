@@ -11,7 +11,7 @@ This checklist is tailored to the current Musical Match Saga repository and Andr
 - Increase both values before each Play Store release.
 - Create a release keystore and keep it out of source control.
 
-Create `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/android/keystore.properties` with:
+Create `android/keystore.properties` with:
 
 ```properties
 storeFile=/absolute/path/to/your-upload-keystore.jks
@@ -29,7 +29,7 @@ You can also provide the same values through these environment variables:
 
 ## 2. Build the Play Store bundle
 
-From `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush` run:
+From the repository root run:
 
 ```bash
 npm install
@@ -45,20 +45,20 @@ This does all of the following:
 
 The release bundle output is expected at:
 
-`/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/android/app/build/outputs/bundle/release/app-release.aab`
+`android/app/build/outputs/bundle/release/app-release.aab`
 
 ## 3. Verify Android assets before upload
 
 Review and replace these Android assets if you want updated release branding:
 
-- launcher icons in `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/android/app/src/main/res/mipmap-*/`
-- round launcher icons in `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/android/app/src/main/res/mipmap-*/`
-- splash assets in `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/android/app/src/main/res/drawable*/splash.png`
+- launcher icons in `android/app/src/main/res/mipmap-*/`
+- round launcher icons in `android/app/src/main/res/mipmap-*/`
+- splash assets in `android/app/src/main/res/drawable*/splash.png`
 
 Also verify the web app icons used by the packaged app:
 
-- `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/images/icon-192.svg`
-- `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/images/icon-512.svg`
+- `images/icon-192.svg`
+- `images/icon-512.svg`
 
 ## 4. Confirm privacy and Play policy answers
 
@@ -79,7 +79,7 @@ Use those facts when completing:
 
 Privacy policy source in the repo:
 
-- `/home/runner/work/Musical-Themed-Candy-Crush/Musical-Themed-Candy-Crush/privacy.html`
+- `privacy.html`
 
 ## 5. Prepare the Play Store listing
 

@@ -43,23 +43,27 @@ android {
     }
     buildTypes {
         release {
-            if (hasReleaseSigning) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
-tasks.configureEach { task ->
-    if ((task.name == 'bundleRelease' || task.name == 'assembleRelease') && !hasReleaseSigning) {
-        task.doFirst {
-            throw new GradleException(
-                "Release signing is not configured. Add android/keystore.properties or set " +
-                "ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, and ANDROID_KEY_PASSWORD."
-            )
-        }
+gradle.taskGraph.whenReady { graph ->
+    if (
+        !hasReleaseSigning &&
+        (
+            graph.hasTask(':app:bundleRelease') ||
+            graph.hasTask(':app:assembleRelease') ||
+            graph.hasTask('bundleRelease') ||
+            graph.hasTask('assembleRelease')
+        )
+    ) {
+        throw new GradleException(
+            "Release signing is not configured. Add android/keystore.properties or set " +
+            "ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, and ANDROID_KEY_PASSWORD."
+        )
     }
 }
 
