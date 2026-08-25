@@ -29,10 +29,10 @@ export function updateCellAppearance(cell) {
     && cell.dataset.col !== undefined
     && cell.dataset.row !== ''
     && cell.dataset.col !== '';
-  const row = hasCoordinates ? Number(cell.dataset.row) : NaN;
-  const col = hasCoordinates ? Number(cell.dataset.col) : NaN;
+  const row = hasCoordinates ? Number.parseInt(cell.dataset.row, 10) : NaN;
+  const col = hasCoordinates ? Number.parseInt(cell.dataset.col, 10) : NaN;
 
-  if (!Number.isInteger(row) || !Number.isInteger(col)) {
+  if (!Number.isFinite(row) || !Number.isFinite(col)) {
     cell.removeAttribute('aria-label');
     return;
   }
