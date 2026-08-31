@@ -19,11 +19,21 @@ export let gameState = {
   selectedCell: null,
 };
 
+/**
+ * True for dynamic objective-progress keys (e.g. "violinLeft"), which are
+ * distinguished from the fixed "movesLeft" field by the same "Left" suffix.
+ * @param {string} key
+ * @returns {boolean}
+ */
+export function isObjectiveKey(key) {
+  return key.endsWith('Left') && key !== 'movesLeft';
+}
+
 export function resetGameState(config) {
   gameState.movesLeft = config.moves;
   gameState.score = 0;
   Object.keys(gameState).forEach(key => {
-    if (key.endsWith('Left') && key !== 'movesLeft') delete gameState[key];
+    if (isObjectiveKey(key)) delete gameState[key];
   });
   if (config.objectives && Array.isArray(config.objectives)) {
     config.objectives.forEach(obj => {

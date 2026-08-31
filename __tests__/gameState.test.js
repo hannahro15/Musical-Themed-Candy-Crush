@@ -1,6 +1,6 @@
 // gameState.test.js - Unit tests for gameState.js
 // Add your tests here
-import { gameState, resetGameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from '../src/gameState.js';
+import { gameState, resetGameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY, setSelectedCell, isObjectiveKey } from '../src/gameState.js';
 
 
 describe('gameState', () => {
@@ -130,5 +130,29 @@ describe('gameState', () => {
     expect(gameState.levelComplete).toBe(false);
     expect(gameState.timer).toBe(20);
     expect(gameState.timerActive).toBe(true);
+  });
+
+  test('setSelectedCell updates and resets selectedCell', () => {
+    const cell = { id: 'cell5' };
+    setSelectedCell(cell);
+    expect(gameState.selectedCell).toBe(cell);
+    setSelectedCell(null);
+    expect(gameState.selectedCell).toBeNull();
+  });
+});
+
+describe('isObjectiveKey', () => {
+  test('is true for dynamic objective-progress keys', () => {
+    expect(isObjectiveKey('violinLeft')).toBe(true);
+    expect(isObjectiveKey('pianoLeft')).toBe(true);
+  });
+
+  test('excludes movesLeft, which is not an objective', () => {
+    expect(isObjectiveKey('movesLeft')).toBe(false);
+  });
+
+  test('is false for keys that do not end in Left', () => {
+    expect(isObjectiveKey('score')).toBe(false);
+    expect(isObjectiveKey('level')).toBe(false);
   });
 });

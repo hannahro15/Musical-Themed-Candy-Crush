@@ -2,6 +2,11 @@
      BASE & GLOBAL STYLES
      ========================= */
 
+:root {
+    --color-primary: #6c5ce7;
+    --color-primary-dark: #5849c7;
+}
+
 /* 1. Global Box Sizing */
 html {
     box-sizing: border-box;
@@ -50,7 +55,7 @@ button {
 button:focus,
 [tabindex]:focus,
 a:focus {
-    outline: 3px solid #6c5ce7;
+    outline: 3px solid var(--color-primary);
     outline-offset: 2px;
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
     transition: outline 0.2s, box-shadow 0.2s;

@@ -32,7 +32,7 @@ describe('gameController', () => {
       }
       return null;
     });
-    global.document.querySelector = jest.fn((selector) => {
+    global.document.querySelector = jest.fn(() => {
       return { classList: { add: jest.fn(), remove: jest.fn() }, style: {} };
     });
   });

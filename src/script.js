@@ -5,8 +5,6 @@ import { showElement, hideElement } from './utils.js';
 import * as dom from './domElements.js';
 import {
   showMenu,
-  showGameUI,
-  showGameOver,
   hideGameOver,
   startGame,
   continueGame,
@@ -32,17 +30,9 @@ function bindEvents() {
     dom.continueButton.addEventListener('click', continueGame);
   }
 
-  // Restart Game button event
-  if (dom.restartGameButton) {
-    dom.restartGameButton.addEventListener('click', () => {
-      const { restartGame } = require('./gameController.js');
-      restartGame();
-    });
-  }
-
   // Home button event (during gameplay)
   if (dom.homeBtn) {
-    dom.homeBtn.addEventListener('click', (e) => {
+    dom.homeBtn.addEventListener('click', () => {
       // Only show confirm modal if in game (board is visible)
       if (!dom.gameBoardContainer.classList.contains('hidden')) {
         const modal = document.getElementById('confirmHomeModal');
@@ -61,7 +51,6 @@ function bindEvents() {
 
         function handleConfirm() {
           cleanup();
-          if (typeof saveGameProgress === 'function') saveGameProgress();
           goHome();
         }
         function handleCancel() {
@@ -170,6 +159,41 @@ function bindEvents() {
 }
 
 /* -----------------------------------
+   ANDROID BACK BUTTON (Capacitor)
+----------------------------------- */
+
+/**
+ * Wires the hardware/gesture back button on Android to something sane:
+ * close whichever modal is open, else fall back to the Home button's own
+ * confirm-and-save flow during gameplay, else exit the app from the menu.
+ *
+ * The project has no JS bundler, so the @capacitor/app plugin (installed
+ * so `npx cap sync` pulls in its native Android code) is reached via the
+ * `window.Capacitor` bridge the native shell injects at runtime, rather
+ * than an ES import — that import wouldn't resolve in a plain browser
+ * (including the GitHub Pages build), and this guards to a no-op there.
+ */
+function bindAndroidBackButton() {
+  const CapacitorApp = window.Capacitor?.Plugins?.App;
+  if (!CapacitorApp?.addListener) return;
+
+  CapacitorApp.addListener('backButton', () => {
+    const openModal = document.querySelector('.modal:not(.hidden)');
+    if (openModal) {
+      hideElement(openModal);
+      return;
+    }
+
+    if (dom.container?.classList.contains('game-active')) {
+      dom.homeBtn?.click();
+      return;
+    }
+
+    CapacitorApp.exitApp();
+  });
+}
+
+/* -----------------------------------
    INITIALIZATION
 ----------------------------------- */
 
@@ -178,13 +202,11 @@ function init() {
     gameBoard: dom.gameBoard,
     movesDisplay: dom.movesDisplay,
     scoreDisplay: dom.scoreDisplay,
-    totalScoreDisplay: dom.totalScoreDisplay,
-    restartContainer: dom.restartContainer,
-    restartBtn: dom.confirmRestartBtn,
-    nextLevelBtn: dom.confirmNextLevelBtn
+    totalScoreDisplay: dom.totalScoreDisplay
   });
 
   bindEvents();
+  bindAndroidBackButton();
   showMenu();
 }
 

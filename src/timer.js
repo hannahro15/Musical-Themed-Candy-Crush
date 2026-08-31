@@ -1,6 +1,5 @@
 // timer.js - Handles timer logic for the game
 import { updateTimerDisplay } from './ui.js';
-import { INITIAL_LIVES } from './constants.js';
 
 export function startTimer(gameState, timerDisplay, handleLevelLose) {
     clearInterval(gameState.timerInterval);

@@ -1,6 +1,17 @@
 
 // Board and match logic
 import { swapCellContents } from './game.js';
+import { SYMBOL_TO_CLASS } from './constants.js';
+
+/**
+ * Applies the symbol-specific background class to a cell, clearing any prior one.
+ * @param {HTMLElement} cell
+ */
+export function updateCellClass(cell) {
+  Object.values(SYMBOL_TO_CLASS).forEach(cls => cell.classList.remove(cls));
+  const symbolClass = SYMBOL_TO_CLASS[cell.textContent];
+  if (symbolClass) cell.classList.add(symbolClass);
+}
 
 /**
  * Returns all cell elements from the game board.
@@ -93,7 +104,7 @@ export function getSafeSymbol(grid, row, col, SYMBOLS) {
  */
 export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, hasPossibleMoves, wireUpCellEvents) {
   let attempts = 0;
-  let hasMove = false;
+  let hasMove;
   do {
     gameBoard.innerHTML = '';
     const grid = Array.from({ length: BOARD_SIZE }, () => []);
@@ -103,17 +114,8 @@ export function generateGameBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol,
         grid[row][col] = symbol;
         const cell = document.createElement('div');
         cell.className = 'cell';
-        // Add symbol-specific class for background
-        const symbolClass = {
-          '🎻': 'cell-violin',
-          '🎹': 'cell-piano',
-          '🎺': 'cell-trumpet',
-          '🥁': 'cell-drum',
-          '🎷': 'cell-saxophone',
-          '🎵': 'cell-musicalnote'
-        }[symbol];
-        if (symbolClass) cell.classList.add(symbolClass);
         cell.textContent = symbol;
+        updateCellClass(cell);
         cell.draggable = true;
         cell.tabIndex = 0;
         cell.setAttribute('role', 'button');
@@ -171,19 +173,6 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, ha
   const allCells = getBoardCells(gameBoard);
   let symbols = allCells.map(cell => cell.textContent).filter(Boolean);
   let attempts = 0;
-  const symbolToClass = {
-    '🎻': 'cell-violin',
-    '🎹': 'cell-piano',
-    '🎺': 'cell-trumpet',
-    '🥁': 'cell-drum',
-    '🎷': 'cell-saxophone',
-    '🎵': 'cell-musicalnote'
-  };
-  function updateCellClass(cell) {
-    Object.values(symbolToClass).forEach(cls => cell.classList.remove(cls));
-    const symbolClass = symbolToClass[cell.textContent];
-    if (symbolClass) cell.classList.add(symbolClass);
-  }
   do {
     for (let i = symbols.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -215,19 +204,6 @@ export function reshuffleBoard(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol, ha
 export function dropAndRefill(gameBoard, BOARD_SIZE, SYMBOLS, getSafeSymbol) {
   const grid = [];
   const allCells = getBoardCells(gameBoard);
-  const symbolToClass = {
-    '🎻': 'cell-violin',
-    '🎹': 'cell-piano',
-    '🎺': 'cell-trumpet',
-    '🥁': 'cell-drum',
-    '🎷': 'cell-saxophone',
-    '🎵': 'cell-musicalnote'
-  };
-  function updateCellClass(cell) {
-    Object.values(symbolToClass).forEach(cls => cell.classList.remove(cls));
-    const symbolClass = symbolToClass[cell.textContent];
-    if (symbolClass) cell.classList.add(symbolClass);
-  }
   for (let row = 0; row < BOARD_SIZE; row++) {
     grid[row] = [];
     for (let col = 0; col < BOARD_SIZE; col++) {

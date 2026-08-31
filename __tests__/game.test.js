@@ -57,18 +57,6 @@ describe('game', () => {
     expect(scoreForMatch(0)).toBe(0);
   });
 
-  test('swapCellContents swaps values correctly', () => {
-    const cell1 = document.createElement('div');
-    const cell2 = document.createElement('div');
-    cell1.textContent = 'X';
-    cell2.textContent = 'Y';
-
-    swapCellContents(cell1, cell2);
-
-    expect(cell1.textContent).toBe('Y');
-    expect(cell2.textContent).toBe('X');
-  });
-
   test('same cells in areAdjacent returns false', () => {
     const cell = { row: 0, col: 0 };
     const gameBoard = {
@@ -95,12 +83,6 @@ describe('game', () => {
 
     expect(areAdjacent(cellA, cellB, gameBoard, BOARD_SIZE)).toBe(false);
     expect(areAdjacent(cellB, cellA, gameBoard, BOARD_SIZE)).toBe(false);
-  });
-
-  test('scoreForMatch returns 0 for match sizes less than 3', () => {
-    expect(scoreForMatch(0)).toBe(0);
-    expect(scoreForMatch(1)).toBe(0);
-    expect(scoreForMatch(2)).toBe(0);
   });
 });
 

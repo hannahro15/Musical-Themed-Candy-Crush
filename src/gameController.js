@@ -14,10 +14,11 @@ import { getHighScore, saveHighScore, getHighestLevel, saveHighestLevel, loadGam
 import {
   getSafeSymbol,
   hasPossibleMoves,
-  generateGameBoard
+  generateGameBoard,
+  updateCellClass
 } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
-import { gameState } from './gameState.js';
+import { gameState, isObjectiveKey, setSelectedCell } from './gameState.js';
 import { handleLevelLose } from './levelOutcomes.js';
 import { setGameBoardRef, boardEventHandlers } from './boardEventHandlers.js';
 import { startTimer } from './timer.js';
@@ -142,7 +143,7 @@ export function resetGame() {
 
 function clearObjectives() {
   Object.keys(gameState).forEach((key) => {
-    if (key.endsWith('Left') && key !== 'movesLeft') {
+    if (isObjectiveKey(key)) {
       delete gameState[key];
     }
   });
@@ -206,7 +207,8 @@ function setupBoardEvents() {
     boardEventHandlers.onDragStart,
     boardEventHandlers.onDrop,
     boardEventHandlers.onTouchStart,
-    boardEventHandlers.onTouchEnd
+    boardEventHandlers.onTouchEnd,
+    boardEventHandlers.onActivate
   );
 }
 
@@ -271,7 +273,7 @@ export function continueGame() {
   }
   
   // Restore board state
-  restoreBoardState(savedProgress.boardState, config);
+  restoreBoardState(savedProgress.boardState);
   
   // Update UI
   renderLevel(config);
@@ -287,7 +289,8 @@ export function continueGame() {
   }
 }
 
-function restoreBoardState(boardState, config) {
+function restoreBoardState(boardState) {
+  setSelectedCell(null);
   // Set game board reference
   setGameBoardRef(dom.gameBoard);
   
@@ -309,22 +312,12 @@ function restoreBoardState(boardState, config) {
   dom.gameBoard.innerHTML = '';
   
   // Recreate board from saved state
-  const symbolToClass = {
-    '🎻': 'cell-violin',
-    '🎹': 'cell-piano',
-    '🎺': 'cell-trumpet',
-    '🥁': 'cell-drum',
-    '🎷': 'cell-saxophone',
-    '🎵': 'cell-musicalnote'
-  };
   boardState.forEach((row, i) => {
     row.forEach((symbol, j) => {
       const cell = document.createElement('div');
       cell.classList.add('cell');
-      // Add symbol-specific class for background
-      const symbolClass = symbolToClass[symbol];
-      if (symbolClass) cell.classList.add(symbolClass);
       cell.textContent = symbol;
+      updateCellClass(cell);
       cell.dataset.row = i;
       cell.dataset.col = j;
       cell.draggable = true;
@@ -342,7 +335,8 @@ function restoreBoardState(boardState, config) {
     boardEventHandlers.onDragStart,
     boardEventHandlers.onDrop,
     boardEventHandlers.onTouchStart,
-    boardEventHandlers.onTouchEnd
+    boardEventHandlers.onTouchEnd,
+    boardEventHandlers.onActivate
   );
 }
 
@@ -354,6 +348,7 @@ export function startLevel(levelNumber) {
     return;
   }
 
+  setSelectedCell(null);
   gameState.level = levelNumber;
   gameState.levelComplete = false;
   gameState.movesLeft = config.moves;

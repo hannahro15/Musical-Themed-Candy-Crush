@@ -1,7 +1,7 @@
 // board.test.js - Unit tests for board.js
 // Add your tests here
-import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard } from '../src/board.js';
-import { BOARD_SIZE, SYMBOLS } from '../src/constants.js';
+import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard, updateCellClass } from '../src/board.js';
+import { BOARD_SIZE, SYMBOLS, SYMBOL_TO_CLASS } from '../src/constants.js';
 
 describe('board', () => {
   test('findMatches identifies horizontal and vertical matches', () => {
@@ -110,5 +110,31 @@ describe('board', () => {
         expect(cell.getAttribute('aria-label')).toBe(expectedLabel);
       }
     }
+  });
+});
+
+describe('updateCellClass', () => {
+  test('adds the matching symbol class', () => {
+    const cell = document.createElement('div');
+    cell.textContent = '🎻';
+    updateCellClass(cell);
+    expect(cell.classList.contains(SYMBOL_TO_CLASS['🎻'])).toBe(true);
+  });
+
+  test('removes a stale symbol class before applying the new one', () => {
+    const cell = document.createElement('div');
+    cell.classList.add(SYMBOL_TO_CLASS['🎻']);
+    cell.textContent = '🥁';
+    updateCellClass(cell);
+    expect(cell.classList.contains(SYMBOL_TO_CLASS['🎻'])).toBe(false);
+    expect(cell.classList.contains(SYMBOL_TO_CLASS['🥁'])).toBe(true);
+  });
+
+  test('leaves no symbol class for an empty cell', () => {
+    const cell = document.createElement('div');
+    cell.classList.add(SYMBOL_TO_CLASS['🎷']);
+    cell.textContent = '';
+    updateCellClass(cell);
+    expect(Object.values(SYMBOL_TO_CLASS).some(cls => cell.classList.contains(cls))).toBe(false);
   });
 });

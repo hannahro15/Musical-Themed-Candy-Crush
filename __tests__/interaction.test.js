@@ -1,8 +1,8 @@
 // interaction.test.js - Unit tests for interaction.js
 // Add your tests here
 
-import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from '../src/interaction.js';
-import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from '../src/gameState.js';
+import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd, handleCellActivate } from '../src/interaction.js';
+import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY, setSelectedCell } from '../src/gameState.js';
 
 
 beforeEach(() => {
@@ -12,6 +12,7 @@ beforeEach(() => {
   setTouchStartCell(null);
   setTouchStartX(null);
   setTouchStartY(null);
+  setSelectedCell(null);
 });
 
 describe('handleDragStart', () => {
@@ -212,5 +213,75 @@ describe('handleTouchEnd', () => {
     setTouchStartY(0);
     handleTouchEnd(event, gameState, touchStartCell, 0, 0, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
     expect(trySwap).not.toHaveBeenCalled();
+  });
+});
+
+describe('handleCellActivate', () => {
+  test('selects a cell when nothing is selected', async () => {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    const event = { currentTarget: cell };
+
+    await handleCellActivate(event, gameState, setSelectedCell, jest.fn(), jest.fn());
+
+    expect(cell.classList.contains('selected')).toBe(true);
+    expect(gameState.selectedCell).toBe(cell);
+  });
+
+  test('deselects a cell when tapped again', async () => {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    const event = { currentTarget: cell };
+
+    await handleCellActivate(event, gameState, setSelectedCell, jest.fn(), jest.fn());
+    await handleCellActivate(event, gameState, setSelectedCell, jest.fn(), jest.fn());
+
+    expect(cell.classList.contains('selected')).toBe(false);
+    expect(gameState.selectedCell).toBeNull();
+  });
+
+  test('swaps with the selected cell when the new cell is adjacent', async () => {
+    const first = document.createElement('div');
+    first.classList.add('cell');
+    const second = document.createElement('div');
+    second.classList.add('cell');
+    const areAdjacent = jest.fn().mockReturnValue(true);
+    const trySwap = jest.fn().mockResolvedValue();
+
+    await handleCellActivate({ currentTarget: first }, gameState, setSelectedCell, areAdjacent, trySwap);
+    await handleCellActivate({ currentTarget: second }, gameState, setSelectedCell, areAdjacent, trySwap);
+
+    expect(areAdjacent).toHaveBeenCalledWith(first, second);
+    expect(trySwap).toHaveBeenCalledWith(first, second);
+    expect(first.classList.contains('selected')).toBe(false);
+    expect(gameState.selectedCell).toBeNull();
+  });
+
+  test('moves selection to the new cell when it is not adjacent', async () => {
+    const first = document.createElement('div');
+    first.classList.add('cell');
+    const second = document.createElement('div');
+    second.classList.add('cell');
+    const areAdjacent = jest.fn().mockReturnValue(false);
+    const trySwap = jest.fn();
+
+    await handleCellActivate({ currentTarget: first }, gameState, setSelectedCell, areAdjacent, trySwap);
+    await handleCellActivate({ currentTarget: second }, gameState, setSelectedCell, areAdjacent, trySwap);
+
+    expect(trySwap).not.toHaveBeenCalled();
+    expect(first.classList.contains('selected')).toBe(false);
+    expect(second.classList.contains('selected')).toBe(true);
+    expect(gameState.selectedCell).toBe(second);
+  });
+
+  test('does nothing while a move is resolving', async () => {
+    gameState.isResolving = true;
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+
+    await handleCellActivate({ currentTarget: cell }, gameState, setSelectedCell, jest.fn(), jest.fn());
+
+    expect(cell.classList.contains('selected')).toBe(false);
+    expect(gameState.selectedCell).toBeNull();
   });
 });

@@ -4,11 +4,6 @@
 import { updateScore, updateLevel, updateTimer, showGameOver, hideGameOver, updateObjectiveCounters, updateMovesDisplay, updateLivesDisplay, updateScoreDisplay, updateTimerDisplay, showMenuPage, updateHighScoreDisplay, updateTotalScoreDisplay } from '../src/ui.js';
 
 describe('UI functions', () => {
-  let scoreElement;
-  let levelElement;
-  let timerElement;
-  let gameOverElement;
-
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="score">0</div>
@@ -18,10 +13,6 @@ describe('UI functions', () => {
       <div id="score-moves-wrapper"></div>
       <div id="levelDisplay"></div>
     `;
-    scoreElement = document.getElementById('score');
-    levelElement = document.getElementById('level');
-    timerElement = document.getElementById('timer');
-    gameOverElement = document.getElementById('game-over');
   });
 
   test('updateScore updates #score element text', () => {

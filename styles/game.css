@@ -117,7 +117,7 @@
 }
 
 .cell:focus {
-  outline: 2px solid #6c5ce7;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   z-index: 2;
   box-shadow: 0 0 0 3px #ede7fa;
@@ -161,7 +161,7 @@
   width: 100%;
   padding: 10px 10px 8px;
   box-sizing: border-box;
-  background: linear-gradient(135deg, #6c5ce7 0%, #8f5cff 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #8f5cff 100%);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -222,7 +222,7 @@
 #totalScoreDisplay {
   font-size: 1rem;
   font-weight: 600;
-  color: #6c5ce7;
+  color: var(--color-primary);
   text-align: center;
   padding: 6px 16px;
   background: linear-gradient(135deg, #f3f3fa 0%, #e6eaff 100%);

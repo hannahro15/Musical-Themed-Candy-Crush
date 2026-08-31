@@ -1,4 +1,5 @@
 // storage.js - localStorage utilities for game data persistence
+import { isObjectiveKey } from './gameState.js';
 
 const STORAGE_KEY = 'musicalMatchSaga';
 
@@ -86,10 +87,10 @@ export function saveGameProgress(gameState, boardState) {
       timestamp: Date.now()
     };
     
-    // Save objective counters (e.g., 🎵Left, 🎸Left, etc.)
+    // Save objective counters (e.g., violinLeft, pianoLeft, etc.)
     const objectives = {};
     for (const key in gameState) {
-      if (key.endsWith('Left')) {
+      if (isObjectiveKey(key)) {
         objectives[key] = gameState[key];
       }
     }

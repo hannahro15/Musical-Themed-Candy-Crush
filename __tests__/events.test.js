@@ -73,6 +73,44 @@ describe('events', () => {
     });
   });
 
+  test('wireUpCellEvents wires click and keyboard activation when onActivate is given', () => {
+    const gameBoard = document.createElement('div');
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    gameBoard.appendChild(cell);
+    const onActivate = jest.fn();
+
+    wireUpCellEvents(gameBoard, 1, () => {}, () => {}, () => {}, () => {}, onActivate);
+
+    const wiredCell = gameBoard.querySelector('.cell');
+    wiredCell.dispatchEvent(new MouseEvent('click'));
+    expect(onActivate).toHaveBeenCalledTimes(1);
+
+    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', cancelable: true });
+    wiredCell.dispatchEvent(enterEvent);
+    expect(onActivate).toHaveBeenCalledTimes(2);
+
+    const spaceEvent = new KeyboardEvent('keydown', { key: ' ', cancelable: true });
+    wiredCell.dispatchEvent(spaceEvent);
+    expect(onActivate).toHaveBeenCalledTimes(3);
+
+    const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true });
+    wiredCell.dispatchEvent(tabEvent);
+    expect(onActivate).toHaveBeenCalledTimes(3); // unchanged — Tab isn't an activation key
+  });
+
+  test('wireUpCellEvents omits click/keydown listeners when onActivate is not provided', () => {
+    const gameBoard = document.createElement('div');
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    gameBoard.appendChild(cell);
+
+    expect(() => {
+      wireUpCellEvents(gameBoard, 1, () => {}, () => {}, () => {}, () => {});
+      gameBoard.querySelector('.cell').dispatchEvent(new MouseEvent('click'));
+    }).not.toThrow();
+  });
+
   test('wireUpCellEvents that draggable attribute is set to true after wiring', () => {
     const gameBoard = document.createElement('div');
     for (let i = 0; i < 3; i++) {

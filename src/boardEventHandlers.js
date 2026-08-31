@@ -1,5 +1,5 @@
-import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd } from './interaction.js';
-import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY } from './gameState.js';
+import { handleDragStart, handleDrop, handleTouchStart, handleTouchEnd, handleCellActivate } from './interaction.js';
+import { gameState, setDraggedCell, setTouchStartCell, setTouchStartX, setTouchStartY, setSelectedCell } from './gameState.js';
 import { areAdjacent } from './game.js';
 import { trySwap } from './boardController.js';
 import { BOARD_SIZE } from './constants.js';
@@ -49,6 +49,17 @@ export const boardEventHandlers = {
       setTouchStartCell,
       BOARD_SIZE,
       gameBoard,
+      trySwap
+    );
+  },
+  onActivate: function (event) {
+    handleCellActivate(
+      event,
+      gameState,
+      setSelectedCell,
+      function (a, b) {
+        return areAdjacent(a, b, gameBoard, BOARD_SIZE);
+      },
       trySwap
     );
   }

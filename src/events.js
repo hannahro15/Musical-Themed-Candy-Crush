@@ -2,16 +2,18 @@
 // events.js - Handles event listeners and event-related logic
 
 /**
- * Wires up drag and touch events for all .cell elements in the game board.
- * Removes previous listeners by cloning each cell, then attaches new listeners.
+ * Wires up drag, touch, and activation events for all .cell elements in the
+ * game board. Removes previous listeners by cloning each cell, then attaches
+ * new listeners.
  * @param {HTMLElement} gameBoard - The game board container.
  * @param {number} boardSize - The size of the board (unused, for API compatibility).
  * @param {Function} onDragStart - Handler for dragstart.
  * @param {Function} onDrop - Handler for drop.
  * @param {Function} onTouchStart - Handler for touchstart.
  * @param {Function} onTouchEnd - Handler for touchend.
+ * @param {Function} [onActivate] - Handler for tap/click/keyboard select-and-swap.
  */
-export function wireUpCellEvents(gameBoard, boardSize, onDragStart, onDrop, onTouchStart, onTouchEnd) {
+export function wireUpCellEvents(gameBoard, boardSize, onDragStart, onDrop, onTouchStart, onTouchEnd, onActivate) {
   // Replace each cell with a clone to remove old listeners
   const cells = Array.from(gameBoard.querySelectorAll('.cell'));
   cells.forEach(cell => {
@@ -29,6 +31,15 @@ export function wireUpCellEvents(gameBoard, boardSize, onDragStart, onDrop, onTo
     cell.addEventListener('drop', onDrop);
     cell.addEventListener('touchstart', onTouchStart);
     cell.addEventListener('touchend', onTouchEnd);
+    if (typeof onActivate === 'function') {
+      cell.addEventListener('click', onActivate);
+      cell.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+          event.preventDefault();
+          onActivate(event);
+        }
+      });
+    }
   });
 }
 

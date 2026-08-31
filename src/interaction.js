@@ -1,3 +1,4 @@
+import { announce } from './utils.js';
 
 /**
  * Determines the swipe direction and target index for a swipe gesture.
@@ -86,6 +87,58 @@ export async function handleTouchEnd(
 
     const targetIndex = getSwipeTargetIndex(sourceIndex, deltaX, deltaY, BOARD_SIZE, allCells.length);
     if (targetIndex !== -1) {
+        // A real swipe was handled here — suppress the synthetic click most
+        // mobile browsers fire after touchend, so tap-to-select doesn't
+        // double-fire on the same gesture.
+        event.preventDefault?.();
         await trySwap(touchStartCell, allCells[targetIndex]);
+    }
+}
+
+/**
+ * Handles a tap/click/keyboard activation on a cell: selects it, or — if
+ * another cell is already selected and this one is adjacent — swaps them.
+ * This is the accessible counterpart to drag/swipe: it's what fires for a
+ * plain tap, a mouse click, Enter/Space on a focused cell, and (critically
+ * for the Android build) a TalkBack double-tap, none of which reliably
+ * produce the raw touchmove-based swipe gesture above.
+ * @param {Event} event
+ * @param {Object} gameState
+ * @param {Function} setSelectedCell
+ * @param {Function} areAdjacent
+ * @param {Function} trySwap
+ */
+export async function handleCellActivate(event, gameState, setSelectedCell, areAdjacent, trySwap) {
+    if (gameState.isResolving) return;
+    const cell = event.currentTarget;
+    if (!cell?.classList?.contains('cell')) return;
+
+    const selectedCell = gameState.selectedCell;
+
+    if (!selectedCell) {
+        cell.classList.add('selected');
+        setSelectedCell(cell);
+        announce(`Selected ${cell.textContent || 'tile'}. Choose an adjacent tile to swap.`);
+        return;
+    }
+
+    if (selectedCell === cell) {
+        selectedCell.classList.remove('selected');
+        setSelectedCell(null);
+        announce('Deselected.');
+        return;
+    }
+
+    selectedCell.classList.remove('selected');
+    setSelectedCell(null);
+
+    if (areAdjacent(selectedCell, cell)) {
+        await trySwap(selectedCell, cell);
+    } else {
+        // Not adjacent — move the selection to the newly tapped cell instead
+        // of forcing the player to deselect first.
+        cell.classList.add('selected');
+        setSelectedCell(cell);
+        announce(`${cell.textContent || 'Tile'} is not adjacent to the previous selection. Selected ${cell.textContent || 'tile'} instead.`);
     }
 }

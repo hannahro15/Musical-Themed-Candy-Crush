@@ -1,6 +1,6 @@
 
 // boardController.js - Handles board swapping and match resolution logic
-import { swapCellContents, scoreForMatch, areAdjacent } from './game.js';
+import { swapCellContents, scoreForMatch } from './game.js';
 import { getLevelConfig } from './levels.js';
 import { findMatches, dropAndRefill, hasPossibleMoves } from './board.js';
 import { updateMovesDisplay, updateScoreDisplay, updateObjectiveCounters, updateTotalScoreDisplay } from './ui.js';
@@ -13,7 +13,7 @@ import { autoSaveProgress } from './gameController.js';
 import { announce } from './utils.js';
 
 // These will be injected from script.js
-let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay, restartContainer, nextLevelBtn, restartBtn;
+let gameBoard, movesDisplay, scoreDisplay, totalScoreDisplay;
 
 /**
  * Injects DOM and UI dependencies for the board controller.
@@ -24,9 +24,6 @@ export function setBoardControllerDeps(deps) {
   movesDisplay = deps.movesDisplay;
   scoreDisplay = deps.scoreDisplay;
   totalScoreDisplay = deps.totalScoreDisplay;
-  restartContainer = deps.restartContainer;
-  nextLevelBtn = deps.nextLevelBtn;
-  restartBtn = deps.restartBtn;
 }
 
 
@@ -155,7 +152,8 @@ async function resolveAllMatchesAndDrop() {
       boardEventHandlers.onDragStart,
       boardEventHandlers.onDrop,
       boardEventHandlers.onTouchStart,
-      boardEventHandlers.onTouchEnd
+      boardEventHandlers.onTouchEnd,
+      boardEventHandlers.onActivate
     );
     matches = findMatches(gameBoard, BOARD_SIZE);
     if (!hasPossibleMoves(gameBoard, BOARD_SIZE)) {
@@ -166,7 +164,8 @@ async function resolveAllMatchesAndDrop() {
           boardEventHandlers.onDragStart,
           boardEventHandlers.onDrop,
           boardEventHandlers.onTouchStart,
-          boardEventHandlers.onTouchEnd
+          boardEventHandlers.onTouchEnd,
+          boardEventHandlers.onActivate
         ));
       });
       break;
