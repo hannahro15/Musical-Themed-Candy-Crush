@@ -3,8 +3,10 @@
   "scripts": {
     "build": "node build-www.js",
     "cap:sync": "npm run build && npx cap sync android",
-    "test": "jest",
-    "lint": "eslint ."
+    "test": "npx jest",
+    "test:coverage": "npx jest --coverage",
+    "lint": "eslint .",
+    "android:bundle": "npm run cap:sync && cd android && ./gradlew bundleRelease"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.2",

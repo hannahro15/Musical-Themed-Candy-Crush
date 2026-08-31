@@ -30,9 +30,11 @@ A musical twist on the classic match-3 formula. Swap and match musical symbols, 
 5. [Project Structure](#project-structure)
 6. [Running Tests](#running-tests)
 7. [Test Coverage](#test-coverage)
+
 8. [Known Issues](#known-issues)
-9. [Roadmap](#roadmap)
-10. [Credits](#credits)
+9. [Android Release & Play Store](#android-release--play-store)
+10. [Roadmap](#roadmap)
+11. [Credits](#credits)
 
 ---
 
@@ -156,26 +158,29 @@ Musical-Themed-Candy-Crush/
 ├── package-lock.json
 └── README.md
 ```
-## Running Tests
+
 This modular structure makes it easy to maintain, test, and extend the game. Each file is responsible for a specific aspect of the game logic or UI.
 
 ---
-   npm install
-## Running Unit Tests
+
+## Running Tests
+
+This project uses [Jest](https://jestjs.io/) with `babel-jest` and the `jsdom` environment for unit and component testing.
 
 1. Install dependencies (if not already):
    ```bash
-   npm install --save-dev jest
-3. Run coverage:
-   ```bash
-   npx jest --coverage
+   npm install
    ```
 2. Run all tests:
    ```bash
    npx jest
    ```
-3. Add your test cases in the `__tests__` folder for each module.
-This project uses [Jest](https://jestjs.io/) with `babel-jest` and the `jsdom` environment for unit and component testing.
+3. Run with coverage:
+   ```bash
+   npx jest --coverage
+   ```
+4. Add new test cases in the `__tests__` folder for each module.
+
 ---
 
 ## Test Coverage
@@ -201,7 +206,15 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 - Further accessibility testing and improvements are ongoing.
 - UI is responsive, but additional polish and real-device/mobile browser testing are planned.
 - Sound effects and music not yet implemented.
-- Android app is packaged via Capacitor; a signed release build and Play Store listing are still pending.
+- Android release setup is in progress, but Play Store testing, final assets, and console submission still need to be completed.
+
+---
+
+## Android Release & Play Store
+
+- The Android app shell is configured with Capacitor in `android/`.
+- See `android/app/build.gradle` for the current Android `versionCode` and `versionName`.
+- For the repo-specific publish workflow, see `docs/google-play-publish-checklist.md`.
 
 ---
 
@@ -223,5 +236,3 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 Created and maintained by Hannah Olbrich (solo project).
 Emoji icons from [Unicode](https://unicode.org/emoji/).
 AI-assisted development with GitHub Copilot.
-
-
