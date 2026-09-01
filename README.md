@@ -5,6 +5,10 @@
 ---
 ## Recent Updates
 
+- Fixed a dark-mode/WebView rendering bug that inverted the light purple background to dark blue on some Android devices; the home screen background is now the same gradient on mobile and desktop.
+- Added `prefers-reduced-motion` support and fixed several text/button colors that fell short of WCAG AA contrast.
+- Set the Android app back to `versionCode 1` / `versionName "1.0"` for its first Play Store submission.
+- Significantly expanded test coverage for game-flow, board-swap, and event-wiring logic — project-wide statement coverage is now ~90% (see [Test Coverage](#test-coverage)).
 - Improved accessibility: visible focus styles, ARIA roles, and keyboard navigation.
 - Home page UI polish: vertically centered content on mobile, stylish and prominent title.
 - Ongoing testing and UI/UX refinements.
@@ -122,10 +126,13 @@ Musical-Themed-Candy-Crush/
 ├── __tests__/
 │   ├── board.test.js
 │   ├── boardController.test.js
+│   ├── boardController.trySwap.test.js
 │   ├── boardEventHandlers.test.js
+│   ├── boardEventHandlers.delegation.test.js
 │   ├── events.test.js
 │   ├── game.test.js
 │   ├── gameController.test.js
+│   ├── gameController.flow.test.js
 │   ├── gameState.test.js
 │   ├── interaction.test.js
 │   ├── levelOutcomes.test.js
@@ -198,14 +205,16 @@ This project uses [Jest](https://jestjs.io/) for unit and component testing. Tes
 
 Aim for high coverage, but focus on meaningful tests for game logic, UI, and edge cases. See the coverage report for areas needing more tests.
 
+As of the last full run, project-wide statement coverage is ~90%, with the core game-flow (`gameController.js`), board-swap (`boardController.js`), and event-wiring (`boardEventHandlers.js`) modules all above 80%.
+
 ---
 
 ## Known Issues
 
-- Further accessibility testing and improvements are ongoing.
+- Automated WCAG AA contrast checks now pass, but a full manual/assistive-tech accessibility pass is still ongoing.
 - UI is responsive, but additional polish and real-device/mobile browser testing are planned.
 - Sound effects and music not yet implemented.
-- Android release setup is in progress, but Play Store testing, final assets, and console submission still need to be completed.
+- Android release config (signing setup, `versionCode 1` / `versionName "1.0"`) is ready for a first submission, but a real upload keystore, store listing assets, and Play Console submission still need to be completed — see `docs/google-play-publish-checklist.md`.
 
 ---
 
@@ -219,7 +228,7 @@ Aim for high coverage, but focus on meaningful tests for game logic, UI, and edg
 
 ## Roadmap
 
-- Improve accessibility: ARIA labels, contrast checks, and comprehensive keyboard/screen reader support.
+- Improve accessibility further: a full manual/assistive-tech pass on top of the automated ARIA and contrast checks already in place.
 - Continue polishing the UI with improved animation, transitions, and mobile tuning.
 - Add more levels and increase gameplay variety.
 - Implement sound effects and background music.
