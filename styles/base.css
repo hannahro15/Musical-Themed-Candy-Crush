@@ -10,6 +10,7 @@
 /* 1. Global Box Sizing */
 html {
     box-sizing: border-box;
+    color-scheme: light;
 }
 
 /* 2. Body Layout */
