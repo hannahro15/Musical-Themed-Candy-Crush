@@ -18,9 +18,8 @@ A musical twist on the classic match-3 formula. Swap and match musical symbols, 
 
 **Solo Project:** This game was designed, developed, and tested entirely by Hannah Olbrich as a personal project. It is not open source and does not accept external contributions.
 
-**Play it here:** https://hannahro15.github.io/Musical-Themed-Candy-Crush/
-
----
+**Play it here:** [
+](https://hannahro15.github.io/Musical-Themed-Candy-Crush/)---
 
 ## Table of Contents
 1. [Getting Started](#getting-started)
