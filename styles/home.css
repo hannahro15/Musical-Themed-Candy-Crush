@@ -133,7 +133,7 @@ h1 {
  
 .subtitle {
   font-size: 1rem;
-  color: #7057b0;
+  color: #6a53a7;
   margin: 0 auto 20px;
   text-align: center;
   font-style: italic;
@@ -149,7 +149,7 @@ h1 {
 #highestLevelDisplay {
     font-size: 1.05rem;
     font-weight: 700;
-    color: var(--color-primary);
+    color: #6959e0;
     text-align: center;
     padding: 12px 20px;
     margin: 2px auto; /* reduced gap */
@@ -164,7 +164,7 @@ h1 {
 }
  
 #highestLevelDisplay {
-  color: #9c5ce7;
+  color: #854ec4;
   background: rgba(255, 240, 255, 0.6);
   border-color: rgba(156, 92, 231, 0.2);
 }
@@ -206,7 +206,7 @@ h1 {
   font-size: 1rem;
   font-weight: 700;
   color: white;
-  background: linear-gradient(90deg, var(--color-primary) 0%, #a084ee 100%);
+  background: linear-gradient(90deg, var(--color-primary) 0%, #7e68bc 100%);
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(108, 92, 231, 0.3);
   transition: background 0.25s, transform 0.12s, box-shadow 0.2s;
@@ -223,7 +223,7 @@ h1 {
   padding: 18px 32px;
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(108, 92, 231, 0.35);
-  background: linear-gradient(90deg, #8f5cff 0%, var(--color-primary) 100%);
+  background: linear-gradient(90deg, #8656f0 0%, var(--color-primary) 100%);
 }
  
 /* Icons */

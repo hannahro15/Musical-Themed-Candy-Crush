@@ -62,6 +62,16 @@ a:focus {
     transition: outline 0.2s, box-shadow 0.2s;
 }
 
+/* Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* Hide scrollbars on mobile for body and main containers */
 
 @media (max-width: 767px) {

@@ -126,4 +126,18 @@ describe('LEVELS', () => {
     const config = getLevelConfig(levelNum);
     expect(config).toBeUndefined();
   });
+
+  test('every level\'s own winCondition is true when all its objectives are met and false otherwise', () => {
+    LEVELS.forEach((level) => {
+      const metState = { objectives: level.objectives };
+      level.objectives.forEach((obj) => {
+        metState[obj.label + 'Left'] = 0;
+      });
+      expect(level.winCondition(metState)).toBe(true);
+
+      // Leave the first objective unmet.
+      const unmetState = { ...metState, [level.objectives[0].label + 'Left']: 1 };
+      expect(level.winCondition(unmetState)).toBe(false);
+    });
+  });
 });
