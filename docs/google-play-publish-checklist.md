@@ -6,9 +6,9 @@ This checklist is tailored to the current Musical Match Saga repository and Andr
 
 - Confirm the Android package ID is still `com.musicalmatchsaga.game`.
 - The Android app version is currently:
-  - `versionCode 2`
-  - `versionName "1.0.1"`
-- Increase both values before each Play Store release.
+  - `versionCode 1`
+  - `versionName "1.0"`
+- This is fine for the first Play Store release. Increase both values before every release after that.
 - Create a release keystore and keep it out of source control.
 
 Create `android/keystore.properties` with:
