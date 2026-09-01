@@ -3,62 +3,52 @@ import { isObjectiveKey } from './gameState.js';
 
 const STORAGE_KEY = 'musicalMatchSaga';
 
-export function getHighScore() {
+function readStore() {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      return parsed.highScore || 0;
-    }
+    return data ? JSON.parse(data) : {};
   } catch (e) {
     console.error('Error reading from localStorage:', e);
+    return {};
   }
-  return 0;
+}
+
+function writeStore(parsed) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    return true;
+  } catch (e) {
+    console.error('Error writing to localStorage:', e);
+    return false;
+  }
+}
+
+export function getHighScore() {
+  return readStore().highScore || 0;
 }
 
 export function saveHighScore(score) {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    const parsed = data ? JSON.parse(data) : {};
-    
-    // Only update if new score is higher
-    if (score > (parsed.highScore || 0)) {
-      parsed.highScore = score;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      return true; // Indicates new high score
-    }
-  } catch (e) {
-    console.error('Error writing to localStorage:', e);
+  const parsed = readStore();
+
+  // Only update if new score is higher
+  if (score > (parsed.highScore || 0)) {
+    parsed.highScore = score;
+    return writeStore(parsed); // true indicates new high score
   }
   return false;
 }
 
 export function getHighestLevel() {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      return parsed.highestLevel || 0;
-    }
-  } catch (e) {
-    console.error('Error reading from localStorage:', e);
-  }
-  return 0;
+  return readStore().highestLevel || 0;
 }
 
 export function saveHighestLevel(level) {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    const parsed = data ? JSON.parse(data) : {};
-    
-    // Only update if new level is higher
-    if (level > (parsed.highestLevel || 0)) {
-      parsed.highestLevel = level;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      return true;
-    }
-  } catch (e) {
-    console.error('Error writing to localStorage:', e);
+  const parsed = readStore();
+
+  // Only update if new level is higher
+  if (level > (parsed.highestLevel || 0)) {
+    parsed.highestLevel = level;
+    return writeStore(parsed);
   }
   return false;
 }
@@ -72,62 +62,40 @@ export function clearStorage() {
 }
 
 export function saveGameProgress(gameState, boardState) {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    const parsed = data ? JSON.parse(data) : {};
-    
-    parsed.savedProgress = {
-      level: gameState.level,
-      lives: gameState.lives,
-      score: gameState.score,
-      totalScore: gameState.totalScore,
-      movesLeft: gameState.movesLeft,
-      timer: gameState.timer,
-      boardState: boardState,
-      timestamp: Date.now()
-    };
-    
-    // Save objective counters (e.g., violinLeft, pianoLeft, etc.)
-    const objectives = {};
-    for (const key in gameState) {
-      if (isObjectiveKey(key)) {
-        objectives[key] = gameState[key];
-      }
+  const parsed = readStore();
+
+  parsed.savedProgress = {
+    level: gameState.level,
+    lives: gameState.lives,
+    score: gameState.score,
+    totalScore: gameState.totalScore,
+    movesLeft: gameState.movesLeft,
+    timer: gameState.timer,
+    boardState: boardState,
+    timestamp: Date.now()
+  };
+
+  // Save objective counters (e.g., violinLeft, pianoLeft, etc.)
+  const objectives = {};
+  for (const key in gameState) {
+    if (isObjectiveKey(key)) {
+      objectives[key] = gameState[key];
     }
-    parsed.savedProgress.objectives = objectives;
-    
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-    return true;
-  } catch (e) {
-    console.error('Error saving game progress:', e);
   }
-  return false;
+  parsed.savedProgress.objectives = objectives;
+
+  return writeStore(parsed);
 }
 
 export function loadGameProgress() {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      return parsed.savedProgress || null;
-    }
-  } catch (e) {
-    console.error('Error loading game progress:', e);
-  }
-  return null;
+  return readStore().savedProgress || null;
 }
 
 export function clearGameProgress() {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      delete parsed.savedProgress;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      return true;
-    }
-  } catch (e) {
-    console.error('Error clearing game progress:', e);
+  const parsed = readStore();
+  if (parsed.savedProgress) {
+    delete parsed.savedProgress;
+    return writeStore(parsed);
   }
   return false;
 }
