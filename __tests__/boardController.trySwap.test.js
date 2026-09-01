@@ -145,4 +145,72 @@ describe('trySwap', () => {
     await trySwap(sourceCell, targetCell);
     expect(boardMock.findMatches).not.toHaveBeenCalled();
   });
+
+  test('calls handleLevelWin when all objectives reach zero', async () => {
+    levelsMock.getLevelConfig.mockReturnValue({
+      objectives: [{ symbol: '🎻', label: 'violin', count: 1 }],
+    });
+
+    const group = [sourceCell, targetCell, makeCell('🎹')];
+    boardMock.findMatches
+      .mockReturnValueOnce([group])
+      .mockReturnValueOnce([group])
+      .mockReturnValueOnce([]);
+
+    await trySwap(sourceCell, targetCell);
+    await Promise.resolve();
+
+    expect(levelOutcomesMock.handleLevelWin).toHaveBeenCalled();
+    expect(levelOutcomesMock.handleLevelLose).not.toHaveBeenCalled();
+    expect(gameState.isResolving).toBe(false);
+  });
+
+  test('calls handleLevelLose when moves reach zero without a win', async () => {
+    document.body.innerHTML = `
+      <div id="restartLevelModal"></div>
+      <button id="confirmRestartBtn"></button>
+      <button id="confirmNextLevelBtn"></button>
+    `;
+
+    Object.assign(gameState, {
+      movesLeft: 1,
+      timer: 30,
+    });
+
+    levelsMock.getLevelConfig.mockReturnValue({
+      objectives: [{ symbol: '🎻', label: 'violin', count: 10 }],
+    });
+
+    const group = [sourceCell, targetCell, makeCell('🎹')];
+    boardMock.findMatches
+      .mockReturnValueOnce([group])
+      .mockReturnValueOnce([group])
+      .mockReturnValueOnce([]);
+
+    await trySwap(sourceCell, targetCell);
+
+    expect(gameState.movesLeft).toBe(0);
+    expect(levelOutcomesMock.handleLevelLose).toHaveBeenCalled();
+    expect(levelOutcomesMock.handleLevelWin).not.toHaveBeenCalled();
+    expect(gameState.isResolving).toBe(false);
+  });
+
+  test('reshuffles when no possible moves remain after refill', async () => {
+    boardMock.hasPossibleMoves.mockReturnValue(false);
+
+    levelsMock.getLevelConfig.mockReturnValue({
+      objectives: [{ symbol: '🎻', label: 'violin', count: 10 }],
+    });
+
+    const group = [sourceCell, targetCell, makeCell('🎹')];
+    boardMock.findMatches
+      .mockReturnValueOnce([group])
+      .mockReturnValueOnce([group])
+      .mockReturnValueOnce([]);
+
+    await trySwap(sourceCell, targetCell);
+
+    expect(boardMock.reshuffleBoard).toHaveBeenCalled();
+    expect(gameState.isResolving).toBe(false);
+  });
 });

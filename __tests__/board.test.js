@@ -1,6 +1,6 @@
 // board.test.js - Unit tests for board.js
 // Add your tests here
-import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard, updateCellClass } from '../src/board.js';
+import { getSafeSymbol, findMatches, dropAndRefill, hasPossibleMoves, generateGameBoard, updateCellClass, reshuffleBoard } from '../src/board.js';
 import { BOARD_SIZE, SYMBOLS, SYMBOL_TO_CLASS } from '../src/constants.js';
 
 describe('board', () => {
@@ -136,5 +136,53 @@ describe('updateCellClass', () => {
     cell.textContent = '';
     updateCellClass(cell);
     expect(Object.values(SYMBOL_TO_CLASS).some(cls => cell.classList.contains(cls))).toBe(false);
+  });
+});
+
+describe('reshuffleBoard', () => {
+  function buildBoard(symbols) {
+    const gameBoard = document.createElement('div');
+    symbols.forEach(symbol => {
+      const cell = document.createElement('div');
+      cell.textContent = symbol;
+      gameBoard.appendChild(cell);
+    });
+    return gameBoard;
+  }
+
+  test('shuffles the existing symbols in place once a possible move exists', () => {
+    const symbols = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const gameBoard = buildBoard(symbols);
+    const wireUpCellEvents = jest.fn();
+    const alwaysHasMoves = jest.fn(() => true);
+
+    reshuffleBoard(gameBoard, 2, SYMBOLS, getSafeSymbol, alwaysHasMoves, wireUpCellEvents);
+
+    // Same multiset of symbols, just reordered - not regenerated.
+    const after = Array.from(gameBoard.children).map(c => c.textContent);
+    expect(after.slice().sort()).toEqual(symbols.slice().sort());
+    expect(wireUpCellEvents).toHaveBeenCalledTimes(1);
+    expect(alwaysHasMoves).toHaveBeenCalledTimes(1);
+  });
+
+  test('falls back to generating a fresh board after 20 failed shuffle attempts', () => {
+    const gameBoard = buildBoard(['A', 'B', 'C', 'D']);
+    const neverHasMoves = jest.fn(() => false);
+
+    reshuffleBoard(gameBoard, 2, SYMBOLS, getSafeSymbol, neverHasMoves, () => {});
+
+    // generateGameBoard replaces the board with a fresh 2x2 grid drawn from
+    // SYMBOLS, not the original placeholder letters - proof the fallback ran.
+    expect(gameBoard.children.length).toBe(4);
+    Array.from(gameBoard.children).forEach(cell => {
+      expect(SYMBOLS).toContain(cell.textContent);
+    });
+  });
+
+  test('does not throw when no wireUpCellEvents callback is provided', () => {
+    const gameBoard = buildBoard(['A', 'B', 'C', 'D']);
+    expect(() => {
+      reshuffleBoard(gameBoard, 2, SYMBOLS, getSafeSymbol, () => true, undefined);
+    }).not.toThrow();
   });
 });

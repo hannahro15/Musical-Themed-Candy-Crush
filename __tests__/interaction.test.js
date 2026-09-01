@@ -184,6 +184,17 @@ describe('handleTouchStart', () => {
 });
 
 describe('handleTouchEnd', () => {
+  function buildBoard(size = 3) {
+    const gameBoard = document.createElement('div');
+    for (let i = 0; i < size * size; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.textContent = String(i);
+      gameBoard.appendChild(cell);
+    }
+    return gameBoard;
+  }
+
   test('does nothing if swipe is too short or indices are invalid', () => {
     const touchStartCell = document.createElement('div');
     touchStartCell.classList.add('cell');
@@ -212,6 +223,86 @@ describe('handleTouchEnd', () => {
     setTouchStartX(0);
     setTouchStartY(0);
     handleTouchEnd(event, gameState, touchStartCell, 0, 0, setTouchStartCell, BOARD_SIZE, gameBoard, trySwap);
+    expect(trySwap).not.toHaveBeenCalled();
+  });
+
+  test('swipes right to adjacent target and prevents synthetic click', async () => {
+    const board = buildBoard(3);
+    const cells = Array.from(board.querySelectorAll('.cell'));
+    const sourceCell = cells[0];
+    const trySwap = jest.fn().mockResolvedValue();
+    const event = {
+      changedTouches: [{ clientX: 200, clientY: 100 }],
+      preventDefault: jest.fn(),
+    };
+
+    await handleTouchEnd(event, gameState, sourceCell, 100, 100, setTouchStartCell, 3, board, trySwap);
+
+    expect(trySwap).toHaveBeenCalledWith(sourceCell, cells[1]);
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(gameState.touchStartCell).toBeNull();
+  });
+
+  test('swipes down to adjacent target', async () => {
+    const board = buildBoard(3);
+    const cells = Array.from(board.querySelectorAll('.cell'));
+    const sourceCell = cells[1];
+    const trySwap = jest.fn().mockResolvedValue();
+    const event = {
+      changedTouches: [{ clientX: 100, clientY: 250 }],
+      preventDefault: jest.fn(),
+    };
+
+    await handleTouchEnd(event, gameState, sourceCell, 100, 100, setTouchStartCell, 3, board, trySwap);
+
+    expect(trySwap).toHaveBeenCalledWith(sourceCell, cells[4]);
+  });
+
+  test('does not swap when swipe would cross left boundary', async () => {
+    const board = buildBoard(3);
+    const cells = Array.from(board.querySelectorAll('.cell'));
+    const sourceCell = cells[0];
+    const trySwap = jest.fn();
+    const event = {
+      changedTouches: [{ clientX: 50, clientY: 100 }],
+      preventDefault: jest.fn(),
+    };
+
+    await handleTouchEnd(event, gameState, sourceCell, 100, 100, setTouchStartCell, 3, board, trySwap);
+
+    expect(trySwap).not.toHaveBeenCalled();
+  });
+
+  test('returns early when source cell is not present in board', async () => {
+    const board = buildBoard(3);
+    const detachedCell = document.createElement('div');
+    detachedCell.classList.add('cell');
+    const trySwap = jest.fn();
+    const event = {
+      changedTouches: [{ clientX: 200, clientY: 100 }],
+      preventDefault: jest.fn(),
+    };
+
+    await handleTouchEnd(event, gameState, detachedCell, 100, 100, setTouchStartCell, 3, board, trySwap);
+
+    expect(trySwap).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+
+  test('returns early when resolving or without a starting cell', async () => {
+    const board = buildBoard(3);
+    const event = {
+      changedTouches: [{ clientX: 200, clientY: 100 }],
+      preventDefault: jest.fn(),
+    };
+    const trySwap = jest.fn();
+
+    gameState.isResolving = true;
+    await handleTouchEnd(event, gameState, board.querySelector('.cell'), 100, 100, setTouchStartCell, 3, board, trySwap);
+    expect(trySwap).not.toHaveBeenCalled();
+
+    gameState.isResolving = false;
+    await handleTouchEnd(event, gameState, null, 100, 100, setTouchStartCell, 3, board, trySwap);
     expect(trySwap).not.toHaveBeenCalled();
   });
 });

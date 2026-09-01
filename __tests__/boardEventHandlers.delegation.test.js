@@ -113,4 +113,17 @@ describe('boardEventHandlers delegation', () => {
     expect(typeof areAdjacentArg).toBe('function');
     expect(trySwapArg).toBe(trySwap);
   });
+
+  test("onActivate's adjacency check is bound to the current board", () => {
+    const cellA = document.createElement('div');
+    const cellB = document.createElement('div');
+    const cellC = document.createElement('div');
+    board.append(cellA, cellB, cellC); // indexes 0, 1, 2 -> A/B adjacent, A/C are not
+
+    boardEventHandlers.onActivate({});
+    const areAdjacentArg = interactionMock.handleCellActivate.mock.calls[0][3];
+
+    expect(areAdjacentArg(cellA, cellB)).toBe(true);
+    expect(areAdjacentArg(cellA, cellC)).toBe(false);
+  });
 });
