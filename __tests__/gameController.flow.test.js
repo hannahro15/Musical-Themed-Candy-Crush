@@ -43,7 +43,6 @@ jest.mock('../src/timer.js', () => ({
 
 jest.mock('../src/events.js', () => ({
   wireUpCellEvents: jest.fn(),
-  attachEventListeners: jest.fn(),
 }));
 
 jest.mock('../src/boardEventHandlers.js', () => ({
@@ -119,7 +118,6 @@ describe('gameController flow', () => {
     dom.restartGameBtn = el(true);
     dom.playButton = el();
     dom.homeBtn = el(true);
-    dom.restartContainer = el(true);
     dom.restartLevelModal = el(true);
     dom.confirmRestartBtn = el();
     dom.nextLevelModal = el(true);
@@ -279,8 +277,11 @@ describe('gameController flow', () => {
 
   test('nextLevel advances to the next level and saves the highest level reached', () => {
     gameState.level = 1;
+    // totalScore is kept live in sync with score during play (see
+    // boardController.js), so by the time nextLevel() runs it already
+    // reflects the level just completed — nextLevel() must not add score again.
     gameState.score = 50;
-    gameState.totalScore = 0;
+    gameState.totalScore = 50;
     dom.nextLevelModal.classList.remove('hidden');
     nextLevel();
     expect(gameState.totalScore).toBe(50);
@@ -292,15 +293,16 @@ describe('gameController flow', () => {
 
   test('nextLevel finishes the game after the last level', () => {
     gameState.level = mockLevels.length;
+    // totalScore already includes score (see comment above).
     gameState.score = 30;
     gameState.totalScore = 70;
     dom.nextLevelModal.classList.remove('hidden');
     nextLevel();
-    expect(gameState.totalScore).toBe(100);
-    expect(storageMock.saveHighScore).toHaveBeenCalledWith(100);
+    expect(gameState.totalScore).toBe(70);
+    expect(storageMock.saveHighScore).toHaveBeenCalledWith(70);
     expect(storageMock.saveHighestLevel).toHaveBeenCalledWith(mockLevels.length);
     expect(storageMock.clearGameProgress).toHaveBeenCalled();
-    expect(dom.congratsFinalScore.textContent).toBe('Total Score: 100');
+    expect(dom.congratsFinalScore.textContent).toBe('Total Score: 70');
     expect(dom.congratsModal.classList.contains('hidden')).toBe(false);
     expect(dom.nextLevelModal.classList.contains('hidden')).toBe(true);
   });

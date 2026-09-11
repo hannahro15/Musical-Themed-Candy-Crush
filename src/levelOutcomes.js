@@ -3,17 +3,20 @@ import { gameState } from './gameState.js';
 import { LEVELS } from './levels.js';
 import { saveHighScore, saveHighestLevel, clearGameProgress } from './storage.js';
 import { announce } from './utils.js';
+import { stopTimer } from './timer.js';
 
 
 export function handleLevelWin() {
     gameState.levelComplete = true;
     gameState.timerActive = false;
-    if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+    stopTimer(gameState);
     const isFinalLevel = gameState.level >= LEVELS.length;
 
     if (isFinalLevel) {
-        const finalScore = gameState.totalScore + gameState.score;
-        gameState.totalScore = finalScore;
+        // gameState.totalScore is already kept live in sync with each
+        // match's score gain (see boardController.js's
+        // updateScoreAndObjectives), so it already includes gameState.score.
+        const finalScore = gameState.totalScore;
         gameState.score = 0;
 
         saveHighScore(finalScore);
@@ -41,7 +44,7 @@ export function handleLevelWin() {
 export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
     gameState.levelComplete = true;
     gameState.timerActive = false;
-    if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+    stopTimer(gameState);
 
     // Decrement lives and update display
     if (Number.isFinite(gameState.lives) && gameState.lives > 0) {
@@ -54,8 +57,9 @@ export function handleLevelLose(restartContainer, restartBtn, nextLevelBtn) {
 
     // If out of lives, show game over modal instead of restart modal
     if (gameState.lives <= 0) {
-        const finalScore = gameState.totalScore + gameState.score;
-        gameState.totalScore = finalScore;
+        // gameState.totalScore already includes gameState.score — see the
+        // matching comment in the final-level branch of handleLevelWin above.
+        const finalScore = gameState.totalScore;
         gameState.score = 0;
 
         // Save high score if it's a new record and clear saved progress

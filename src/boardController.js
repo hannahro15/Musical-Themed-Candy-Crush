@@ -2,7 +2,7 @@
 // boardController.js - Handles board swapping and match resolution logic
 import { swapCellContents, scoreForMatch } from './game.js';
 import { getLevelConfig } from './levels.js';
-import { findMatches, dropAndRefill, hasPossibleMoves } from './board.js';
+import { findMatches, dropAndRefill, hasPossibleMoves, updateCellClass } from './board.js';
 import { updateMovesDisplay, updateScoreDisplay, updateObjectiveCounters, updateTotalScoreDisplay } from './ui.js';
 import { gameState } from './gameState.js';
 import { BOARD_SIZE, SYMBOLS } from './constants.js';
@@ -51,7 +51,7 @@ export async function trySwap(sourceCell, targetCell) {
   if (checkWinCondition(config)) {
     // Use handleLevelWin to show modal and update state
     await wait(250); // Animation delay for match clear
-    import('./levelOutcomes.js').then(({ handleLevelWin }) => {
+    await import('./levelOutcomes.js').then(({ handleLevelWin }) => {
       handleLevelWin();
     });
     gameState.isResolving = false;
@@ -82,11 +82,15 @@ export async function trySwap(sourceCell, targetCell) {
  */
 async function swapAndCheckMatch(sourceCell, targetCell) {
   swapCellContents(sourceCell, targetCell);
+  updateCellClass(sourceCell);
+  updateCellClass(targetCell);
   await wait(180);
   let matches = findMatches(gameBoard, BOARD_SIZE);
   const swappedInMatch = matches.some(group => group.includes(sourceCell) || group.includes(targetCell));
   if (matches.length === 0 || !swappedInMatch) {
     swapCellContents(sourceCell, targetCell);
+    updateCellClass(sourceCell);
+    updateCellClass(targetCell);
     return false;
   }
   // Decrement movesLeft and update display for a valid swap

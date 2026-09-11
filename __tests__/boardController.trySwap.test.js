@@ -12,6 +12,7 @@ jest.mock('../src/board.js', () => ({
   hasPossibleMoves: jest.fn(() => true),
   getSafeSymbol: jest.fn(),
   reshuffleBoard: jest.fn(),
+  updateCellClass: jest.fn(),
 }));
 
 jest.mock('../src/levels.js', () => ({

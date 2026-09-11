@@ -38,6 +38,8 @@ describe('levelOutcomes', () => {
 
   test('handleLevelWin shows congratulations modal on the final level', () => {
     gameState.level = LEVELS.length;
+    // totalScore is kept live in sync with score during play, so it already
+    // includes the level's score by the time handleLevelWin() runs.
     gameState.score = 125;
     gameState.totalScore = 400;
 
@@ -65,10 +67,10 @@ describe('levelOutcomes', () => {
     expect(gameState.timerActive).toBe(false);
     expect(congratsModal.classList.contains('hidden')).toBe(false);
     expect(nextLevelModal.classList.contains('hidden')).toBe(true);
-    expect(gameState.totalScore).toBe(525);
+    expect(gameState.totalScore).toBe(400);
     expect(gameState.score).toBe(0);
-    expect(congratsFinalScore.textContent).toBe('Total Score: 525');
-    expect(getHighScore()).toBe(525);
+    expect(congratsFinalScore.textContent).toBe('Total Score: 400');
+    expect(getHighScore()).toBe(400);
     expect(getHighestLevel()).toBe(LEVELS.length);
     expect(loadGameProgress()).toBeNull();
   });
@@ -104,6 +106,8 @@ describe('levelOutcomes', () => {
   
   test("lives do not go below 0 if gamrState.lives is already 0", () => {
     gameState.lives = 0; // Set lives to 0 before calling handleLevelLose
+    // totalScore is kept live in sync with score during play, so it already
+    // includes the level's score by the time handleLevelLose() runs.
     gameState.score = 75;
     gameState.totalScore = 200;
 
@@ -126,11 +130,11 @@ describe('levelOutcomes', () => {
     handleLevelLose(restartContainer, restartBtn, nextLevelBtn);
 
     expect(gameState.lives).toBe(0); // Lives should not go below 0
-    expect(gameState.totalScore).toBe(275);
+    expect(gameState.totalScore).toBe(200);
     expect(gameState.score).toBe(0);
     expect(gameOverModal.classList.contains('hidden')).toBe(false);
-    expect(gameOverFinalScore.textContent).toBe('Total Score: 275');
-    expect(getHighScore()).toBe(275);
+    expect(gameOverFinalScore.textContent).toBe('Total Score: 200');
+    expect(getHighScore()).toBe(200);
   });
 
   test('livesDisplay is updated if present in the DOM when handleLevelLose is called', () => {
@@ -253,6 +257,8 @@ describe('levelOutcomes', () => {
 
   test('handelLevelWin updates total score and resets current score', () => {
     gameState.level = LEVELS.length; // Set to final level
+    // totalScore is kept live in sync with score during play, so it already
+    // includes the level's score by the time handleLevelWin() runs.
     gameState.score = 150;
     gameState.totalScore = 350;
 
@@ -267,9 +273,9 @@ describe('levelOutcomes', () => {
 
     handleLevelWin();
 
-    expect(gameState.totalScore).toBe(500);
+    expect(gameState.totalScore).toBe(350);
     expect(gameState.score).toBe(0);
-    expect(congratsFinalScore.textContent).toBe('Total Score: 500');
+    expect(congratsFinalScore.textContent).toBe('Total Score: 350');
 
     // Clean up
     document.body.removeChild(congratsModal);

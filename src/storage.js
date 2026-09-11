@@ -53,14 +53,6 @@ export function saveHighestLevel(level) {
   return false;
 }
 
-export function clearStorage() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (e) {
-    console.error('Error clearing localStorage:', e);
-  }
-}
-
 export function saveGameProgress(gameState, boardState) {
   const parsed = readStore();
 

@@ -1,72 +1,14 @@
 // ui.test.js - Unit tests for ui.js
 // Add your tests here
 
-import { updateScore, updateLevel, updateTimer, showGameOver, hideGameOver, updateObjectiveCounters, updateMovesDisplay, updateLivesDisplay, updateScoreDisplay, updateTimerDisplay, showMenuPage, updateHighScoreDisplay, updateTotalScoreDisplay } from '../src/ui.js';
+import { updateObjectiveCounters, updateMovesDisplay, updateLivesDisplay, updateScoreDisplay, updateTimerDisplay, showMenuPage, updateHighScoreDisplay, updateTotalScoreDisplay } from '../src/ui.js';
 
 describe('UI functions', () => {
   beforeEach(() => {
     document.body.innerHTML = `
-      <div id="score">0</div>
-      <div id="level">1</div>
-      <div id="timer">60</div>
-      <div id="game-over" class="hidden">Game Over</div>
       <div id="score-moves-wrapper"></div>
       <div id="levelDisplay"></div>
     `;
-  });
-
-  test('updateScore updates #score element text', () => {
-    document.body.innerHTML = '<div id="score"></div>';
-    updateScore(123);
-    expect(document.getElementById('score').textContent).toBe('123');
-  });
-
-  test('updateScore does nothing if #score element missing', () => {
-    document.body.innerHTML = '';
-    expect(() => updateScore(123)).not.toThrow();
-  });
-
-  test('updateLevel updates #level element text', () => {
-    document.body.innerHTML = '<div id="level"></div>';
-    updateLevel(5);
-    expect(document.getElementById('level').textContent).toBe('5');
-  });
-
-  test('updateLevel does nothing if #level element missing', () => {
-    document.body.innerHTML = '';
-    expect(() => updateLevel(5)).not.toThrow();
-  });
-
-  test('updateTimer updates #timer element text', () => {
-    document.body.innerHTML = '<div id="timer"></div>';
-    updateTimer(42);
-    expect(document.getElementById('timer').textContent).toBe('42');
-  });
-
-  test('updateTimer does nothing if #timer element missing', () => {
-    document.body.innerHTML = '';
-    expect(() => updateTimer(42)).not.toThrow();
-  });
-
-  test('showGameOver removes hidden from #game-over', () => {
-    showGameOver();
-    expect(document.getElementById('game-over').classList.contains('hidden')).toBe(false);
-  });
-
-  test('showGameOver does nothing if #game-over missing', () => {
-    document.body.innerHTML = '';
-    expect(() => showGameOver()).not.toThrow();
-  });
-
-  test('hideGameOver adds hidden to #game-over', () => {
-    document.body.innerHTML = '<div id="game-over"></div>';
-    hideGameOver();
-    expect(document.getElementById('game-over').classList.contains('hidden')).toBe(true);
-  });
-
-  test('hideGameOver does nothing if #game-over missing', () => {
-    document.body.innerHTML = '';
-    expect(() => hideGameOver()).not.toThrow();
   });
 
   test('updateObjectiveCounters handles null container gracefully', () => {

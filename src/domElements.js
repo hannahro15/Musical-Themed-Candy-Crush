@@ -29,12 +29,10 @@ export const scoreMovesWrapper = document.getElementById('score-moves-wrapper');
 export const objectiveCounters = document.getElementById('objective-counters');
 
 // Restart level modal
-export const restartContainer = document.getElementById('restartLevelModal');
 export const restartLevelModal = document.getElementById('restartLevelModal');
 export const confirmRestartBtn = document.getElementById('confirmRestartBtn');
 export const cancelRestartBtn = document.getElementById('cancelRestartBtn');
 export const closeRestartModal = document.getElementById('closeRestartModal');
-export const restartTrigger = document.getElementById('restartBtn');
 
 // Next level modal
 export const nextLevelModal = document.getElementById('nextLevelModal');

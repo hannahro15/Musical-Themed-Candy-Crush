@@ -5,7 +5,6 @@ import {
   saveHighScore,
   getHighestLevel,
   saveHighestLevel,
-  clearStorage,
   saveGameProgress,
   loadGameProgress,
   clearGameProgress
@@ -68,27 +67,12 @@ describe('storage.js', () => {
     expect(getHighestLevel()).toBe(0);
   });
 
-  test('clearStorage from storage.js clears localStorage', () => {
-    saveHighScore(200);
-    saveHighestLevel(15);
-    localStorage.clear();
-    expect(getHighScore()).toBe(0);
-    expect(getHighestLevel()).toBe(0);
-  });
-
   test('savedProgress is cleared after game over', () => {
     saveHighScore(250);
     saveHighestLevel(20);
     localStorage.clear();
     expect(getHighScore()).toBe(0);
     expect(getHighestLevel()).toBe(0);
-  });
-
-  test('clearStorage removes the musicalMatchSaga key from localStorage', () => {
-    saveHighScore(300);
-    saveHighestLevel(25);
-    localStorage.clear();
-    expect(localStorage.getItem('musicalMatchSaga')).toBeNull();
   });
 
   test('savedGameProgress stores savedProgress and objectives correctly', () => {
@@ -104,32 +88,6 @@ describe('storage.js', () => {
     localStorage.setItem('musicalMatchSaga', JSON.stringify({ savedProgress }));
     const storedData = JSON.parse(localStorage.getItem('musicalMatchSaga'));
     expect(storedData.savedProgress).toEqual(savedProgress);
-  });
-
-  test ('clearStorage clears savedProgress and objectives', () => {
-    const savedProgress = {
-      level: 4,
-      score: 600,
-      lives: 1,
-      objectives: {
-        collectRedLeft: 0,
-        collectBlueLeft: 2
-      }
-    };
-    localStorage.setItem('musicalMatchSaga', JSON.stringify({ savedProgress }));
-    localStorage.clear();
-    const storedData = JSON.parse(localStorage.getItem('musicalMatchSaga'));
-    expect(storedData).toBeNull();
-  });
-
-  test('clearStorage does not throw error if localStorage is already empty', () => {
-    expect(() => localStorage.clear()).not.toThrow();
-  });
-
-  test('clearStorage removes the musicalMatchSaga key', () => {
-    saveHighScore(400);
-    clearStorage();
-    expect(localStorage.getItem('musicalMatchSaga')).toBeNull();
   });
 
   test('loadGameProgress returns null when nothing has been saved', () => {
@@ -188,13 +146,5 @@ describe('storage.js', () => {
     });
     expect(saveHighScore(100)).toBe(false);
     setItemSpy.mockRestore();
-  });
-
-  test('clearStorage does not throw when localStorage.removeItem throws', () => {
-    const removeItemSpy = jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
-      throw new Error('storage unavailable');
-    });
-    expect(() => clearStorage()).not.toThrow();
-    removeItemSpy.mockRestore();
   });
 });

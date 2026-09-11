@@ -83,11 +83,6 @@ function bindEvents() {
   }
 
   // Restart modal events
-  if (dom.restartTrigger) {
-    dom.restartTrigger.addEventListener('click', () => {
-      showElement(dom.restartLevelModal);
-    });
-  }
   if (dom.confirmRestartBtn) {
     dom.confirmRestartBtn.addEventListener('click', restartLevel);
   }

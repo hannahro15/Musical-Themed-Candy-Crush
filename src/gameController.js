@@ -18,10 +18,10 @@ import {
   updateCellClass
 } from './board.js';
 import { BOARD_SIZE, SYMBOLS, INITIAL_LIVES } from './constants.js';
-import { gameState, isObjectiveKey, setSelectedCell } from './gameState.js';
+import { gameState, isObjectiveKey, setSelectedCell, resetGameState } from './gameState.js';
 import { handleLevelLose } from './levelOutcomes.js';
 import { setGameBoardRef, boardEventHandlers } from './boardEventHandlers.js';
-import { startTimer } from './timer.js';
+import { startTimer, stopTimer } from './timer.js';
 import { wireUpCellEvents } from './events.js';
 import { showElement, hideElement } from './utils.js';
 import * as dom from './domElements.js';
@@ -41,7 +41,7 @@ export function showMenu() {
     dom.scoreDisplay,
     dom.timerDisplay,
     dom.livesDisplay,
-    dom.restartContainer
+    dom.restartLevelModal
   );
   
   // Show high score and highest level on menu
@@ -119,13 +119,10 @@ export function hideGameOver() {
 export function goHome() {
   // Auto-save progress before going home
   autoSaveProgress();
-  
-  // Stop timer if active
-  if (gameState.timerInterval) {
-    clearInterval(gameState.timerInterval);
-    gameState.timerActive = false;
-  }
-  
+
+  gameState.timerActive = false;
+  stopTimer(gameState);
+
   // Return to menu
   showMenu();
 }
@@ -151,18 +148,19 @@ function clearObjectives() {
 
 function getCurrentBoardState() {
   const board = [];
-  const cells = dom.gameBoard.querySelectorAll('.cell');
-  
+  // Cells aren't tagged with dataset.row/col during normal play (only
+  // restoreBoardState() sets those, when rebuilding from a save) — read
+  // position from DOM order instead, which board.js always keeps row-major.
+  const cells = Array.from(dom.gameBoard.querySelectorAll('.cell'));
+
   for (let i = 0; i < BOARD_SIZE; i++) {
     board[i] = [];
     for (let j = 0; j < BOARD_SIZE; j++) {
-      const cell = Array.from(cells).find(c => 
-        parseInt(c.dataset.row) === i && parseInt(c.dataset.col) === j
-      );
+      const cell = cells[i * BOARD_SIZE + j];
       board[i][j] = cell ? cell.textContent : '';
     }
   }
-  
+
   return board;
 }
 
@@ -284,7 +282,7 @@ export function continueGame() {
     startTimer(
       gameState,
       dom.timerDisplay,
-      () => handleLevelLose(dom.restartContainer, dom.confirmRestartBtn, dom.confirmNextLevelBtn)
+      () => handleLevelLose(dom.restartLevelModal, dom.confirmRestartBtn, dom.confirmNextLevelBtn)
     );
   }
 }
@@ -350,13 +348,7 @@ export function startLevel(levelNumber) {
 
   setSelectedCell(null);
   gameState.level = levelNumber;
-  gameState.levelComplete = false;
-  gameState.movesLeft = config.moves;
-  gameState.timer = config.timer;
-  gameState.timerActive = true;
-  gameState.score = 0;
-
-  loadObjectives(config);
+  resetGameState(config);
 
   renderLevel(config);
   generateBoard();
@@ -364,7 +356,7 @@ export function startLevel(levelNumber) {
   startTimer(
     gameState,
     dom.timerDisplay,
-    () => handleLevelLose(dom.restartContainer, dom.confirmRestartBtn, dom.confirmNextLevelBtn)
+    () => handleLevelLose(dom.restartLevelModal, dom.confirmRestartBtn, dom.confirmNextLevelBtn)
   );
 }
 
@@ -390,20 +382,22 @@ export function restartLevel() {
 }
 
 export function nextLevel() {
-  // Add current level score to total score
-  gameState.totalScore += gameState.score;
-  
+  // gameState.totalScore is already kept live in sync with each match's
+  // score gain (see boardController.js's updateScoreAndObjectives), so it
+  // already reflects the level just completed — adding gameState.score
+  // again here would double-count it.
+
   if (gameState.level >= LEVELS.length) {
     // Game completed - save high score and highest level
     saveHighScore(gameState.totalScore);
     saveHighestLevel(LEVELS.length);
     clearGameProgress(); // Clear saved progress when game is completed
-    
+
     // Display final score in congratulations modal
     if (dom.congratsFinalScore) {
       dom.congratsFinalScore.textContent = `Total Score: ${gameState.totalScore.toLocaleString()}`;
     }
-    
+
     showElement(dom.congratsModal);
     hideElement(dom.nextLevelModal);
     return;
