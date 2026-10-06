@@ -35,7 +35,7 @@ export default [
     }
   },
   {
-    files: ['build-www.js', 'jest.config.js', 'eslint.config.js'],
+    files: ['jest.config.js', 'eslint.config.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -45,6 +45,6 @@ export default [
     }
   },
   {
-    ignores: ['www/**', 'coverage/**', 'android/**', 'node_modules/**']
+    ignores: ['coverage/**', 'node_modules/**']
   }
 ];

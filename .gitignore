@@ -4,7 +4,6 @@ node_modules/
 # Build output
 dist/
 build/
-www/
 
 # Test coverage
 coverage/
@@ -22,12 +21,6 @@ yarn-error.log*
 
 # Environment variables
 .env
-
-# Android release signing
-android/keystore.properties
-android/*.jks
-android/*.keystore
-android/*.pem
 
 # Jest cache
 .jest/

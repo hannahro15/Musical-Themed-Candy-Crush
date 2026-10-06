@@ -154,41 +154,6 @@ function bindEvents() {
 }
 
 /* -----------------------------------
-   ANDROID BACK BUTTON (Capacitor)
------------------------------------ */
-
-/**
- * Wires the hardware/gesture back button on Android to something sane:
- * close whichever modal is open, else fall back to the Home button's own
- * confirm-and-save flow during gameplay, else exit the app from the menu.
- *
- * The project has no JS bundler, so the @capacitor/app plugin (installed
- * so `npx cap sync` pulls in its native Android code) is reached via the
- * `window.Capacitor` bridge the native shell injects at runtime, rather
- * than an ES import — that import wouldn't resolve in a plain browser
- * (including the GitHub Pages build), and this guards to a no-op there.
- */
-function bindAndroidBackButton() {
-  const CapacitorApp = window.Capacitor?.Plugins?.App;
-  if (!CapacitorApp?.addListener) return;
-
-  CapacitorApp.addListener('backButton', () => {
-    const openModal = document.querySelector('.modal:not(.hidden)');
-    if (openModal) {
-      hideElement(openModal);
-      return;
-    }
-
-    if (dom.container?.classList.contains('game-active')) {
-      dom.homeBtn?.click();
-      return;
-    }
-
-    CapacitorApp.exitApp();
-  });
-}
-
-/* -----------------------------------
    INITIALIZATION
 ----------------------------------- */
 
@@ -201,7 +166,6 @@ function init() {
   });
 
   bindEvents();
-  bindAndroidBackButton();
   showMenu();
 }
 
