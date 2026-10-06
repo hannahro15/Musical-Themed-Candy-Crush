@@ -48,10 +48,16 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
+      # Publish only the game itself, not node_modules, tests or config
+      - name: Collect site files
+        run: |
+          mkdir _site
+          cp -r index.html privacy.html manifest.json src styles images _site/
+
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
